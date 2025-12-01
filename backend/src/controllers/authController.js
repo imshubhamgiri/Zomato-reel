@@ -108,7 +108,7 @@ authController.loginFodPartner = async (req, res) => {
         )
         res.cookie('token',token)
        return res.status(200).json({
-        message:"Registration successful",
+        message:"login successful",
         user:{id:existing._id.toString(), name: existing.name,  email: existing.email, }})
     } catch (error) {
         console.log('login error', error)
