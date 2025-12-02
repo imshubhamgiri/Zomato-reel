@@ -15,7 +15,7 @@ authController.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ name, email, password: hashedPassword });
         await newUser.save();
-        const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ Id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.cookie("token", token);
         res.status(201).json({ 
             user: { id: newUser._id.toString(), name: newUser.name, email: newUser.email },
@@ -39,7 +39,7 @@ authController.login = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ Id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 3600000 });
         res.status(200).json({ 
             user: { id: user._id, name: user.name, email: user.email },

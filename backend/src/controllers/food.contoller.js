@@ -38,10 +38,10 @@ foodController.addFoodItem = async (req, res) => {
     }
 };
 
-foodController.listfoodItems = async (req, res) => {
+foodController.getFoodItems = async (req, res) => {
     try {
         const foodItems = await food.find().populate('foodPartner', 'name');
-        res.status(200).json(foodItems);
+        res.status(200).json({ message: 'Food items retrieved successfully', fooditems: foodItems });
     } catch (error) {
         res.status(500).json({ message: 'Failed to retrieve food items', error });
     }
