@@ -4,7 +4,8 @@ import ProfileDropdown from '../components/ProfileDropdown';
 
 function UserProfile() {
   // Mock user data - will be replaced with actual API data
-  const user = {
+  
+  const user = JSON.parse(localStorage.getItem('user')) || {
     name: 'John Doe',
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
@@ -40,7 +41,7 @@ function UserProfile() {
               </div>
               <div className="text-white">
                 <h1 className="text-3xl font-bold">{user.name}</h1>
-                <p className="text-red-100 mt-1">Member since {user.memberSince}</p>
+                <p className="text-red-100 mt-1">Member since {user.memberSince || 'N/A'} </p>
               </div>
             </div>
           </div>
@@ -62,7 +63,7 @@ function UserProfile() {
                   <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                     Phone Number
                   </label>
-                  <p className="text-gray-900 dark:text-white">{user.phone}</p>
+                  <p className="text-gray-900 dark:text-white">{user.phone || 'Not added Yet/N/A'}</p>
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">

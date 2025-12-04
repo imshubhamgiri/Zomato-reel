@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { userAPI } from '../services/api';
 
-function ProfileDropdown({ user, type = 'user' }) {
+function ProfileDropdown({ user, type  }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -22,6 +22,9 @@ function ProfileDropdown({ user, type = 'user' }) {
     userAPI.logout().then((response) => {
       // Handle post-logout actions here, e.g., redirect to login page
     console.log( response )
+    localStorage.removeItem('user');
+    window.location.href = '/';
+    window.location.reload()
     }).catch((error) => {
       console.error('Logout failed:', error);
     });

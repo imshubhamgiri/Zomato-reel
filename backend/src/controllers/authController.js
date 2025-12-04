@@ -59,7 +59,7 @@ authController.logoutuser = (req, res) => {
 
 authController.registerFodPartner = async (req, res) => {
     // Implementation for food partner registration
-    const { name, email, password } = req.body;
+    const { name, email, password , restaurantName } = req.body;
     // Similar logic as user registration can be applied here
     try {
         
@@ -69,7 +69,7 @@ authController.registerFodPartner = async (req, res) => {
         }
          
          const hashedPassword = await bcrypt.hash(password , 10);
-       const newUser = new FoodPartner({ name, email, password: hashedPassword });
+       const newUser = new FoodPartner({ name, email, restaurantName, password: hashedPassword });
          await newUser.save();
         const token = jwt.sign(
             {Id:newUser._id},
@@ -109,7 +109,7 @@ authController.loginFodPartner = async (req, res) => {
         res.cookie('token',token)
        return res.status(200).json({
         message:"login successful",
-        user:{id:existing._id.toString(), name: existing.name,  email: existing.email, }})
+        user:{id:existing._id.toString(), name: existing.name,restaurantName: existing.restaurantName, email: existing.email, }})
     } catch (error) {
         console.log('login error', error)
         res.status(500).json({message:"server error",error})
