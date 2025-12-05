@@ -59,17 +59,18 @@ authController.logoutuser = (req, res) => {
 
 authController.registerFodPartner = async (req, res) => {
     // Implementation for food partner registration
-    const { name, email, password , restaurantName } = req.body;
+    const { name, email, password , restaurantName, phone , address } = req.body;
+    console.log({ name, email, password , restaurantName, phone , address });
     // Similar logic as user registration can be applied here
     try {
         
         const existing = await FoodPartner.findOne({email}).lean()
         if(existing){
-             return res.status(400).json({ message: 'User already exists' });
+             return res.status(400).json({ message: 'Email already exists', field: 'email' });
         }
          
          const hashedPassword = await bcrypt.hash(password , 10);
-       const newUser = new FoodPartner({ name, email, restaurantName, password: hashedPassword });
+       const newUser = new FoodPartner({ name, email, restaurantName, phone,address, password: hashedPassword });
          await newUser.save();
         const token = jwt.sign(
             {Id:newUser._id},
@@ -79,9 +80,9 @@ authController.registerFodPartner = async (req, res) => {
         res.cookie('token',token)
        return res.status(201).json({
         message:"Registration successful",
-        user:{id:newUser._id.toString(),name: newUser.name,  email: newUser.email, }})
+        user:{id:newUser._id.toString(),name: newUser.name,phone: newUser.phone,restaurantName:newUser.restaurantName, address: newUser.address, email: newUser.email, }})
     } catch (error) {
-        console.log('login error', error)
+        console.log('Registration error', error)
         res.status(500).json({message:"server error",error})
     }
 
@@ -95,11 +96,14 @@ authController.loginFodPartner = async (req, res) => {
         
         const existing = await FoodPartner.findOne({email}).lean()
         if(!existing){
+           console.log("User not found");
            return res.status(400).json({message:"invalid credential"})
         } 
        const isMatch = await bcrypt.compare(password, existing.password);
        if(!isMatch){
+            console.log("password did not match");
           return res.status(400).json({message:"invalid credential"})
+
        }
         const token = jwt.sign(
             {Id:existing._id},
@@ -109,7 +113,7 @@ authController.loginFodPartner = async (req, res) => {
         res.cookie('token',token)
        return res.status(200).json({
         message:"login successful",
-        user:{id:existing._id.toString(), name: existing.name,restaurantName: existing.restaurantName, email: existing.email, }})
+        user:{id:existing._id.toString(), name: existing.name,restaurantName: existing.restaurantName,phone: existing.phone, address: existing.address, email: existing.email, }})
     } catch (error) {
         console.log('login error', error)
         res.status(500).json({message:"server error",error})

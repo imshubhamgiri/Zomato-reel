@@ -1,27 +1,48 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { partnerAPI } from '../services/api';
+import { partnerAPI, authAPI } from '../services/api';
 
 function PartnerRegister() {
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
+  const [loading, setloading] = useState(false)
 
   const handleSubmit = async (e) => {
+    setloading(true)
     e.preventDefault();
+
     const restaurantName = e.target['restaurant-name'].value;
-    const ownerName = e.target['owner-name'].value;
+    const name = e.target['owner-name'].value;
     const email = e.target.email.value;
     const phone = e.target.phone.value;
     const password = e.target.password.value;
+    const address = e.target.address.value
 
+    console.table({ restaurantName,name, email, phone, address, password });
+    setEmailError('');
+    setError('');
+    // setloading(false)
     try {
-      const response = await partnerAPI.register(restaurantName, ownerName, email, phone, password);
+      const response = await partnerAPI.register({ restaurantName, name, email, phone, address, password });
       console.log(response);
-      // Navigate to partner profile after successful registration
-      navigate('/partner/profile');
+      
+      // Check user type and navigate accordingly
+      const authCheck = await authAPI.checkAuth();
+      if (authCheck.userType === 'partner') {
+        navigate('/partner/profile');
+      } else {
+        navigate('/user/profile');
+      }
     } catch (error) {
-      console.error(error);
-      setError('Registration failed. Please try again.');
+      console.error('Registration error:', error);
+      if (error.response?.data?.field === 'email') {
+        setEmailError(error.response.data.message);
+      } else {
+        setError(error.response?.data?.message || 'Registration failed. Please try again.');
+      }
+    }finally{
+      setloading(false)
     }
   };
 
@@ -83,9 +104,14 @@ function PartnerRegister() {
                 type="email"
                 autoComplete="email"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+                  emailError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
+                }`}
                 placeholder="partner@restaurant.com"
               />
+              {emailError && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{emailError}</p>
+              )}
             </div>
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -98,7 +124,21 @@ function PartnerRegister() {
                 autoComplete="tel"
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                placeholder="+1 (555) 000-0000"
+                placeholder="+91 (555) 000-0000"
+              />
+            </div>
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Address
+              </label>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                autoComplete="street-address"
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                placeholder="123 Main St, City, State, ZIP"
               />
             </div>
             <div>
@@ -137,8 +177,9 @@ function PartnerRegister() {
             <button
               type="submit"
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            disabled={loading}
             >
-              Register restaurant
+              {loading ? 'Registering...' : 'Register restaurant'}
             </button>
           </div>
 

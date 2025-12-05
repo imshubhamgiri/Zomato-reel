@@ -8,6 +8,7 @@ import PartnerLogin from './pages/PartnerLogin';
 import PartnerRegister from './pages/PartnerRegister';
 import PartnerProfile from './pages/PartnerProfile';
 import PartnerProfileUser from './pages/PartnerProfileUser';
+import Addfood from './pages/Addfood';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/partner/login" element={<PartnerLogin />} />
         <Route path="/partner/profile" element={<PartnerProfile />} />
         <Route path="/profile/foodpartner/:id" element={<PartnerProfileUser />} />
+        <Route path='/partner/addfood' element={<Addfood/>}/>
       </Routes>
       
     </>

@@ -52,14 +52,22 @@ async function loginMiddleware(req, res) {
             return res.status(401).json({ message: 'Invalid token' });
         }
         
-        // Fixed: use 'restrauntName' (with typo from model) instead of 'restaurantName'
-        return res.status(200).json({
+        const userType = user.restaurantName ? 'partner' : 'user';
+        const responseData = {
             message: "User found",
-            name: user.name || user.restrauntName,  // Changed from restaurantName
+            id: user._id.toString(),
+            name: user.name,
             email: user.email,
-            restaurantName: user.restrauntName,      // Changed from restaurantName
-            userType: user.restrauntName ? 'partner' : 'user'  // Changed from restaurantName
-        });
+            userType: userType
+        };
+        
+        if (userType === 'partner') {
+            responseData.restaurantName = user.restaurantName;
+            responseData.phone = user.phone;
+            responseData.address = user.address;
+        }
+        
+        return res.status(200).json(responseData);
     } catch (error) {
         return res.status(401).json({ message: 'Authentication failed: ' + error.message });
     }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { userAPI } from '../services/api';
+import { userAPI, authAPI } from '../services/api';
 
 function UserLogin() {
     const [error, setError] = useState('');
@@ -14,8 +14,14 @@ function UserLogin() {
         try {
             const response = await userAPI.login(email, password);
             console.log(response);
-            // Navigate to user profile after successful login
-            navigate('/user/profile');
+            
+            // Check user type and navigate accordingly
+            const authCheck = await authAPI.checkAuth();
+            if (authCheck.userType === 'partner') {
+                navigate('/partner/profile');
+            } else {
+                navigate('/user/profile');
+            }
         } catch (error) {
             console.error(error);
             setError('Login failed. Please check your credentials.');

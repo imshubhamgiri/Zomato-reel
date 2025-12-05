@@ -1,20 +1,44 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
-
+import { authAPI } from '../services/api';
+ import { ToastContainer, toast } from 'react-toastify';
 function PartnerProfile() {
-  // Mock partner data - will be replaced with actual API data
-  const partner = {
-    restaurantName: 'Delicious Bites',
-    ownerName: 'Jane Smith',
-    name: 'Jane Smith',
-    email: 'partner@deliciousbites.com',
-    phone: '+1 (555) 987-6543',
-    address: '456 Restaurant Ave, NY 10002',
-    memberSince: 'March 2023',
-    status: 'Active',
-    totalOrders: 1234,
-  };
+  const [partner, setPartner] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPartnerData = async () => {
+      try {
+        const response = await authAPI.checkAuth();
+        if (response.userType !== 'partner') {
+          navigate('/user/profile');
+          return;
+        }
+        setPartner(response);
+      } catch (error) {
+        console.error('Error fetching partner data:', error);
+        navigate('/partner/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPartnerData();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!partner) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -45,13 +69,13 @@ function PartnerProfile() {
                 </div>
                 <div className="text-white">
                   <h1 className="text-3xl font-bold">{partner.restaurantName}</h1>
-                  <p className="text-gray-300 mt-1">Owner: {partner.ownerName}</p>
-                  <p className="text-gray-400 text-sm mt-1">Partner since {partner.memberSince}</p>
+                  <p className="text-gray-300 mt-1">Owner: {partner.name}</p>
+                  <p className="text-gray-400 text-sm mt-1">Restaurant Partner</p>
                 </div>
               </div>
               <div className="text-right">
                 <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                  {partner.status}
+                  Active
                 </span>
               </div>
             </div>
@@ -61,15 +85,15 @@ function PartnerProfile() {
           <div className="border-b border-gray-200 dark:border-gray-700 px-8 py-6">
             <div className="grid grid-cols-3 gap-6 text-center">
               <div>
-                <p className="text-3xl font-bold text-red-600 dark:text-red-400">{partner.totalOrders}</p>
+                <p className="text-3xl font-bold text-red-600 dark:text-red-400">0</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Orders</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-red-600 dark:text-red-400">4.8</p>
+                <p className="text-3xl font-bold text-red-600 dark:text-red-400">5.0</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Rating</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-red-600 dark:text-red-400">856</p>
+                <p className="text-3xl font-bold text-red-600 dark:text-red-400">0</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Reviews</p>
               </div>
             </div>
@@ -118,6 +142,9 @@ function PartnerProfile() {
                 <button className="px-6 py-2 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg border-2 border-gray-300 dark:border-gray-600 transition-colors">
                   Analytics
                 </button>
+                <Link to={'/partner/addfood'} className='px-6 py-2 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg border-2 border-gray-300 dark:border-gray-600 transition-colors'>
+                Add Food
+                </Link>
               </div>
             </div>
           </div>

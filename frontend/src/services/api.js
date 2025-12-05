@@ -44,14 +44,8 @@ export const userAPI = {
 
 // Partner Authentication APIs
 export const partnerAPI = {
-  register: async (restaurantName, ownerName, email, phone, password) => {
-    const response = await apiClient.post('/api/auth/partner/register', {
-      restaurantName,
-      ownerName,
-      email,
-      phone,
-      password,
-    });
+  register: async (data) => {
+    const response = await apiClient.post('/api/auth/partner/register', data);
     return response.data;
   },
 
@@ -70,6 +64,14 @@ export const partnerAPI = {
 
   getProfile: async () => {
     const response = await apiClient.get('/api/auth/partner/profile');
+    return response.data;
+  },
+};
+
+// Auth check API
+export const authAPI = {
+  checkAuth: async () => {
+    const response = await apiClient.get('/api/auth/loginCheck');
     return response.data;
   },
 };

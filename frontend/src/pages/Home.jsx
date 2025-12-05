@@ -1,19 +1,30 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
 import axios from 'axios';
 
 function Home() {
+  // ---------------------------------------------------------------------------
+  // STATE MANAGEMENT
+  // ---------------------------------------------------------------------------
   const [isLoggedIn, setisLoggenIn] = useState(false);
-  const [userType] = useState('user');
+  const [userType] = useState(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    return user ? user.userType : 'user';
+  });
   const [user, setuser] = useState({});
   const [videos, setVideos] = useState([]);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const videoRefs = useRef([]);
-  const containerRef = useRef(null);
-  const touchStartY = useRef(0);
-  const isScrolling = useRef(false);
   
+  // Refs for scrolling and video management
+  const videoFeedRef = useRef(null);
+  const videoRefs = useRef([]);
+  
+  // Track the currently active video ID for UI updates (like the counter)
+  const [currentVideoId, setCurrentVideoId] = useState(null);
+
+  // ---------------------------------------------------------------------------
+  // DATA FETCHING
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     async function getdata() {
       try {
@@ -31,7 +42,7 @@ function Home() {
             restaurantName: response.data.restaurantName || 'N/A',
             userType: response.data.userType || 'user'
           });
-          localStorage.setItem('user', JSON.stringify(response.data));
+          localStorage.setItem(response.data.userType, JSON.stringify(response.data));
         }
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -42,10 +53,16 @@ function Home() {
 
     async function fetchVideos() {
       try {
-        const res = await axios.get('http://localhost:3000/api/food/listfood');
+        const res = await axios.get('http://localhost:3000/api/food/list',{
+          withCredentials: true
+        });
         const foodItems = res.data.fooditems || [];
         setVideos(foodItems);
         console.table(foodItems);
+        // Initialize current video ID if videos exist
+        if (foodItems.length > 0) {
+            setCurrentVideoId(foodItems[0]._id);
+        }
       } catch (error) {
         console.error('Error fetching videos:', error);
       }
@@ -53,93 +70,86 @@ function Home() {
     fetchVideos();
   }, []);
 
-  // Play video when it comes into view
-  useEffect(() => {
-    if (videoRefs.current[currentVideoIndex]) {
-      videoRefs.current[currentVideoIndex].play();
-    }
-    
-    // Pause other videos
-    videoRefs.current.forEach((video, index) => {
-      if (video && index !== currentVideoIndex) {
-        video.pause();
-      }
-    });
-  }, [currentVideoIndex]);
-
-  // Handle wheel scroll for desktop
-  useEffect(() => {
-    const handleWheel = (e) => {
-      e.preventDefault();
-      
-      if (!isScrolling.current && videos.length > 0) {
-        isScrolling.current = true;
-        
-        if (e.deltaY > 0 && currentVideoIndex < videos.length - 1) {
-          setCurrentVideoIndex(prev => prev + 1);
-        } else if (e.deltaY < 0 && currentVideoIndex > 0) {
-          setCurrentVideoIndex(prev => prev - 1);
-        }
-        
-        setTimeout(() => {
-          isScrolling.current = false;
-        }, 600);
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false });
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener('wheel', handleWheel);
-      }
-    };
-  }, [currentVideoIndex, videos.length]);
-
-  // Handle touch scroll for mobile
-  useEffect(() => {
-    const handleTouchStart = (e) => {
-      touchStartY.current = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e) => {
-      if (!isScrolling.current && videos.length > 0) {
-        const touchEndY = e.changedTouches[0].clientY;
-        const diff = touchStartY.current - touchEndY;
-
-        if (Math.abs(diff) > 50) {
-          isScrolling.current = true;
-
-          if (diff > 0 && currentVideoIndex < videos.length - 1) {
-            setCurrentVideoIndex(prev => prev + 1);
-          } else if (diff < 0 && currentVideoIndex > 0) {
-            setCurrentVideoIndex(prev => prev - 1);
-          }
-
-          setTimeout(() => {
-            isScrolling.current = false;
-          }, 600);
-        }
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('touchstart', handleTouchStart, { passive: true });
-      container.addEventListener('touchend', handleTouchEnd, { passive: true });
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener('touchstart', handleTouchStart);
-        container.removeEventListener('touchend', handleTouchEnd);
-      }
-    };
-  }, [currentVideoIndex, videos.length]);
+  // ---------------------------------------------------------------------------
+  // SCROLL & PLAYBACK LOGIC
+  // ---------------------------------------------------------------------------
   
+  /**
+   * Debounce utility to limit how often the scroll handler runs.
+   * This improves performance by preventing the check from running on every single pixel scroll.
+   */
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+  };
+
+  /**
+   * Finds the visible video in the viewport and controls its playback.
+   * - Plays the video that is most visible (centered).
+   * - Pauses all other videos to save resources and prevent audio overlap.
+   */
+  const updateVideoPlayback = useCallback(() => {
+    let foundVisibleId = null;
+
+    videoRefs.current.forEach((videoElement) => {
+        if (!videoElement) return;
+
+        const rect = videoElement.getBoundingClientRect();
+        // Check if the video is mostly centered in the viewport
+        // We consider it "visible" if its top is near the top of the viewport
+        const isVisible = rect.top >= -window.innerHeight / 2 && rect.bottom <= window.innerHeight * 1.5;
+        
+        if (isVisible) {
+            // This video is visible and should be playing
+            if (videoElement.paused) {
+                videoElement.play().catch(e => console.log('Autoplay blocked or playback error:', e));
+            }
+            // Store the ID from the data attribute
+            foundVisibleId = videoElement.dataset.id;
+        } else {
+            // This video is not visible and should be paused
+            if (!videoElement.paused) {
+                videoElement.pause();
+            }
+        }
+    });
+
+    // Update state to track the visible video's ID
+    if (foundVisibleId !== null) {
+        setCurrentVideoId(foundVisibleId);
+    }
+  }, []);
+
+  // Effect to set up the scroll listener on the feed container
+  useEffect(() => {
+    const feed = videoFeedRef.current;
+    if (feed && videos.length > 0) {
+        // Use debounced function for performance
+        const handleScroll = debounce(updateVideoPlayback, 50);
+        feed.addEventListener('scroll', handleScroll);
+
+        // Initial setup: attempt to play the first video immediately
+        // We need a small timeout to ensure the DOM is ready
+        setTimeout(() => {
+             updateVideoPlayback();
+        }, 100);
+
+        // Cleanup function to remove listener when component unmounts or updates
+        return () => {
+            feed.removeEventListener('scroll', handleScroll);
+        };
+    }
+  }, [videos, updateVideoPlayback]);
+
+
+  // ---------------------------------------------------------------------------
+  // MOCK DATA & HELPERS
+  // ---------------------------------------------------------------------------
   const mockUser = {
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -153,17 +163,48 @@ function Home() {
 
   const currentUser = userType === 'partner' ? mockPartner : user;
 
+  // Calculate current index for the counter
+  const currentIndex = videos.findIndex(v => v._id === currentVideoId);
+  const displayIndex = currentIndex !== -1 ? currentIndex + 1 : 1;
+
+  // ---------------------------------------------------------------------------
+  // STYLES (CSS Scroll Snap)
+  // ---------------------------------------------------------------------------
+  const customStyles = `
+    .video-feed {
+        scroll-snap-type: y mandatory; 
+        overflow-y: scroll;
+        height: 100vh;
+        /* Hide scrollbar for cleaner look */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        scroll-behavior: smooth;
+    }
+    .video-feed::-webkit-scrollbar {
+        display: none;
+    }
+    .reel-item {
+        scroll-snap-align: start;
+        height: 100vh;
+        width: 100%;
+        position: relative;
+    }
+  `;
+
   return (
     <div className="min-h-screen bg-linear-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Header with Profile Dropdown */}
+      {/* Inject custom scroll snap CSS */}
+      <style>{customStyles}</style>
+
+      {/* Header with Profile Dropdown (Only shown when NOT logged in) */}
       {!isLoggedIn && (
-        <div className="bg-white/80 h-20 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm">
+        <div className="bg-white/80 h-20 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm fixed top-0 w-full z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
               <Link to="/" className="text-2xl font-bold text-red-600">
                 Zomato
               </Link>
-              {isLoggedIn && <div className='text-white'>Hello You are Logged in</div>}
+              {!isLoggedIn && <div className='text-white'>Hello You Not Logged in</div>}
               {isLoggedIn && <ProfileDropdown user={currentUser} type={userType} />}
             </div>
           </div>
@@ -172,10 +213,11 @@ function Home() {
 
       {/* Reel View with Smooth Scrolling */}
       {isLoggedIn && videos.length > 0 ? (
-        <div ref={containerRef} className="relative h-screen w-full overflow-hidden bg-black">
+        <div className="relative h-screen w-full bg-black overflow-hidden">
+            
           {/* Fixed Header on Reel */}
-          <div className="absolute top-0 left-0 right-0 z-30 bg-linear-to-b from-black/70 to-transparent p-4">
-            <div className="flex justify-between items-center">
+          <div className="absolute top-0 left-0 right-0 z-30 bg-linear-to-b from-black/70 to-transparent p-4 pointer-events-none">
+            <div className="flex justify-between items-center pointer-events-auto">
               <Link to="/" className="text-2xl font-bold text-white">
                 Zomato
               </Link>
@@ -185,43 +227,43 @@ function Home() {
 
           {/* Scrollable Video Container */}
           <div 
-            className="relative h-full w-full transition-transform duration-500 ease-out"
-            style={{ 
-              transform: `translateY(-${currentVideoIndex * 100}vh)` 
-            }}
+            ref={videoFeedRef}
+            className="video-feed"
           >
             {videos.map((video, index) => (
               <div 
                 key={video._id} 
-                className="relative h-screen w-full flex items-center justify-center snap-start"
+                className="reel-item flex items-center justify-center bg-black"
               >
                 {/* Video */}
                 <video
                   ref={(el) => (videoRefs.current[index] = el)}
+                  data-id={video._id}
                   className="h-full w-full object-cover md:object-contain"
                   src={video.video}
                   loop
                   playsInline
-                  preload=''
-                  onClick={() => {
-                    const videoEl = videoRefs.current[index];
-                    if (videoEl.paused) {
-                      videoEl.play();
+                  muted={false} // Allow sound by default
+                  onClick={(e) => {
+                    // Toggle play/pause on click
+                    if (e.target.paused) {
+                      e.target.play();
                     } else {
-                      videoEl.pause();
+                      e.target.pause();
                     }
                   }}
                 />
 
                 {/* Video Info Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 z-20 bg-linear-to-t from-black/90 via-black/50 to-transparent p-6 pb-8">
-                  <div className="max-w-md">
+                <div className="absolute bottom-0 left-0 right-0 z-20 bg-linear-to-t from-black/90 via-black/50 to-transparent p-6 pb-20 md:pb-8 pointer-events-none">
+                  <div className="max-w-md pointer-events-auto">
                     <h2 className="text-white text-xl font-bold mb-2 flex items-center gap-2">
-                     <Link to={'/profile/foodpartner/'+ video.foodPartner?._id}> <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                     <Link to={'/profile/foodpartner/'+ video.foodPartner?._id} className="hover:underline flex items-center gap-2"> 
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                       </svg>
-                      
-                      {video.foodPartner?.name || video.foodPartner?.restrauntName || 'Restaurant'}</Link>
+                      {video.foodPartner?.name || video.foodPartner?.restrauntName || 'Restaurant'}
+                     </Link>
                     </h2>
                     
                     <h3 className="text-white text-2xl font-extrabold mb-2">
@@ -236,9 +278,9 @@ function Home() {
                       <span className="text-green-400 text-lg font-bold">
                         ₹{video.price}
                       </span>
-                      <Link className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-semibold transition-colors">
+                      <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-semibold transition-colors cursor-pointer">
                         Order Now
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -246,24 +288,16 @@ function Home() {
             ))}
           </div>
 
-          {/* Scroll Indicator */}
-          <div className="absolute right-4 bottom-32 z-30 flex flex-col items-center gap-2 animate-bounce">
-            <svg className="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-            <span className="text-white/70 text-xs">Swipe</span>
-          </div>
-
           {/* Video Counter */}
-          <div className="absolute top-24 right-4 z-30 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full">
+          <div className="absolute top-24 right-4 z-30 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full pointer-events-none">
             <span className="text-white text-sm font-medium">
-              {currentVideoIndex + 1} / {videos.length}
+              {displayIndex} / {videos.length}
             </span>
           </div>
         </div>
       ) : (
         /* Login/Signup View */
-        <div className="flex items-center justify-center px-4" style={{ minHeight: isLoggedIn ? 'calc(100vh - 64px)' : '100vh' }}>
+        <div className="flex items-center justify-center px-4 pt-20" style={{ minHeight: '100vh' }}>
           <div className="max-w-4xl w-full text-center space-y-12">
             <div className="space-y-4">
               <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">

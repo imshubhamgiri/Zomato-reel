@@ -1,17 +1,44 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
+import { authAPI } from '../services/api';
 
 function UserProfile() {
-  // Mock user data - will be replaced with actual API data
-  
-  const user = JSON.parse(localStorage.getItem('user')) || {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Food Street, NY 10001',
-    memberSince: 'January 2024',
-  };
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await authAPI.checkAuth();
+        if (response.userType !== 'user') {
+          navigate('/partner/profile');
+          return;
+        }
+        setUser(response);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        navigate('/user/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -41,7 +68,7 @@ function UserProfile() {
               </div>
               <div className="text-white">
                 <h1 className="text-3xl font-bold">{user.name}</h1>
-                <p className="text-red-100 mt-1">Member since {user.memberSince || 'N/A'} </p>
+                <p className="text-red-100 mt-1">Food Lover</p>
               </div>
             </div>
           </div>
