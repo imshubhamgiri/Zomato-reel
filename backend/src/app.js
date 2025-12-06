@@ -5,6 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth.routes');
 const foodRoutes = require('./routes/food.routes');
 const profileRoutes = require('./routes/profile.routes');
+const actionRoutes = require('./routes/useraction.routes')
 dotenv.config();
 
 const app = express();
@@ -20,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/food', foodRoutes);
 
 app.use('/api/profile', profileRoutes);
+app.use('/api/actions',actionRoutes)
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');

@@ -21,6 +21,9 @@ function Home() {
   
   // Track the currently active video ID for UI updates (like the counter)
   const [currentVideoId, setCurrentVideoId] = useState(null);
+  
+  // Audio state (muted by default for autoplay)
+  const [isMuted, setIsMuted] = useState(true);
 
   // ---------------------------------------------------------------------------
   // DATA FETCHING
@@ -43,7 +46,7 @@ function Home() {
             userType: response.data.userType || 'user'
           });
           localStorage.setItem(response.data.userType, JSON.stringify(response.data));
-        }
+        } 
       } catch (error) {
         console.error('Error fetching user:', error);
         setisLoggenIn(false);
@@ -57,11 +60,21 @@ function Home() {
           withCredentials: true
         });
         const foodItems = res.data.fooditems || [];
-        setVideos(foodItems);
-        console.table(foodItems);
+        
+        // Initialize local state for UI interactions (default to false since backend doesn't send user state yet)
+        const itemsWithState = foodItems.map(item => ({
+            ...item,
+            isLiked: false, // Default, would ideally come from backend
+            isSaved: false, // Default, would ideally come from backend
+            likeCount: item.likeCount || 0,
+            saveCount: item.saveCount || 0
+        }));
+
+        setVideos(itemsWithState);
+        console.table(itemsWithState);
         // Initialize current video ID if videos exist
-        if (foodItems.length > 0) {
-            setCurrentVideoId(foodItems[0]._id);
+        if (itemsWithState.length > 0) {
+            setCurrentVideoId(itemsWithState[0]._id);
         }
       } catch (error) {
         console.error('Error fetching videos:', error);
@@ -69,6 +82,87 @@ function Home() {
     }
     fetchVideos();
   }, []);
+
+  // ---------------------------------------------------------------------------
+  // ACTION HANDLERS (Like & Save)
+  // ---------------------------------------------------------------------------
+  const handleLike = async (e, foodId) => {
+    e.stopPropagation(); // Prevent video play/pause toggle
+    if (!isLoggedIn) {
+        alert("Please login to like");
+        return;
+    }
+
+    // Optimistic UI Update
+    setVideos(prev => prev.map(v => {
+        if (v._id === foodId) {
+            const newIsLiked = !v.isLiked;
+            return {
+                ...v,
+                isLiked: newIsLiked,
+                likeCount: newIsLiked ? v.likeCount + 1 : v.likeCount - 1
+            };
+        }
+        return v;
+    }));
+
+    try {
+        await axios.post('http://localhost:3000/api/actions/like', { foodId }, { withCredentials: true });
+    } catch (error) {
+        console.error("Like failed:", error);
+        // Revert on error
+        setVideos(prev => prev.map(v => {
+            if (v._id === foodId) {
+                const newIsLiked = !v.isLiked;
+                return {
+                    ...v,
+                    isLiked: newIsLiked,
+                    likeCount: newIsLiked ? v.likeCount + 1 : v.likeCount - 1
+                };
+            }
+            return v;
+        }));
+    }
+  };
+
+  const handleSave = async (e, foodId) => {
+    e.stopPropagation(); // Prevent video play/pause toggle
+    if (!isLoggedIn) {
+        alert("Please login to save");
+        return;
+    }
+
+    // Optimistic UI Update
+    setVideos(prev => prev.map(v => {
+        if (v._id === foodId) {
+            const newIsSaved = !v.isSaved;
+            return {
+                ...v,
+                isSaved: newIsSaved,
+                saveCount: newIsSaved ? v.saveCount + 1 : v.saveCount - 1
+            };
+        }
+        return v;
+    }));
+
+    try {
+        await axios.post('http://localhost:3000/api/actions/save', { foodId }, { withCredentials: true });
+    } catch (error) {
+        console.error("Save failed:", error);
+        // Revert on error
+        setVideos(prev => prev.map(v => {
+            if (v._id === foodId) {
+                const newIsSaved = !v.isSaved;
+                return {
+                    ...v,
+                    isSaved: newIsSaved,
+                    saveCount: newIsSaved ? v.saveCount + 1 : v.saveCount - 1
+                };
+            }
+            return v;
+        }));
+    }
+  };
 
   // ---------------------------------------------------------------------------
   // SCROLL & PLAYBACK LOGIC
@@ -243,16 +337,64 @@ function Home() {
                   src={video.video}
                   loop
                   playsInline
-                  muted={false} // Allow sound by default
+                  muted={isMuted} 
                   onClick={(e) => {
-                    // Toggle play/pause on click
-                    if (e.target.paused) {
-                      e.target.play();
+                    if (isMuted) {
+                        setIsMuted(false);
                     } else {
-                      e.target.pause();
+                        if (e.target.paused) e.target.play();
+                        else e.target.pause();
                     }
                   }}
                 />
+
+                {/* Mute Indicator */}
+                {isMuted && (
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/40 p-4 rounded-full pointer-events-none backdrop-blur-sm animate-pulse z-10">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-8 h-8">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                    </svg>
+                  </div>
+                )}
+
+                {/* Action Buttons (Right Side) */}
+                <div className="absolute bottom-24 right-4 z-40 flex flex-col items-center gap-6">
+                    {/* Like Button */}
+                    <button 
+                        onClick={(e) => handleLike(e, video._id)}
+                        className="flex flex-col items-center gap-1 group cursor-pointer"
+                    >
+                        <div className={`p-3 rounded-full bg-black/20 backdrop-blur-sm transition-all ${video.isLiked ? 'text-red-500' : 'text-white group-hover:bg-black/40'}`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={video.isLiked ? "currentColor" : "none"} stroke="currentColor" strokeWidth={video.isLiked ? "0" : "2"} className="w-8 h-8 transition-transform active:scale-75">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                            </svg>
+                        </div>
+                        <span className="text-white text-xs font-bold drop-shadow-md">{video.likeCount}</span>
+                    </button>
+
+                    {/* Save Button */}
+                    <button 
+                        onClick={(e) => handleSave(e, video._id)}
+                        className="flex flex-col items-center gap-1 group cursor-pointer"
+                    >
+                        <div className={`p-3 rounded-full bg-black/20 backdrop-blur-sm transition-all ${video.isSaved ? 'text-yellow-400' : 'text-white group-hover:bg-black/40'}`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={video.isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={video.isSaved ? "0" : "2"} className="w-8 h-8 transition-transform active:scale-75">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                            </svg>
+                        </div>
+                        <span className="text-white text-xs font-bold drop-shadow-md">{video.saveCount}</span>
+                    </button>
+                    
+                    {/* Share Button (Placeholder) */}
+                    <button className="flex flex-col items-center gap-1 group cursor-pointer">
+                        <div className="p-3 rounded-full bg-black/20 backdrop-blur-sm text-white group-hover:bg-black/40 transition-all">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                            </svg>
+                        </div>
+                        <span className="text-white text-xs font-bold drop-shadow-md">Share</span>
+                    </button>
+                </div>
 
                 {/* Video Info Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 z-20 bg-linear-to-t from-black/90 via-black/50 to-transparent p-6 pb-20 md:pb-8 pointer-events-none">
@@ -289,11 +431,11 @@ function Home() {
           </div>
 
           {/* Video Counter */}
-          <div className="absolute top-24 right-4 z-30 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full pointer-events-none">
+          {/* <div className="absolute top-24 right-4 z-30 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full pointer-events-none">
             <span className="text-white text-sm font-medium">
               {displayIndex} / {videos.length}
             </span>
-          </div>
+          </div> */}
         </div>
       ) : (
         /* Login/Signup View */
