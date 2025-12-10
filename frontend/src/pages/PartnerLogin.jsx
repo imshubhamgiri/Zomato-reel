@@ -23,7 +23,7 @@ function PartnerLogin() {
         navigate('/user/profile');
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error reason :",error.response.data.message);
       setError('Login failed. Please check your credentials.');
     }
   };
@@ -47,8 +47,8 @@ function PartnerLogin() {
             Sign in to your restaurant account
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+        <form className="mt-8 space-y-6 " onSubmit={handleSubmit}>
+          <div className="space-y-4 relative">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email address
@@ -76,9 +76,10 @@ function PartnerLogin() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="••••••••"
               />
+            
             </div>
+        { error && <p className="-bottom-5 text-red-500 absolute text-sm">{error}</p> }
           </div>
-
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input

@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const FoodPartner = require('../models/foodPartner.model');
-// const foodPartnerModel = require('../models/foodPartner.model');
 const authController = {};
 
 authController.register = async (req, res) => {

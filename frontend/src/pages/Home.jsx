@@ -2,43 +2,32 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
 import axios from 'axios';
+import API_URL from '../config/Api.js';
 
 function Home() {
-  // ---------------------------------------------------------------------------
-  // STATE MANAGEMENT
-  // ---------------------------------------------------------------------------
-  const [isLoggedIn, setisLoggenIn] = useState(false);
+const [isLoggedIn, setisLoggenIn] = useState(false);
   const [userType] = useState(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     return user ? user.userType : 'user';
   });
   const [user, setuser] = useState({});
   const [videos, setVideos] = useState([]);
-  
-  // Refs for scrolling and video management
   const videoFeedRef = useRef(null);
   const videoRefs = useRef([]);
-  
-  // Track the currently active video ID for UI updates (like the counter)
   const [currentVideoId, setCurrentVideoId] = useState(null);
   
-  // Audio state (muted by default for autoplay)
+
   const [isMuted, setIsMuted] = useState(true);
 
-  // ---------------------------------------------------------------------------
-  // DATA FETCHING
-  // ---------------------------------------------------------------------------
-  useEffect(() => {
+ useEffect(() => {
     async function getdata() {
       try {
-        const response = await axios.get('http://localhost:3000/api/auth/loginCheck', {
+        const response = await axios.get(`${API_URL}/api/auth/loginCheck`, {
           withCredentials: true
         });
         
         if (response.status === 200) {
           setisLoggenIn(true);
-          console.table(response.data);
-          
           setuser({
             name: response.data.name || 'User',
             email: response.data.email || 'N/A',
@@ -48,30 +37,28 @@ function Home() {
           localStorage.setItem(response.data.userType, JSON.stringify(response.data));
         } 
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error('Error fetching user:', error.response.data);
         setisLoggenIn(false);
       }
     }
     getdata();
-
+    
     async function fetchVideos() {
+
       try {
-        const res = await axios.get('http://localhost:3000/api/food/list',{
+        const res = await axios.get(`${API_URL}/api/food/listfood`,{
           withCredentials: true
         });
         const foodItems = res.data.fooditems || [];
-        
-        // Initialize local state for UI interactions (default to false since backend doesn't send user state yet)
+     
         const itemsWithState = foodItems.map(item => ({
             ...item,
-            isLiked: false, // Default, would ideally come from backend
-            isSaved: false, // Default, would ideally come from backend
             likeCount: item.likeCount || 0,
             saveCount: item.saveCount || 0
         }));
 
         setVideos(itemsWithState);
-        console.table(itemsWithState);
+        // console.table(itemsWithState);
         // Initialize current video ID if videos exist
         if (itemsWithState.length > 0) {
             setCurrentVideoId(itemsWithState[0]._id);
@@ -83,13 +70,10 @@ function Home() {
     fetchVideos();
   }, []);
 
-  // ---------------------------------------------------------------------------
-  // ACTION HANDLERS (Like & Save)
-  // ---------------------------------------------------------------------------
   const handleLike = async (e, foodId) => {
     e.stopPropagation(); // Prevent video play/pause toggle
     if (!isLoggedIn) {
-        alert("Please login to like");
+      
         return;
     }
 
@@ -107,7 +91,7 @@ function Home() {
     }));
 
     try {
-        await axios.post('http://localhost:3000/api/actions/like', { foodId }, { withCredentials: true });
+        await axios.post(`${API_URL}/api/actions/like`, { foodId }, { withCredentials: true });
     } catch (error) {
         console.error("Like failed:", error);
         // Revert on error
@@ -126,9 +110,8 @@ function Home() {
   };
 
   const handleSave = async (e, foodId) => {
-    e.stopPropagation(); // Prevent video play/pause toggle
+    e.stopPropagation(); 
     if (!isLoggedIn) {
-        alert("Please login to save");
         return;
     }
 
@@ -146,7 +129,7 @@ function Home() {
     }));
 
     try {
-        await axios.post('http://localhost:3000/api/actions/save', { foodId }, { withCredentials: true });
+        await axios.post(`${API_URL}/api/actions/save`, { foodId }, { withCredentials: true });
     } catch (error) {
         console.error("Save failed:", error);
         // Revert on error
@@ -241,10 +224,7 @@ function Home() {
   }, [videos, updateVideoPlayback]);
 
 
-  // ---------------------------------------------------------------------------
-  // MOCK DATA & HELPERS
-  // ---------------------------------------------------------------------------
-  const mockUser = {
+ const mockUser = {
     name: 'John Doe',
     email: 'john.doe@example.com',
   };
@@ -289,8 +269,6 @@ function Home() {
     <div className="min-h-screen bg-linear-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
       {/* Inject custom scroll snap CSS */}
       <style>{customStyles}</style>
-
-      {/* Header with Profile Dropdown (Only shown when NOT logged in) */}
       {!isLoggedIn && (
         <div className="bg-white/80 h-20 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm fixed top-0 w-full z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -357,7 +335,6 @@ function Home() {
                   </div>
                 )}
 
-                {/* Action Buttons (Right Side) */}
                 <div className="absolute bottom-24 right-4 z-40 flex flex-col items-center gap-6">
                     {/* Like Button */}
                     <button 

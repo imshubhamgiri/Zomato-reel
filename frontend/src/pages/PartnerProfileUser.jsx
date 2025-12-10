@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect , useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
+import API_URL from '../config/Api.js'
 
 const PartnerProfileUser = () => {
   const { id } = useParams();
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [foodItems, setFoodItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [playingVideoId, setPlayingVideoId] = useState(null);
+  const videoRefs = useRef({});
 
   useEffect(() => {
     const fetchPartnerProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/profile/foodpartner/${id}`);
+        const response = await axios.get(`${API_URL}/api/profile/foodpartner/${id}`);
         setPartnerProfile(response.data);
-        console.log('Partner Profile:', response.data);
       } catch (error) {
         console.error('Error fetching partner profile:', error);
       }
@@ -21,12 +23,11 @@ const PartnerProfileUser = () => {
 
     const fetchFoodItems = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/food/listfood`);
-        console.log('All Food Items:', response.data.fooditems);
-        // Filter food items by partner ID
-        const partnerFoods = response.data.fooditems?.filter(item => item.foodPartner._id === id) || [];
-        setFoodItems(partnerFoods);
-        console.log('Food Items:', partnerFoods);
+        const response = await axios.get(`${API_URL}/api/food/getfood/${id}`,{
+          withCredentials: true
+        });
+        // const partnerFoods = response.data.fooditems?.filter(item => item.foodPartner._id === id) || [];
+        setFoodItems(response.data.fooditems || []);
       } catch (error) {
         console.error('Error fetching food items:', error);
       } finally {
@@ -38,7 +39,23 @@ const PartnerProfileUser = () => {
     fetchFoodItems();
   }, [id]);
 
-  // Skeleton Loader Component
+  const handleVideoClick = (itemId) => {
+    const videoElement = videoRefs.current[itemId];
+    if(!videoElement) return;
+
+    if (itemId === playingVideoId) {
+      videoElement.pause();
+      setPlayingVideoId(null);
+    } else {
+      
+      if (playingVideoId && videoRefs.current[playingVideoId]) {
+        videoRefs.current[playingVideoId].pause();
+      }
+      videoElement.play();
+      setPlayingVideoId(itemId);
+    }
+  };
+
   const VideoSkeleton = () => (
     <div className="relative aspect-9/16 bg-linear-to-br from-gray-200 via-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-lg">
       <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div>
@@ -50,7 +67,6 @@ const PartnerProfileUser = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-orange-50 via-red-50 to-pink-50">
-      {/* Header */}
       <div className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-10 border-b border-red-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <Link to="/" className="inline-flex items-center text-red-600 hover:text-red-700 font-bold text-lg transition-all hover:gap-3 gap-2">
@@ -62,18 +78,18 @@ const PartnerProfileUser = () => {
         </div>
       </div>
 
-      {/* Profile Section */}
+    
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {partnerProfile ? (
           <>
-            {/* Profile Header */}
+            
             <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden mb-10">
-              {/* Decorative Background */}
+             
               <div className="absolute top-0 left-0 right-0 h-32 bg-linear-to-r from-red-500 via-orange-500 to-pink-500 opacity-20"></div>
               
               <div className="relative p-6 md:p-10">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                  {/* Profile Image */}
+                 
                   <div className="shrink-0 relative group">
                     <div className="absolute inset-0 bg-linear-to-br from-red-400 to-orange-600 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
                     <div className="relative w-28 h-28 md:w-40 md:h-40 rounded-full bg-linear-to-br from-red-500 via-orange-500 to-pink-500 flex items-center justify-center text-white text-5xl md:text-6xl font-black shadow-2xl ring-4 ring-white">
@@ -81,7 +97,6 @@ const PartnerProfileUser = () => {
                     </div>
                   </div>
 
-                  {/* Profile Info */}
                   <div className="flex-1 text-center md:text-left">
                     <div className="inline-block px-4 py-1 bg-red-100 text-red-600 rounded-full text-sm font-semibold mb-3">
                       Partner Restaurant
@@ -109,7 +124,6 @@ const PartnerProfileUser = () => {
                   </div>
                 </div>
 
-                {/* Stats Section */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 pt-8 border-t-2 border-red-100">
                   <div className="bg-linear-to-br from-red-50 to-red-100 rounded-2xl p-5 text-center hover:scale-105 transition-transform">
                     <div className="text-4xl font-black text-red-600 mb-2">
@@ -142,7 +156,6 @@ const PartnerProfileUser = () => {
               </div>
             </div>
 
-            {/* Food Items Grid */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-black text-gray-900 flex items-center gap-3">
@@ -162,7 +175,6 @@ const PartnerProfileUser = () => {
               </div>
 
               {loading ? (
-                // Skeleton Loading
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {[...Array(8)].map((_, index) => (
                     <VideoSkeleton key={index} />
@@ -171,20 +183,25 @@ const PartnerProfileUser = () => {
               ) : foodItems.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                   {foodItems.map((item) => (
-                    <div key={item._id} className="group relative aspect-9/16 bg-black rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 cursor-pointer ring-2 ring-transparent hover:ring-red-500">
-                      {/* Video Thumbnail/Player */}
+                    <div key={item._id} 
+                    onClick={() => handleVideoClick(item._id)}
+                    className="group relative aspect-9/16 bg-black rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 cursor-pointer ring-2 ring-transparent hover:ring-red-500">
                       <video
                         className="w-full h-full object-cover"
                         src={item.video}
                         poster={item.image}
+                        type="video/mp4"
+                        ref={el => videoRefs.current[item._id] = el}
+                        preload="metadata"
+                        playsInline
+                        loop
                       />
                       
-                      {/* Badge */}
+                     
                       <div className="absolute top-3 right-3 px-3 py-1 bg-red-600 text-white rounded-full text-xs font-bold shadow-lg z-10">
                         ₹{item.price}
                       </div>
                       
-                      {/* Overlay */}
                       <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <div className="absolute bottom-0 left-0 right-0 p-5">
                           <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
@@ -200,8 +217,6 @@ const PartnerProfileUser = () => {
                           </div>
                         </div>
                       </div>
-
-                      {/* Play Icon */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="w-20 h-20 bg-red-600/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl">
                           <svg className="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
@@ -226,7 +241,6 @@ const PartnerProfileUser = () => {
             </div>
           </>
         ) : (
-          // Loading Profile
           <div className="animate-pulse">
             <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">

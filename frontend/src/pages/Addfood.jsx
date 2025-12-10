@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { ToastContainer,Flip, toast } from 'react-toastify';
+import API_URL from '../config/Api.js';
 const Addfood = () => {
   const [videoPreview, setVideoPreview] = useState(null)
   const [loading, setloading] = useState(false)
@@ -28,7 +29,7 @@ const Addfood = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Handle form submission logic here
+
     setloading(true)
     const submitData = new FormData()
     submitData.append('name', formData.name)
@@ -38,12 +39,12 @@ const Addfood = () => {
       submitData.append('video', formData.video)
     }
 
-    axios.post('http://localhost:3000/api/food/add', submitData, {
+    axios.post(`${API_URL}/food/add`, submitData, {
       withCredentials: true,
     })
       .then(response => {
         console.log('Form submitted:', response.data)
-        // Optionally reset the form or provide user feedback here
+  
         setFormData({
           name: '',
           description: '',
@@ -63,7 +64,7 @@ const Addfood = () => {
 
   return (<>
     <div className='min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black'>
-      {/* Header */}
+
       <div className="bg-gray-900/90 backdrop-blur-md shadow-2xl sticky top-0 z-10 border-b border-red-500/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center justify-between">
@@ -80,18 +81,18 @@ const Addfood = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+  
       <div className='flex justify-center items-start py-12 px-4'>
         <div className='w-full max-w-5xl'>
           <form onSubmit={handleSubmit} className='bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border border-gray-700'>
-            {/* Form Header */}
+           
             <div className='bg-linear-to-r from-red-600 via-orange-600 to-pink-600 p-8 text-white'>
               <h2 className='text-3xl font-black mb-2'>Upload Your Delicious Creation</h2>
               <p className='text-red-50'>Share your culinary masterpiece with the world</p>
             </div>
 
             <div className='p-8 md:p-12 grid md:grid-cols-2 gap-8'>
-              {/* Left Column - Video Upload */}
+             
               <div className='space-y-6'>
                 <div>
                   <label className='flex items-center gap-2 text-sm font-bold text-gray-300 mb-3'>
@@ -139,7 +140,7 @@ const Addfood = () => {
                 </div>
               </div>
 
-              {/* Right Column - Form Fields */}
+            
               <div className='space-y-6'>
                 {/* Food Name */}
                 <div>
@@ -161,7 +162,7 @@ const Addfood = () => {
                   />
                 </div>
 
-                {/* Description */}
+              
                 <div>
                   <label htmlFor="description" className='flex items-center gap-2 text-sm font-bold text-gray-300 mb-3'>
                     <svg className="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
@@ -181,7 +182,7 @@ const Addfood = () => {
                   />
                 </div>
 
-                {/* Price */}
+               
                 <div>
                   <label htmlFor="price" className='flex items-center gap-2 text-sm font-bold text-gray-300 mb-3'>
                     <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
@@ -207,7 +208,6 @@ const Addfood = () => {
                   </div>
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type='submit'
                   className='w-full bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-black py-4 px-6 rounded-xl shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center gap-3 text-lg group'
@@ -227,8 +227,6 @@ const Addfood = () => {
               </div>
             </div>
           </form>
-
-          {/* Help Text */}
           <div className='mt-8 text-center'>
             <p className='text-gray-400 text-sm'>
               Need help? <a href="#" className='text-red-500 font-semibold hover:text-red-400 hover:underline transition-colors'>View Guidelines</a>

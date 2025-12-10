@@ -1,6 +1,6 @@
 const foodPartnerModel = require('../models/foodPartner.model');
 
-// Get Food Partner Profile by ID
+
 exports.getFoodPartnerProfile = async (req, res) => {
   try {
     const foodPartner = await foodPartnerModel.findById(req.params.id);
