@@ -21,14 +21,12 @@ function ProfileDropdown({ user, type  }) {
   const handleLogout = () => {
     userAPI.logout().then((response) => {
       // Handle post-logout actions here, e.g., redirect to login page
-    console.log( response )
     localStorage.removeItem('user');
     window.location.href = '/';
     window.location.reload()
     }).catch((error) => {
       console.error('Logout failed:', error);
     });
-    console.log('Logout clicked');
     setIsOpen(false);
   };
 

@@ -90,7 +90,6 @@ ActionController.saveFood = async (req,res)=>{
           res.status(400).json({
             message:"Error saving the foodreel " + error.message,
         })
-        console.log("Error in saving food:", error);
     }
 
     

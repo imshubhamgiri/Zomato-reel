@@ -24,9 +24,7 @@ function PartnerRegister() {
     setError('');
     // setloading(false)
     try {
-      const response = await partnerAPI.register({ restaurantName, name, email, phone, address, password });
-      console.log(response);
-      
+       await partnerAPI.register({ restaurantName, name, email, phone, address, password });      
       // Check user type and navigate accordingly
       const authCheck = await authAPI.checkAuth();
       if (authCheck.userType === 'partner') {

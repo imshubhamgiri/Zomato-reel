@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { partnerAPI, authAPI } from '../services/api';
 
+
 function PartnerLogin() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -12,9 +13,8 @@ function PartnerLogin() {
     const password = e.target.password.value;
 
     try {
-      const response = await partnerAPI.login(email, password);
-      console.log(response);
       
+      await partnerAPI.login(email, password);
       // Check user type and navigate accordingly
       const authCheck = await authAPI.checkAuth();
       if (authCheck.userType === 'partner') {

@@ -13,7 +13,6 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
         if (!foodPartner) {
             return res.status(401).json({ message: 'Invalid token' });
         }
-        console.log('Authenticated user:', foodPartner.id);
         req.foodPartner = foodPartner;
         next();
     } catch (error) {

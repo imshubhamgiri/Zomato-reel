@@ -4,6 +4,7 @@ import { userAPI, authAPI } from '../services/api';
 
 function UserLogin() {
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -12,10 +13,9 @@ function UserLogin() {
         const password = e.target.password.value;
 
         try {
-            const response = await userAPI.login(email, password);
-            console.log(response);
-            
-            // Check user type and navigate accordingly
+            setLoading(true);
+            await userAPI.login(email, password);            
+        // Check user type and navigate accordingly
             const authCheck = await authAPI.checkAuth();
             if (authCheck.userType === 'partner') {
                 navigate('/partner/profile');
@@ -24,7 +24,9 @@ function UserLogin() {
             }
         } catch (error) {
             console.error(error);
-            setError('Login failed. Please check your credentials.');
+            setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -76,6 +78,7 @@ function UserLogin() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="••••••••"
               />
+              {error && <p className="text-sm absolute text-red-500 dark:text-red-400">{error}</p>}
             </div>
           </div>
 
@@ -102,8 +105,8 @@ function UserLogin() {
             <button
               type="submit"
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-            >
-              Sign in
+              disabled={loading}>
+             {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
 

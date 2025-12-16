@@ -59,8 +59,6 @@ authController.logoutuser = (req, res) => {
 authController.registerFodPartner = async (req, res) => {
     // Implementation for food partner registration
     const { name, email, password , restaurantName, phone , address } = req.body;
-    console.log({ name, email, password , restaurantName, phone , address });
-    // Similar logic as user registration can be applied here
     try {
         
         const existing = await FoodPartner.findOne({email}).lean()
@@ -95,12 +93,10 @@ authController.loginFodPartner = async (req, res) => {
         
         const existing = await FoodPartner.findOne({email}).lean()
         if(!existing){
-           console.log("User not found");
            return res.status(400).json({message:"invalid credential"})
         } 
        const isMatch = await bcrypt.compare(password, existing.password);
        if(!isMatch){
-            console.log("password did not match");
           return res.status(400).json({message:"invalid credential"})
 
        }
@@ -114,7 +110,6 @@ authController.loginFodPartner = async (req, res) => {
         message:"login successful",
         user:{id:existing._id.toString(), name: existing.name,restaurantName: existing.restaurantName,phone: existing.phone, address: existing.address, email: existing.email, }})
     } catch (error) {
-        console.log('login error', error)
         res.status(500).json({message:"server error",error})
     }
 

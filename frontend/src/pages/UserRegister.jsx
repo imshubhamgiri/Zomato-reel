@@ -13,9 +13,7 @@ function UserRegister() {
     const password = e.target.password.value;
 
     try {
-      const response = await userAPI.register(name, email, password);
-      console.log(response);
-      
+      await userAPI.register(name, email, password);      
       // Check user type and navigate accordingly
       const authCheck = await authAPI.checkAuth();
       if (authCheck.userType === 'partner') {
@@ -91,6 +89,7 @@ function UserRegister() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="••••••••"
               />
+              {error && <p className="text-sm absolute text-red-500 dark:text-red-400">{error}</p>}
             </div>
           </div>
 

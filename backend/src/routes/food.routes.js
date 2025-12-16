@@ -1,6 +1,6 @@
 const express = require('express');
 const foodroutes = express.Router();
-const foodController = require('../controllers/food.contoller');
+const foodController = require('../controllers/food.controller');
 const { FoodauthMiddleware, userAuthMiddleware } = require('../middleware/auth.js');
 const multer = require('multer');
 const storage = multer.memoryStorage(); // IMPORTANT!
