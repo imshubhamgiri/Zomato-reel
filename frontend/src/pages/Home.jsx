@@ -5,7 +5,7 @@ import axios from 'axios';
 import API_URL from '../config/Api.js';
 
 function Home() {
-const [isLoggedIn, setisLoggenIn] = useState(false);
+const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
   const [userType] = useState(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     return user ? user.userType : 'user';
@@ -27,7 +27,6 @@ const [isLoggedIn, setisLoggenIn] = useState(false);
         });
         
         if (response.status === 200) {
-          setisLoggenIn(true);
           setuser({
             name: response.data.name || 'User',
             email: response.data.email || 'N/A',
@@ -35,10 +34,11 @@ const [isLoggedIn, setisLoggenIn] = useState(false);
             userType: response.data.userType || 'user'
           });
           localStorage.setItem(response.data.userType, JSON.stringify(response.data));
+          localStorage.setItem('isLoggedIn', 'true');
+          setisLoggenIn(true);
         } 
       } catch (error) {
-        console.error('Error fetching user:', error.response.data);
-        setisLoggenIn(false);
+        console.error('Error fetching user:', error.response.data); 
       }
     }
     getdata();
@@ -68,7 +68,7 @@ const [isLoggedIn, setisLoggenIn] = useState(false);
       }
     }
     fetchVideos();
-  }, []);
+  }, [isLoggedIn]);
 
   const handleLike = async (e, foodId) => {
     e.stopPropagation(); // Prevent video play/pause toggle
@@ -284,7 +284,8 @@ const [isLoggedIn, setisLoggenIn] = useState(false);
       )}
 
       {/* Reel View with Smooth Scrolling */}
-      {isLoggedIn && videos.length > 0 ? (
+      {isLoggedIn ? (
+        videos.length > 0 ? (
         <div className="relative h-screen w-full bg-black overflow-hidden">
             
           {/* Fixed Header on Reel */}
@@ -414,6 +415,35 @@ const [isLoggedIn, setisLoggenIn] = useState(false);
             </span>
           </div> */}
         </div>
+        ) : (
+            <div className="h-screen w-full bg-black relative animate-pulse">
+                {/* Skeleton Header */}
+                <div className="absolute top-0 left-0 right-0 z-30 p-4 flex justify-between items-center">
+                    <div className="h-8 w-24 bg-gray-800 rounded"></div>
+                    <div className="h-10 w-10 bg-gray-800 rounded-full"></div>
+                </div>
+
+                {/* Skeleton Right Actions */}
+                <div className="absolute bottom-24 right-4 z-40 flex flex-col items-center gap-6">
+                    <div className="h-12 w-12 bg-gray-800 rounded-full"></div>
+                    <div className="h-12 w-12 bg-gray-800 rounded-full"></div>
+                    <div className="h-12 w-12 bg-gray-800 rounded-full"></div>
+                </div>
+
+                {/* Skeleton Bottom Info */}
+                <div className="absolute bottom-0 left-0 right-0 z-20 p-6 pb-20 md:pb-8">
+                    <div className="max-w-md space-y-4">
+                        <div className="h-6 w-48 bg-gray-800 rounded"></div>
+                        <div className="h-8 w-64 bg-gray-800 rounded"></div>
+                        <div className="h-4 w-full max-w-xs bg-gray-800 rounded"></div>
+                        <div className="flex items-center gap-4">
+                            <div className="h-6 w-16 bg-gray-800 rounded"></div>
+                            <div className="h-10 w-32 bg-gray-800 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
       ) : (
         /* Login/Signup View */
         <div className="flex items-center justify-center px-4 pt-20" style={{ minHeight: '100vh' }}>
