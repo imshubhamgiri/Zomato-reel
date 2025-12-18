@@ -11,7 +11,7 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const foodPartner = await FoodPartner.findById(decoded.Id);
         if (!foodPartner) {
-            return res.status(401).json({ message: 'Invalid token' });
+            return res.status(401).json({ message: ' partner Invalid token' });
         }
         req.foodPartner = foodPartner;
         next();
@@ -30,7 +30,7 @@ async function userAuthMiddleware(req, res, next) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.Id);
         if (!user) {
-            return res.status(401).json({ message: 'Invalid token' });
+            return res.status(401).json({ message: 'User Invalid token' });
         }
         req.user = user;
         next();
@@ -72,4 +72,35 @@ async function loginMiddleware(req, res) {
     }
 }
 
-module.exports = { FoodauthMiddleware: FoodPartnerAuthMiddleware, userAuthMiddleware, loginMiddleware };
+async function combineAuth(req, res, next) {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({ message: 'Please Login first' });
+    }
+    
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        //FoodPartner check
+        const foodPartner = await FoodPartner.findById(decoded.Id);
+        if (foodPartner) {
+            req.foodPartner = foodPartner;
+            return next();
+        }
+        
+        // If not a partner, check for User
+        const user = await User.findById(decoded.Id);
+        if (user) {
+            req.user = user;
+            return next();
+        }
+        
+        return res.status(401).json({ message: 'Invalid token' });
+        
+    } catch (error) {
+        console.error('Auth error:', error);
+        return res.status(401).json({ message: 'Authentication failed' });
+    }
+}
+
+module.exports = { FoodauthMiddleware: FoodPartnerAuthMiddleware, userAuthMiddleware, loginMiddleware, combineAuth };
