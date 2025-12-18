@@ -7,7 +7,7 @@ import API_URL from '../config/Api.js';
 function Home() {
 const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
   const [userType] = useState(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem('user' || 'partner'));
     return user ? user.userType : 'user';
   });
   const [user, setuser] = useState({});
@@ -33,11 +33,15 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
             restaurantName: response.data.restaurantName || 'N/A',
             userType: response.data.userType || 'user'
           });
-          localStorage.setItem(response.data.userType, JSON.stringify(response.data));
+          localStorage.setItem(response.data.userType , JSON.stringify(response.data));
           localStorage.setItem('isLoggedIn', 'true');
           setisLoggenIn(true);
         } 
       } catch (error) {
+       if(error.response.message==="invalid token" || error.response.status===401){
+        localStorage.clear();
+        setisLoggenIn(false);
+      }
         console.error('Error fetching user:', error.response.data); 
       }
     }
@@ -77,7 +81,6 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
         return;
     }
 
-    // Optimistic UI Update
     setVideos(prev => prev.map(v => {
         if (v._id === foodId) {
             const newIsLiked = !v.isLiked;
@@ -93,6 +96,7 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
     try {
         await axios.post(`${API_URL}/api/actions/like`, { foodId }, { withCredentials: true });
     } catch (error) {
+    
         console.error("Like failed:", error);
         // Revert on error
         setVideos(prev => prev.map(v => {
@@ -147,103 +151,72 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
     }
   };
 
-  // ---------------------------------------------------------------------------
-  // SCROLL & PLAYBACK LOGIC
-  // ---------------------------------------------------------------------------
+
+useEffect(() => {
+  if (videos.length === 0) return;
+
+  const options = {
+     root: videoFeedRef.current, 
+      threshold: [0, 0.5, 0.7, 1.0], 
+      rootMargin: '-10% 0px -10% 0px' 
+  }
   
-  /**
-   * Debounce utility to limit how often the scroll handler runs.
-   * This improves performance by preventing the check from running on every single pixel scroll.
-   */
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return (...args) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    };
-  };
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target;
 
-  /**
-   * Finds the visible video in the viewport and controls its playback.
-   * - Plays the video that is most visible (centered).
-   * - Pauses all other videos to save resources and prevent audio overlap.
-   */
-  const updateVideoPlayback = useCallback(() => {
-    let foundVisibleId = null;
-
-    videoRefs.current.forEach((videoElement) => {
-        if (!videoElement) return;
-
-        const rect = videoElement.getBoundingClientRect();
-        // Check if the video is mostly centered in the viewport
-        // We consider it "visible" if its top is near the top of the viewport
-        const isVisible = rect.top >= -window.innerHeight / 2 && rect.bottom <= window.innerHeight * 1.5;
         
-        if (isVisible) {
-            // This video is visible and should be playing
-            if (videoElement.paused) {
-                videoElement.play().catch(e => console.log('Autoplay blocked or playback error:', e));
-            }
-            // Store the ID from the data attribute
-            foundVisibleId = videoElement.dataset.id;
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+          // Video is 70% visible - play it
+          video.play().catch(e => console.log('Autoplay blocked:', e));
+          setCurrentVideoId(video.dataset.id);
         } else {
-            // This video is not visible and should be paused
-            if (!videoElement.paused) {
-                videoElement.pause();
-            }
+          if (!video.paused) {
+            video.pause();
+          }
         }
+      });
+    }, options );
+
+  
+  videoRefs.current.forEach((video) => {
+    if (video) {
+      observer.observe(video);
+    }
+  });
+
+  
+  return () => {
+    videoRefs.current.forEach((video) => {
+      if (video) {
+        observer.unobserve(video);
+      }
     });
-
-    // Update state to track the visible video's ID
-    if (foundVisibleId !== null) {
-        setCurrentVideoId(foundVisibleId);
-    }
-  }, []);
-
-  // Effect to set up the scroll listener on the feed container
-  useEffect(() => {
-    const feed = videoFeedRef.current;
-    if (feed && videos.length > 0) {
-        // Use debounced function for performance
-        const handleScroll = debounce(updateVideoPlayback, 50);
-        feed.addEventListener('scroll', handleScroll);
-
-        // Initial setup: attempt to play the first video immediately
-        // We need a small timeout to ensure the DOM is ready
-        setTimeout(() => {
-             updateVideoPlayback();
-        }, 100);
-
-        // Cleanup function to remove listener when component unmounts or updates
-        return () => {
-            feed.removeEventListener('scroll', handleScroll);
-        };
-    }
-  }, [videos, updateVideoPlayback]);
-
-
- const mockUser = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
+    observer.disconnect();
   };
+}, [videos]);
 
-  const mockPartner = {
-    restaurantName: 'Delicious Bites',
-    name: 'Jane Smith',
-    email: 'partner@deliciousbites.com',
-  };
 
-  const currentUser = userType === 'partner' ? mockPartner : user;
 
-  // Calculate current index for the counter
+//  const mockUser = {
+//     name: 'John Doe',
+//     email: 'john.doe@example.com',
+//   };
+
+//   const mockPartner = {
+//     restaurantName: 'Delicious Bites',
+//     name: 'Jane Smith',
+//     email: 'partner@deliciousbites.com',
+//   };
+
+  const currentUser = user;
+
+
   const currentIndex = videos.findIndex(v => v._id === currentVideoId);
   const displayIndex = currentIndex !== -1 ? currentIndex + 1 : 1;
 
-  // ---------------------------------------------------------------------------
-  // STYLES (CSS Scroll Snap)
-  // ---------------------------------------------------------------------------
+
   const customStyles = `
     .video-feed {
         scroll-snap-type: y mandatory; 
@@ -263,11 +236,25 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
         width: 100%;
         position: relative;
     }
+    
+    /* Hide scrollbar globally when on login page */
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        width: 0px;
+        display: none;
+    }
+    html {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    body {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
   `;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Inject custom scroll snap CSS */}
+    <div className={`min-h-screen bg-linear-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 ${!isLoggedIn ? 'login-page-container' : ''}`}>
       <style>{customStyles}</style>
       {!isLoggedIn && (
         <div className="bg-white/80 h-20 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm fixed top-0 w-full z-50">
@@ -446,84 +433,114 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
         )
       ) : (
         /* Login/Signup View */
+        <>
         <div className="flex items-center justify-center px-4 pt-20" style={{ minHeight: '100vh' }}>
-          <div className="max-w-4xl w-full text-center space-y-12">
-            <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
-                Welcome to <span className="text-red-600">Zomato</span>
-              </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Discover the best food & drinks in your city
-              </p>
-            </div>
-            <div className="space-y-8">
-              <div className="w-24 h-1 bg-red-600 mx-auto rounded"></div>
-            </div>
-            {!isLoggedIn && (
-              <>
-                <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
-                    <div className="space-y-6">
-                      <div>
-                        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                          For Food Lovers
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">
-                          Order your favorite meals
-                        </p>
-                      </div>
-                      <div className="space-y-3">
-                        <Link
-                          to="/user/login"
-                          className="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
-                        >
-                          Login
-                        </Link>
-                        <Link
-                          to="/user/register"
-                          className="block w-full py-3 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-red-600 dark:text-red-400 font-medium rounded-lg border-2 border-red-600 dark:border-red-400 transition-colors"
-                        >
-                          Sign Up
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
-                    <div className="space-y-6">
-                      <div>
-                        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                          For Restaurants
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">
-                          Grow your business with us
-                        </p>
-                      </div>
-                      <div className="space-y-3">
-                        <Link
-                          to="/partner/login"
-                          className="block w-full py-3 px-4 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
-                        >
-                          Partner Login
-                        </Link>
-                        <Link
-                          to="/partner/register"
-                          className="block w-full py-3 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg border-2 border-gray-900 dark:border-gray-600 transition-colors"
-                        >
-                          Register Restaurant
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  <p>Join thousands of food lovers and restaurant partners</p>
-                </div>
-              </>
-            )}
-          </div>
+            <div className='text-white text-4xl font-bold bg-black/50 p-8 rounded-lg backdrop-blur-sm'>
+              Craving delicious food? <br/>
+              Join Zomato today and explore a world of flavors at your fingertips! <br />
+              <div className='text-red-200 hover:cursor-pointer hover:underline' onClick={()=>{
+                const el = document.getElementsByClassName('Food-elements')
+                if(!el) return;
+                window.scrollTo({
+                  top: el[0].offsetTop-40,
+                  behavior: 'smooth'
+                })
+              }}>Sign Up or Login to get started </div>
+              </div>
         </div>
+          <div className='Food-elements flex items-center justify-center min-h-screen relative' style={{ width: '100%', height: '100%', zIndex: 1 }}>
+            <div 
+              style={{
+                backgroundImage: 'url(/foodbg.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                filter: 'blur(2px)',
+                zIndex: 1
+              }}
+            ></div>
+            <div className="max-w-4xl w-full text-center bg-black/50 p-8 rounded-lg backdrop-blur-sm space-y-12 relative" style={{zIndex: 2}}>
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
+                  Welcome to <span className="text-red-600">Zomato</span>
+                </h1>
+                <p className="text-xl text-gray-600 dark:text-white max-w-2xl mx-auto">
+                  Discover the best food & drinks in your city
+                </p>
+              </div>
+              <div className="space-y-8">
+                <div className="w-24 h-1 bg-red-600 mx-auto rounded"></div>
+              </div>
+              {!isLoggedIn && (
+                <>
+                  <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+                      <div className="space-y-6">
+                        <div>
+                          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                            For Food Lovers
+                          </h2>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Order your favorite meals
+                          </p>
+                        </div>
+                        <div className="space-y-3">
+                          <Link
+                            to="/user/login"
+                            className="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+                          >
+                            Login
+                          </Link>
+                          <Link
+                            to="/user/register"
+                            className="block w-full py-3 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-red-600 dark:text-red-400 font-medium rounded-lg border-2 border-red-600 dark:border-red-400 transition-colors"
+                          >
+                            Sign Up
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+                      <div className="space-y-6">
+                        <div>
+                          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                            For Restaurants
+                          </h2>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            Grow your business with us
+                          </p>
+                        </div>
+                        <div className="space-y-3">
+                          <Link
+                            to="/partner/login"
+                            className="block w-full py-3 px-4 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
+                          >
+                            Partner Login
+                          </Link>
+                          <Link
+                            to="/partner/register"
+                            className="block w-full py-3 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg border-2 border-gray-900 dark:border-gray-600 transition-colors"
+                          >
+                            Register Restaurant
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <p>Join thousands of food lovers and restaurant partners</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+       </>
       )}
     </div>
   );
