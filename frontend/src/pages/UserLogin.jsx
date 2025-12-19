@@ -3,36 +3,92 @@ import { Link, useNavigate } from 'react-router-dom';
 import { userAPI, authAPI } from '../services/api';
 
 function UserLogin() {
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const email = e.target.email.value;
-        const password = e.target.password.value;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
 
-        try {
-            setLoading(true);
-            await userAPI.login(email, password);            
-        // Check user type and navigate accordingly
-            const authCheck = await authAPI.checkAuth();
-            if (authCheck.userType === 'partner') {
-                navigate('/partner/profile');
-            } else {
-                navigate('/user/profile');
-            }
-        } catch (error) {
-            console.error(error);
-            setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
-        } finally {
-            setLoading(false);
+    try {
+      setLoading(true);
+      await userAPI.login(email, password);
+      // Check user type and navigate accordingly
+      const authCheck = await authAPI.checkAuth();
+      if (authCheck.userType === 'partner') {
+        navigate('/partner/profile');
+      } else {
+        navigate('/user/profile');
+      }
+    } catch (error) {
+      console.error(error);
+      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const customStyles = `
+    @keyframes fadeInUp {
+      from{
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+        to{
+        opacity: 1;
+        transform: translateY(0);
+      }
         }
-    };
+
+      @keyframes fadeInDown{
+      from{
+        opacity: 0;
+        transform: translateY(20px);}
+        to{
+        opacity: 1;
+        transform: translateY(0);
+      }
+      } 
+      
+      @keyframes slideInLeft{
+      from{
+        opacity: 0;
+        transform: translateX(-20px);}
+        to{
+        opacity: 1;
+        transform: translateX(0);
+      }
+      }
+
+      
+      .animate-fadeInUp {
+        animation: fadeInUp 0.6s ease forwards;
+      }
+      .animate-fadeInDown {
+        animation: fadeInDown 0.6s ease forwards;
+      }
+      .animate-slideInLeft {
+        animation: slideInLeft 0.6s ease forwards;
+      }
+
+      .initial-hidden {
+        opacity: 0;
+      }
+
+      .delay-200 {
+      animation-delay: 0.2s;
+      }
+
+    .delay-300 {
+        animation-delay: 0.3s;
+    }
+    `;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="max-w-md w-full space-y-8">
+      <style>{customStyles}</style>
+      <div className="max-w-md w-full space-y-8 ">
         <div className="flex justify-start">
           <Link to="/" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +97,7 @@ function UserLogin() {
             Back to Home
           </Link>
         </div>
-        <div>
+        <div className='initial-hidden animate-fadeInUp delay-200'>
           <h2 className="text-center text-3xl font-bold text-gray-900 dark:text-white">
             Welcome back
           </h2>
@@ -49,8 +105,8 @@ function UserLogin() {
             Sign in to your account
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+        <form className="mt-8 space-y-6  " onSubmit={handleSubmit}>
+          <div className="space-y-4 initial-hidden animate-slideInLeft delay-300">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email address
@@ -101,12 +157,12 @@ function UserLogin() {
             </div>
           </div>
 
-          <div>
+          <div className='initial-hidden animate-fadeInDown'>
             <button
               type="submit"
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
               disabled={loading}>
-             {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
 

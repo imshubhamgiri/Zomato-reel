@@ -207,11 +207,14 @@ const Addfood = () => {
                 </div>
 
                 <button
+                  disabled={loading}
                   type='submit'
-                  className='w-full bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-black py-4 px-6 rounded-xl shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center gap-3 text-lg group'
-                >{loading ? (
-                  <svg className="animate-spin w-6 h-6 text-white" fill="none" viewBox="0 0 24 24">
+                  className='w-full bg-linear-to-r from-blue-600 to-blue-300 hover:from-blue-700 hover:to-green-700 text-white font-black py-4 px-6 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/50 transition-all duration-300 flex items-center justify-center gap-3 text-lg 
+                  group disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400 disabled:shadow-none disabled:hover:shadow-none disabled:cursor-not-allowed disabled:opacity-75'
+                >{loading ? ( 
+                  <svg className="animate-spin w-6 h-6 mr-3 size-5 text-white  " viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 ) : (
                   <>

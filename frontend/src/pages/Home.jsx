@@ -251,6 +251,127 @@ useEffect(() => {
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .animate-fadeInDown {
+        animation: fadeInDown 0.8s ease-out forwards;
+    }
+
+    .animate-fadeInUp {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .animate-scaleIn {
+        animation: scaleIn 0.6s ease-out forwards;
+    }
+
+    .animate-slideInLeft {
+        animation: slideInLeft 0.8s ease-out forwards;
+    }
+
+    .animate-slideInRight {
+        animation: slideInRight 0.8s ease-out forwards;
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .delay-100 {
+        animation-delay: 0.1s;
+    }
+
+    .delay-200 {
+        animation-delay: 0.2s;
+    }
+
+    .delay-300 {
+        animation-delay: 0.3s;
+    }
+
+    .delay-400 {
+        animation-delay: 0.4s;
+    }
+
+    .delay-500 {
+        animation-delay: 0.5s;
+    }
+
+    .delay-600 {
+        animation-delay: 0.6s;
+    }
+
+    .delay-700 {
+        animation-delay: 0.7s;
+    }
+
+    .initial-hidden {
+        opacity: 0;
+    }
   `;
 
   return (
@@ -435,18 +556,57 @@ useEffect(() => {
         /* Login/Signup View */
         <>
         <div className="flex items-center justify-center px-4 pt-20" style={{ minHeight: '100vh' }}>
-            <div className='text-white text-4xl font-bold bg-black/50 p-8 rounded-lg backdrop-blur-sm'>
-              Craving delicious food? <br/>
-              Join Zomato today and explore a world of flavors at your fingertips! <br />
-              <div className='text-red-200 hover:cursor-pointer hover:underline' onClick={()=>{
-                const el = document.getElementsByClassName('Food-elements')
-                if(!el) return;
-                window.scrollTo({
-                  top: el[0].offsetTop-40,
-                  behavior: 'smooth'
-                })
-              }}>Sign Up or Login to get started </div>
+            <div className='text-white max-w-6xl mx-auto'>
+              {/* Main Hero Text */}
+              <div className='bg-black/60 p-12 rounded-3xl backdrop-blur-md shadow-2xl border border-white/10 initial-hidden animate-scaleIn'>
+                <h1 className='text-5xl md:text-7xl pb-4 font-black mb-6 bg-linear-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent initial-hidden animate-fadeInDown delay-100'>
+                  Craving Delicious Food?
+                </h1>
+                
+                <div className='space-y-6 text-xl md:text-2xl leading-relaxed initial-hidden animate-fadeInUp delay-300'>
+                  <p className='text-white/90 font-semibold'>
+                    🍕 Join Zomato today and explore a world of flavors at your fingertips!
+                  </p>
+                  
+                  <div className='grid md:grid-cols-3 gap-6 my-8 initial-hidden animate-fadeInUp delay-400'>
+                    <div className='bg-linear-to-br from-blue-500/20 to-pink-500/20 p-6 rounded-2xl border border-red-500/30 hover:scale-105 transition-transform '>
+                      <div className='text-4xl mb-3 animate-float'>🍔</div>
+                      <h3 className='font-bold text-lg mb-2 text-red-400'>10,000+ Restaurants</h3>
+                      <p className='text-sm text-white/70'>Discover amazing cuisines from local favorites to premium dining</p>
+                    </div>
+                    
+                    <div className='bg-linear-to-br from-orange-500/20 to-yellow-500/20 p-6 rounded-2xl border border-orange-500/30 hover:scale-105 transition-transform' style={{animationDelay: '0.2s'}}>
+                      <div className='text-4xl mb-3 animate-float' style={{animationDelay: '0.5s'}}>⚡</div>
+                      <h3 className='font-bold text-lg mb-2 text-orange-400'>Fast Delivery</h3>
+                      <p className='text-sm text-white/70'>Get your food delivered hot and fresh in under 30 minutes</p>
+                    </div>
+                    
+                    <div className='bg-linear-to-br from-yellow-500/20 to-green-500/20 p-6 rounded-2xl border border-yellow-500/30 hover:scale-105 transition-transform' style={{animationDelay: '0.4s'}}>
+                      <div className='text-4xl mb-3 animate-float' style={{animationDelay: '1s'}}>💰</div>
+                      <h3 className='font-bold text-lg mb-2 text-yellow-400'>Best Deals</h3>
+                      <p className='text-sm text-white/70'>Exclusive discounts and offers on your favorite meals</p>
+                    </div>
+                  </div>
+                  
+                  <div className='text-center pt-6 initial-hidden animate-fadeInUp delay-600'>
+                    <div 
+                      className='inline-block text-2xl md:text-3xl font-bold text-red-400 hover:text-red-300 cursor-pointer hover:underline transition-all transform hover:scale-110 bg-white/10 px-8 py-4 rounded-full border-2 border-red-500/50 hover:border-red-400' 
+                      onClick={()=>{
+                        const el = document.getElementsByClassName('Food-elements')
+                        if(!el) return;
+                        window.scrollTo({
+                          top: el[0].offsetTop-40,
+                          behavior: 'smooth'
+                        })
+                      }}
+                    >
+                      🚀 Sign Up or Login to Get Started
+                      <div className='text-sm font-normal text-white/70 mt-2'>Join millions of food lovers today!</div>
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
         </div>
           <div className='Food-elements flex items-center justify-center min-h-screen relative' style={{ width: '100%', height: '100%', zIndex: 1 }}>
             <div 
@@ -463,78 +623,85 @@ useEffect(() => {
                 zIndex: 1
               }}
             ></div>
-            <div className="max-w-4xl w-full text-center bg-black/50 p-8 rounded-lg backdrop-blur-sm space-y-12 relative" style={{zIndex: 2}}>
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
-                  Welcome to <span className="text-red-600">Zomato</span>
+            <div className="max-w-4xl  w-full text-center bg-black/60 p-12 rounded-3xl backdrop-blur-md shadow-2xl space-y-12 relative border border-white/10" style={{zIndex: 2}}>
+              <div className="space-y-1 initial-hidden animate-fadeInDown">
+                <h1 className="text-5xl md:text-6xl font-black text-white">
+                  Welcome to <span className="bg-linear-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Zomato</span>
                 </h1>
-                <p className="text-xl text-gray-600 dark:text-white max-w-2xl mx-auto">
+                <p className="text-2xl text-white/90 font-semibold max-w-2xl mx-auto">
                   Discover the best food & drinks in your city
                 </p>
               </div>
-              <div className="space-y-8">
-                <div className="w-24 h-1 bg-red-600 mx-auto rounded"></div>
+              
+              <div className="space-y-8 initial-hidden animate-scaleIn delay-200">
+                <div className="w-24 h-1 bg-linear-to-r from-red-600 to-orange-500 mx-auto rounded-full"></div>
               </div>
+              
               {!isLoggedIn && (
                 <>
-                  <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+                  <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+                    <div className="bg-linear-to-br from-red-500/20 to-orange-500/20 rounded-3xl p-8 shadow-2xl border border-red-500/30 hover:scale-105 transition-all duration-300 initial-hidden animate-slideInLeft delay-300">
                       <div className="space-y-6">
-                        <div>
-                          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                        <div className="text-center">
+                          <div className="text-5xl mb-4 animate-float">🍽️</div>
+                          <h2 className="text-3xl font-black text-white mb-3">
                             For Food Lovers
                           </h2>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">
-                            Order your favorite meals
+                          <p className="text-white/80 text-base font-medium">
+                            Order your favorite meals and enjoy exclusive deals
                           </p>
                         </div>
                         <div className="space-y-3">
                           <Link
                             to="/user/login"
-                            className="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+                            className="block w-full py-4 px-6 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-red-500/50"
                           >
-                            Login
+                            🔐 Login
                           </Link>
                           <Link
                             to="/user/register"
-                            className="block w-full py-3 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-red-600 dark:text-red-400 font-medium rounded-lg border-2 border-red-600 dark:border-red-400 transition-colors"
+                            className="block w-full py-4 px-6 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border-2 border-white/50 hover:border-white transition-all transform hover:scale-105 backdrop-blur-sm"
                           >
-                            Sign Up
+                            ✨ Sign Up Free
                           </Link>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+                    <div className="bg-linear-to-br from-gray-700/40 to-gray-900/40 rounded-3xl p-8 shadow-2xl border border-gray-600/30 hover:scale-105 transition-all duration-300 initial-hidden animate-slideInRight delay-400">
                       <div className="space-y-6">
-                        <div>
-                          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                        <div className="text-center">
+                          <div className="text-5xl mb-4 animate-float" style={{animationDelay: '0.5s'}}>🏪</div>
+                          <h2 className="text-3xl font-black text-white mb-3">
                             For Restaurants
                           </h2>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">
-                            Grow your business with us
+                          <p className="text-white/80 text-base font-medium">
+                            Grow your business and reach millions of customers
                           </p>
                         </div>
                         <div className="space-y-3">
                           <Link
                             to="/partner/login"
-                            className="block w-full py-3 px-4 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
+                            className="block w-full py-4 px-6 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-gray-700/50"
                           >
-                            Partner Login
+                            🔐 Partner Login
                           </Link>
                           <Link
                             to="/partner/register"
-                            className="block w-full py-3 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg border-2 border-gray-900 dark:border-gray-600 transition-colors"
+                            className="block w-full py-4 px-6 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border-2 border-white/50 hover:border-white transition-all transform hover:scale-105 backdrop-blur-sm"
                           >
-                            Register Restaurant
+                            🚀 Register Restaurant
                           </Link>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    <p>Join thousands of food lovers and restaurant partners</p>
+                  <div className="text-base text-white/90 font-semibold initial-hidden animate-fadeInUp delay-600">
+                    <p className="flex items-center justify-center gap-2 text-lg">
+                      <span className="text-2xl">🎉</span>
+                      Join <span className="text-red-400 font-black">50,000+</span> food lovers and <span className="text-orange-400 font-black">5,000+</span> restaurant partners
+                    </p>
                   </div>
                 </>
               )}
