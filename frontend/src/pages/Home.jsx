@@ -555,7 +555,7 @@ useEffect(() => {
       ) : (
         /* Login/Signup View */
         <>
-        <div className="flex items-center justify-center px-4 pt-20" style={{ minHeight: '100vh' }}>
+        <div className="section flex items-center justify-center px-4 pt-20" style={{ minHeight: '100vh' }}>
             <div className='text-white max-w-6xl mx-auto'>
               {/* Main Hero Text */}
               <div className='bg-black/60 p-12 rounded-3xl backdrop-blur-md shadow-2xl border border-white/10 initial-hidden animate-scaleIn'>
@@ -608,7 +608,7 @@ useEffect(() => {
               </div>
             </div>
         </div>
-          <div className='Food-elements flex items-center justify-center min-h-screen relative' style={{ width: '100%', height: '100%', zIndex: 1 }}>
+          <div className='section Food-elements flex items-center justify-center min-h-screen relative' style={{ width: '100%', height: '100%', zIndex: 1 }}>
             <div 
               style={{
                 backgroundImage: 'url(/foodbg.jpg)',
