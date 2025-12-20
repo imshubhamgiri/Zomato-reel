@@ -8,6 +8,7 @@ const upload = multer({ storage: storage });
 
 // food-related routes here
 foodroutes.post('/add', FoodauthMiddleware, upload.single('video'), foodController.addFoodItem);
+foodroutes.delete('/delete',FoodauthMiddleware, foodController.deleteFoodItem);
 // foodroutes.post('/trialadd',  foodController.addFoodItem); // Uncomment for testing purposes
 foodroutes.get('/listfood', combineAuth , foodController.getFoodItems);
 foodroutes.get('/getfood/:id', foodController.GetfoodById);

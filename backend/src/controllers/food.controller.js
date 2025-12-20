@@ -22,7 +22,8 @@ foodController.addFoodItem = async (req, res) => {
         const foodPartnerId = req.foodPartner.id;
         const newFoodItem = new food({
             name,
-            video: imageUploadResponse.url,  // Store the ImageKit URL to db
+            video: imageUploadResponse.url,
+            videoPublicId: imageUploadResponse.fileId,  // Store the ImageKit URL to db
             description,
             price,
             foodPartner: foodPartnerId
@@ -95,6 +96,29 @@ foodController.GetfoodById = async (req ,res)=>{
 
     } catch (error) {
         return res.status(500).json({ message: 'Failed to retrieve food items', error });
+    }
+}
+foodController.deleteFoodItem = async (req,res) =>{
+    const { foodId } = req.body;
+    if(!req.foodPartner || !req.foodPartner.id){
+        return res.status(401).json({ message: 'Unauthorized: No food partner info' });
+    }
+
+    try {
+        const fooditem = await food.findById(foodId);
+        if(!fooditem){
+            return res.status(404).json({ message: 'Food item not found' });
+        }
+        if(fooditem.foodPartner.toString() !== req.foodPartner.id){
+            return res.status(403).json({ message: 'Forbidden: You can only delete your own food items' });
+        }
+        await storageService.deleteVideo(fooditem.videoPublicId);
+        await food.findByIdAndDelete(foodId);
+
+        return res.status(200).json({ message: 'Food item deleted successfully' });
+    } catch (error) {
+        console.error('Delete food item error:', error);
+        res.status(500).json({ message: 'Failed to delete food item', error: error.message });
     }
 }
 

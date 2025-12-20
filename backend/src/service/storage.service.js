@@ -31,4 +31,18 @@ async function uploadVideo(fileBuffer, fileName, mimeType) {
   }
 }
 
-module.exports = { uploadVideo };
+async function deleteVideo(fileId){
+  if(!fileId){
+    console.log('no file url');
+    throw new Error('No file url found');
+  }
+  try {
+   await client.files.delete(fileId);
+   return {success: true, message:'File deleted successfully'};
+  } catch (error) {
+    console.error('File deletion error:', error);
+    throw new Error('File deletion failed: ' + error.message);
+  }
+}
+
+module.exports = { uploadVideo ,deleteVideo };
