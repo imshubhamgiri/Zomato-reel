@@ -9,7 +9,7 @@ function PartnerProfile() {
   const [partner, setPartner] = useState(null);
   const [loading, setLoading] = useState(true);
   const [foodItems, setFoodItems] = useState([]);
-  const [partnerid, setPartnerId] = useState(null);
+  const [formdata, setFormdata] = useState({});
   const [error, setError] = useState('');
   const [openDropdown, setOpenDropdown] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -64,12 +64,17 @@ function PartnerProfile() {
 
   function handleEdit(foodId) {
     setEdit(foodId);
+    const food = foodItems.find(item => item._id === foodId);
+    setFormdata({id: food._id, name: food.name, description: food.description, price: food.price });
+    // console.log(foodItems.find(item => item._id === foodId));
+    console.log('Editing food item:', formdata);
     setTimeout(() => {
       const element = document.querySelector('.EditVideo');
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }, 0);
+  
   }
 
   function handleCancelEdit() {
@@ -83,7 +88,13 @@ function PartnerProfile() {
     }, 100);
   }
 
-
+ const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormdata((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  }
 
   function deleteVideo(foodId) {
     axios.delete(`${API_URL}/api/food/delete`, {
@@ -96,6 +107,11 @@ function PartnerProfile() {
       console.error('Error deleting food item:', error);
       toast.error('Failed to delete food item');
     });
+  }
+
+  function handlesubmit(e){
+    e.preventDefault();
+    console.log(formdata)
   }
 
   if (loading) {
@@ -312,12 +328,14 @@ function PartnerProfile() {
             <h3 className='text-xl font-bold text-gray-900 dark:text-white text-center mb-2'>
               Edit Food Item {edit}
             </h3>
-            <form action="">
+            <form action="" className='my-2' onSubmit={handlesubmit}>
+              <div>
               <video
                 src={foodItems.find(item => item._id === edit)?.video}
-                className='w-full h-full object-cover rounded-2xl'
+                className='w-full h-70 object-fit rounded-2xl'
                 controls
               />
+              </div>
                <div className='space-y-6'>
                 {/* Food Name */}
                 <div>
@@ -331,7 +349,7 @@ function PartnerProfile() {
                     type="text"
                     id="name"
                     name="name"
-                    value={formData.name}
+                    value={formdata?.name}
                     onChange={handleInputChange}
                     placeholder='e.g., Butter Chicken'
                     className='w-full px-4 py-3 bg-gray-900 border-2 border-gray-700 rounded-xl focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition-all text-white font-medium placeholder:text-gray-500'
@@ -350,7 +368,7 @@ function PartnerProfile() {
                   <textarea
                     id="description"
                     name="description"
-                    value={formData.description}
+                    value={formdata?.description}
                     onChange={handleInputChange}
                     placeholder='Describe your dish, ingredients, and what makes it special...'
                     rows="4"
@@ -374,7 +392,7 @@ function PartnerProfile() {
                       type="number"
                       id="price"
                       name="price"
-                      value={formData.price}
+                      value={formdata?.price}
                       onChange={handleInputChange}
                       placeholder='299'
                       min="0"
@@ -385,6 +403,8 @@ function PartnerProfile() {
                   </div>
                 </div>
                 </div>
+                <button type='submit' className='w-full my-3 h-10 rounded-xl bg-black text-white px-3 py-1 bg-opacity-20'
+                 >Submit</button>
             </form>
             <button className='text-center bg-black p-3 text-white' onClick={handleCancelEdit}>cancel</button>
           </div>
