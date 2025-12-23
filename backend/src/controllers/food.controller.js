@@ -121,5 +121,37 @@ foodController.deleteFoodItem = async (req,res) =>{
         res.status(500).json({ message: 'Failed to delete food item', error: error.message });
     }
 }
+foodController.updateFoodItem = async (req, res) => {
+    const { foodId, name, description, price } = req.body;
+    
+    if (!req.foodPartner || !req.foodPartner.id) {
+        return res.status(401).json({ message: 'Unauthorized: No food partner info' });
+    }
+
+    try {
+       
+        const foodItem = await food.findById(foodId);
+        
+        if (!foodItem) {
+            return res.status(404).json({ message: 'Food item not found' });
+        }
+
+        if (foodItem.foodPartner.toString() !== req.foodPartner.id) {
+            return res.status(403).json({ message: 'Forbidden: You can only update your own food items' });
+        }
+
+        const updatedFood = await food.findByIdAndUpdate(
+            foodId,
+            { name, description, price },
+            { new: true }  // Return the updated document
+        );
+        return res.status(200).json({ 
+            message: 'Food item updated successfully',
+            foodItem: updatedFood
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to update food item', error: error.message });
+    }
+};
 
 module.exports = foodController;

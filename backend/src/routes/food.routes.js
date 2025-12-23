@@ -12,5 +12,6 @@ foodroutes.delete('/delete',FoodauthMiddleware, foodController.deleteFoodItem);
 // foodroutes.post('/trialadd',  foodController.addFoodItem); // Uncomment for testing purposes
 foodroutes.get('/listfood', combineAuth , foodController.getFoodItems);
 foodroutes.get('/getfood/:id', foodController.GetfoodById);
+foodroutes.put('/update', FoodauthMiddleware, foodController.updateFoodItem);
 
 module.exports = foodroutes;

@@ -14,6 +14,7 @@ function PartnerProfile() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [edit, setEdit] = useState(null);
+  const [Editloading, setEditLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,7 +66,7 @@ function PartnerProfile() {
   function handleEdit(foodId) {
     setEdit(foodId);
     const food = foodItems.find(item => item._id === foodId);
-    setFormdata({id: food._id, name: food.name, description: food.description, price: food.price });
+    setFormdata({foodId: food._id, name: food.name, description: food.description, price: food.price });
     // console.log(foodItems.find(item => item._id === foodId));
     console.log('Editing food item:', formdata);
     setTimeout(() => {
@@ -96,8 +97,8 @@ function PartnerProfile() {
     }));
   }
 
-  function deleteVideo(foodId) {
-    axios.delete(`${API_URL}/api/food/delete`, {
+ async function deleteVideo(foodId) {
+     await axios.delete(`${API_URL}/api/food/delete`, {
       data: { foodId },
       withCredentials: true
     }).then(() => {
@@ -109,9 +110,32 @@ function PartnerProfile() {
     });
   }
 
-  function handlesubmit(e){
+  async function handlesubmit(e){
     e.preventDefault();
+    setEditLoading(true);
     console.log(formdata)
+    
+    try {
+      const response = await axios.put(`${API_URL}/api/food/update`, formdata, {
+        withCredentials: true
+      });
+      
+      // Update the food items in state with the updated data
+      setFoodItems(prevItems => 
+        prevItems.map(item => 
+          item._id === formdata.foodId 
+            ? { ...item, name: formdata.name, description: formdata.description, price: formdata.price }
+            : item
+        )
+      );
+      toast.success('Food item updated successfully');
+      setEdit(null);
+    } catch (error) {
+      console.error('Error updating food item:', error);
+      toast.error('Failed to update food item');
+    } finally {
+      setEditLoading(false);
+    }
   }
 
   if (loading) {
@@ -403,8 +427,9 @@ function PartnerProfile() {
                   </div>
                 </div>
                 </div>
-                <button type='submit' className='w-full my-3 h-10 rounded-xl bg-black text-white px-3 py-1 bg-opacity-20'
-                 >Submit</button>
+                <button disabled={Editloading}
+                type='submit' className='w-full my-3 h-10 rounded-xl bg-black text-white px-3 py-1 bg-opacity-20'
+                 >{Editloading ? 'Updating...' : 'Submit'}</button>
             </form>
             <button className='text-center bg-black p-3 text-white' onClick={handleCancelEdit}>cancel</button>
           </div>
