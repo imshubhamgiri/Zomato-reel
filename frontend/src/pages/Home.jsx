@@ -238,19 +238,53 @@ useEffect(() => {
     }
     
     /* Hide scrollbar globally when on login page */
-    html::-webkit-scrollbar,
-    body::-webkit-scrollbar {
-        width: 0px;
-        display: none;
-    }
-    html {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    body {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
+    // html::-webkit-scrollbar,
+    // body::-webkit-scrollbar {
+    //     width: 3px;
+    //     height: 10px;
+    //     position: fixed;
+    //     z-index: 9999;
+    //     ;
+
+    // }
+    /* Royal dark blue futuristic scrollbar */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+/* Track (background of scrollbar) */
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+    background: #0d1b2a; /* deep navy */
+    // background: transparent;
+}
+
+/* Thumb (the draggable part) */
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: gray; /* royal blue gradient */
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(50, 100, 200, 0.6); /* subtle blue glow */
+  height:12px;
+}
+
+/* Hover effect */
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #243b6b, #3450a1); /* brighter royal blue */
+    box-shadow: 0 0 10px rgba(80, 140, 255, 0.9); /* stronger glow */
+    height:14px;
+}
+    // html {
+    //     -ms-overflow-style: none;
+    //     scrollbar-width: none;
+    // }
+    // body {
+    //     -ms-overflow-style: none;
+    //     scrollbar-width: none;
+    // }
 
     /* Animations */
     @keyframes fadeInUp {
