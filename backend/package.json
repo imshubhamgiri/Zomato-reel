@@ -2,10 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon --exec ts-node server.ts",
+    "start": "ts-node server.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,5 +24,10 @@
     "mongoose": "^9.0.0",
     "multer": "^2.0.2",
     "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

@@ -43,5 +43,6 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
  */
 export interface ErrorResponse extends ApiResponse {
   success: false;
+  message: string;
   error: string;
 }

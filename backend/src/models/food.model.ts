@@ -1,6 +1,21 @@
-const mongoose = require('mongoose');
+import mongoose ,{  Schema , Types, model} from 'mongoose';
 
-const foodSchema = new mongoose.Schema({
+
+export interface IFood  {
+  name: string;
+  video: string;
+  videoPublicId: string;
+  description: string;
+  price: number;
+  likeCount: number;
+  saveCount: number;
+  foodPartner: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+ const foodSchema = new Schema<IFood>({
     name: { type: String, required: true, trim: true },
     video: { type: String, required: true, trim: true },
     videoPublicId: { type: String, required: true, trim: true },
@@ -14,6 +29,5 @@ const foodSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Food = mongoose.model('Food', foodSchema);
-
-module.exports = Food;
+const Food = model<IFood>('Food', foodSchema);
+export default Food;
