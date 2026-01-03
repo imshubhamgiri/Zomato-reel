@@ -2,10 +2,10 @@ import express  from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/auth.routes.js';
-import foodRoutes from './routes/food.routes.js';
-import profileRoutes from './routes/profile.routes.js';
-import actionRoutes from './routes/useraction.routes.js';
+import authRoutes from './routes/auth.routes';
+import foodRoutes from './routes/food.routes';
+import profileRoutes from './routes/profile.routes';
+import actionRoutes from './routes/useraction.routes';
 
 // Initialize dotenv
 dotenv.config();

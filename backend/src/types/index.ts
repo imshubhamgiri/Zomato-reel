@@ -6,7 +6,9 @@ import { Request } from 'express';
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
+  user?: T;
   data?: T;
+  foodItems?: T[];
   error?: string;
 }
 

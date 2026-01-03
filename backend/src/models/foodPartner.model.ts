@@ -6,7 +6,7 @@ export interface IFoodPartner extends Document {
   email: string;
   phone: string;
   address: string;
-  password?: string;
+  password: string;
   createdAt: Date;
   updatedAt: Date;
 }
