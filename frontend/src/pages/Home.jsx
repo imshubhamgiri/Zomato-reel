@@ -53,7 +53,7 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
         const res = await axios.get(`${API_URL}/api/food/listfood`,{
           withCredentials: true
         });
-        const foodItems = res.data.fooditems || [];
+        const foodItems = res.data.data || [];
      
         const itemsWithState = foodItems.map(item => ({
             ...item,
