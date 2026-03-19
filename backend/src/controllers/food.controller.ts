@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import type { ApiResponse, ErrorResponse, AuthenticatedRequest } from '../types';
+import type { ApiResponse, ErrorResponse, AuthenticatedRequest,FoodItemWithStatus  } from '../types';
 import food from '../models/food.model';
-import likedFood from '../models/like.model';
-import savedFood from '../models/save.model';
+// import likedFood from '../models/like.model';
+// import savedFood from '../models/save.model';
 import storageService from '../service/storage.service';
 import { v4 as uuid } from 'uuid';
 import { error } from 'node:console';
+import { PipelineStage } from 'mongoose';
 
 interface UploadResponse {
     name: string;
@@ -14,6 +15,12 @@ interface UploadResponse {
     description: string;
     price: number;
     foodPartnerId: string;
+}
+
+interface File{
+  fileBuffer: Buffer,
+  fileName:string,
+  mimeType:string,
 }
 
 interface FoodItemResponse {
@@ -56,12 +63,14 @@ export const addFoodItem = async (
     }
 
     const { name, description, price } = req.body;
+    
+    const file:File ={
+      fileBuffer:req.file.buffer,
+      fileName:uuid(),
+      mimeType:  req.file.mimetype
+    }
 
-    const imageUploadResponse = await storageService.uploadVideo(
-      req.file.buffer,
-      uuid(),
-      req.file.mimetype
-    );
+    const imageUploadResponse= await storageService.uploadVideo(file);
 
     const foodPartnerId = req.foodPartner.id;
     const newFoodItem = new food({
@@ -99,56 +108,102 @@ export const addFoodItem = async (
 
 export const getFoodItems = async (
   req: AuthenticatedRequest,
-  res: Response<ApiResponse<FoodItemResponse[]> | ErrorResponse>
+  res: Response<ApiResponse<FoodItemWithStatus[]> | ErrorResponse>
 ): Promise<void> => {
   try {
-    const foodItems = await food.find().populate('foodPartner', 'name').lean();
     const userId = req.user?.id;
 
-    if (!userId) {
-      res.status(200).json({
-        success: true,
-        message: 'Food items retrieved successfully',
-        data: foodItems as any,
+    const pipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'foodpartners',
+          localField: 'foodPartner',
+          foreignField: '_id',
+          as: 'foodPartnerData',
+        },
+      },
+      {
+        $unwind: {
+          path: '$foodPartnerData',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          foodPartner:{ name: '$foodPartnerData.name', _id: '$foodPartner' }
+        },
+      },
+    ];
+
+    if (userId) {
+      pipeline.push(
+        {
+          $lookup: {
+            from: 'likes',
+            let: { foodId: '$_id', userId: userId },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$food', '$$foodId'] },
+                      { $eq: ['$userId', { $toObjectId: '$$userId' }] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: 'userLikeData',
+          },
+        },
+        {
+          $lookup: {
+            from: 'saves',
+            let: { foodId: '$_id', userId: userId },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$food', '$$foodId'] },
+                      { $eq: ['$userId', { $toObjectId: '$$userId' }] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: 'userSaveData',
+          },
+        },
+        {
+          $addFields: {
+            isLiked: { $gt: [{ $size: '$userLikeData' }, 0] },
+            isSaved: { $gt: [{ $size: '$userSaveData' }, 0] },
+          },
+        },
+        {
+          $project: {
+            userLikeData: 0,
+            userSaveData: 0,
+            foodPartnerData: 0,
+          },
+        }
+      );
+    } else {
+      pipeline.push({
+        $project: {
+          foodPartnerData: 0,
+        },
       });
-      return;
     }
 
-    const foodItemIds = foodItems.map((item: any) => item._id);
-
-    const userLikes = await likedFood
-      .find({
-        userId: userId,
-        food: { $in: foodItemIds },
-      })
-      .select('food')
-      .lean();
-
-    const userSaves = await savedFood
-      .find({
-        userId: userId,
-        food: { $in: foodItemIds },
-      })
-      .select('food')
-      .lean();
-
-    const likedFoodIds = new Set(userLikes.map((like: any) => like.food.toString()));
-    const savedFoodIds = new Set(userSaves.map((save: any) => save.food.toString()));
-
-    const foodItemsWithStatus = foodItems.map((item: any) => {
-      const itemIdString = item._id.toString();
-
-      return {
-        ...item,
-        isLiked: likedFoodIds.has(itemIdString),
-        isSaved: savedFoodIds.has(itemIdString),
-      };
-    });
+    const foodItemsWithStatus: FoodItemWithStatus[] = await food.aggregate(pipeline);
+  
 
     res.status(200).json({
       success: true,
       message: 'Food items retrieved successfully',
-      data: foodItemsWithStatus as any,
+      data: foodItemsWithStatus,
     });
   } catch (error) {
     res.status(500).json({
