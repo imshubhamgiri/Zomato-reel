@@ -1,19 +1,5 @@
-import mongoose ,{  Schema , Types, model} from 'mongoose';
-
-
-export interface IFood  {
-  name: string;
-  video: string;
-  videoPublicId: string;
-  description: string;
-  price: number;
-  likeCount: number;
-  saveCount: number;
-  foodPartner: Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
+import mongoose ,{  Schema , model} from 'mongoose';
+import { IFood } from '../types';
 
  const foodSchema = new Schema<IFood>({
     name: { type: String, required: true, trim: true },
@@ -21,7 +7,6 @@ export interface IFood  {
     videoPublicId: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     price: { type: Number, required: true },
-    // category: { type: String, required: true, trim: true },
     likeCount: { type: Number, default: 0 },
     saveCount: { type: Number, default: 0 },
     foodPartner: { type: mongoose.Schema.Types.ObjectId, ref: 'FoodPartner', required: true }

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import type { ApiResponse, ErrorResponse, AuthenticatedRequest,FoodItemWithStatus  } from '../types';
+import type { ApiResponse, ErrorResponse, AuthenticatedRequest,FoodItemWithStatus,  AddFoodRequest,  UploadResponse ,File,  FoodItemResponse, UpdateFoodRequest } from '../types';
 import food from '../models/food.model';
 // import likedFood from '../models/like.model';
 // import savedFood from '../models/save.model';
@@ -8,45 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { error } from 'node:console';
 import { PipelineStage } from 'mongoose';
 
-interface UploadResponse {
-    name: string;
-    video: string;
-    videoPublicId: string;
-    description: string;
-    price: number;
-    foodPartnerId: string;
-}
 
-interface File{
-  fileBuffer: Buffer,
-  fileName:string,
-  mimeType:string,
-}
-
-interface FoodItemResponse {
-  id: string;
-  name: string;
-  video: string;
-  videoPublicId: string;
-  description: string;
-  price: number;
-  foodPartner: string;
-  isLiked?: boolean;
-  isSaved?: boolean;
-}
-
-interface AddFoodRequest {
-  name: string;
-  description: string;
-  price: number;
-}
-
-interface UpdateFoodRequest {
-  foodId: string;
-  name: string;
-  description: string;
-  price: number;
-}
 
 export const addFoodItem = async (
   req: Request<{}, {}, AddFoodRequest> & { foodPartner?: any; file?: Express.Multer.File },

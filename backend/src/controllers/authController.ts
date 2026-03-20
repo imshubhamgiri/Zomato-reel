@@ -1,45 +1,11 @@
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import type { ApiResponse , ErrorResponse } from '../types';
+import type { ApiResponse , ErrorResponse ,ProfileRegister , ProfileResponse ,FoodPartnerRegister,FoodPartnerLogin,UserLogin, PartnerResponse,} from '../types';
 import jwt from  'jsonwebtoken';
 import User from '../models/userModel';
 import { FoodPartner } from '../models/foodPartner.model';
 
-interface ProfileRegister{
-    name:string;
-    email:string;
-    password:string;
-}
-interface UserLogin{
-    email:string;
-    password:string;
-}
-interface FoodPartnerRegister{
-    name:string;
-    email:string;
-    password:string;
-    restaurantName:string;
-    phone:string;
-    address:string;
-}
-interface PartnerResponse{
-    id: string;
-    name:string;
-    email:string;
-    restaurantName:string;
-    phone:string;
-    address:string;
-}
-interface FoodPartnerLogin{
-    email:string;
-    password:string;
-}
 
-interface ProfileResponse {
-    id: string;
-    name: string;
-    email: string;
-}
 
 export const register = async (
   req: Request<{}, {}, ProfileRegister>,
@@ -85,67 +51,18 @@ export const register = async (
       user: profileResponse,
     });
   } catch (error) {
-    console.error("Register error:", error);
     res.status(500).json({
       success: false,
       message: "Server error",
-        error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
 
-
-// authController.register = async (req, res) => {
-//     try {
-//         const { name, email, password } = req.body;
-//         const existingUser = await User.findOne({ email }).lean();
-//         if (existingUser) {
-//             return res.status(400).json({ message: 'User already exists' });
-//         }
-//         const hashedPassword = await bcrypt.hash(password, 10);
-//         const newUser = new User({ name, email, password: hashedPassword });
-//         await newUser.save();
-//         const token = jwt.sign({ Id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-//         res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 86400000 }); // 1 day
-//         res.status(201).json({ 
-//             user: { id: newUser._id.toString(), name: newUser.name, email: newUser.email },
-//             message: 'User registered successfully' 
-//         });
-//     }
-//     catch (error) {
-//         console.error('Register error:', error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
-// authController.login = async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-//         const user = await User.findOne({ email }).lean();     
-//         if (!user) {
-//             return res.status(400).json({ message: 'Invalid credentials' });
-//         }
-//         const isMatch = await bcrypt.compare(password, user.password);
-//         if (!isMatch) {
-//             return res.status(400).json({ message: 'Invalid credentials' });
-//         }
-//         const token = jwt.sign({ Id: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-//         res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 86400000 }); // 1 day
-//         res.status(200).json({ 
-//             user: { id: user._id, name: user.name, email: user.email },
-//             message: 'Login successful'
-//          });
-//     }
-//     catch (error) {
-//         console.error('Login error:', error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
 export const login = async (
   req: Request<{}, {}, UserLogin>,
-  res: Response<ApiResponse<ProfileResponse>>
+  res: Response<ApiResponse<ProfileResponse | ErrorResponse>>
 ): Promise<void> => {
   try {
     const { email, password } = req.body;
@@ -245,12 +162,14 @@ export const registerFoodPartner = async (
 }
 
 export const loginFoodPartner = async (req: Request<{}, {}, FoodPartnerLogin>, res: Response<ApiResponse<PartnerResponse> | ErrorResponse>): Promise<void> => {
-    // Implementation for food partner registration
+    
     const { email, password } = req.body;
+    console.log("Login attempt for food partner:", email,password);
     // Similar logic as user registration can be applied here
     try {
         
-        const existing = await FoodPartner.findOne({email}).lean()
+        const existing = await FoodPartner.findOne({email}).select('+password').lean()
+
         if(!existing){
            res.status(400).json({success: false, message:"invalid credential"})
             return;
@@ -260,6 +179,7 @@ export const loginFoodPartner = async (req: Request<{}, {}, FoodPartnerLogin>, r
           res.status(400).json({success: false, message:"invalid credential"})
           return;
        }
+       console.log('Food partner authenticated successfully');
         const token = jwt.sign(
             {Id:existing._id},
             process.env.JWT_SECRET as string,
