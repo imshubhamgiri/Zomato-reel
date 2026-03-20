@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { Types } from 'mongoose';
 
 /**
  * Standard API Response wrapper
@@ -10,6 +11,81 @@ export interface ApiResponse<T = any> {
   data?: T;
   foodItems?: T[];
   error?: string;
+}
+
+export interface Like{
+user: Types.ObjectId,
+food: Types.ObjectId
+}
+
+export interface FoodItemWithStatus {
+  _id: Types.ObjectId;
+  name: string;
+  video: string;
+  videoPublicId: string;
+  description: string;
+  price: number;
+  foodPartner: string;
+  likeCount: number;
+  saveCount: number;
+  isLiked?: boolean;
+  isSaved?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UploadResponse {
+    name: string;
+    video: string;
+    videoPublicId: string;
+    description: string;
+    price: number;
+    foodPartnerId: string;
+}
+
+export interface File{
+  fileBuffer: Buffer,
+  fileName:string,
+  mimeType:string,
+}
+
+export interface FoodItemResponse {
+  id: string;
+  name: string;
+  video: string;
+  videoPublicId: string;
+  description: string;
+  price: number;
+  foodPartner: string;
+  isLiked?: boolean;
+  isSaved?: boolean;
+}
+
+export interface AddFoodRequest {
+  name: string;
+  description: string;
+  price: number;
+}
+
+export interface UpdateFoodRequest {
+  foodId: string;
+  name: string;
+  description: string;
+  price: number;
+}
+
+export interface IFood  {
+  _id?:Types.ObjectId | any,
+  name: string;
+  video: string;
+  videoPublicId: string;
+  description: string;
+  price: number;
+  likeCount: number;
+  saveCount: number;
+  foodPartner: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /**
@@ -47,4 +123,40 @@ export interface ErrorResponse extends ApiResponse {
   success: false;
   message: string;
   error: string;
+}
+
+export interface ProfileRegister{
+    name:string;
+    email:string;
+    password:string;
+}
+export interface UserLogin{
+    email:string;
+    password:string;
+}
+export interface FoodPartnerRegister{
+    name:string;
+    email:string;
+    password:string;
+    restaurantName:string;
+    phone:string;
+    address:string;
+}
+export interface PartnerResponse{
+    id: string;
+    name:string;
+    email:string;
+    restaurantName:string;
+    phone:string;
+    address:string;
+}
+export interface FoodPartnerLogin{
+    email:string;
+    password:string;
+}
+
+export interface ProfileResponse {
+    id: string;
+    name: string;
+    email: string;
 }
