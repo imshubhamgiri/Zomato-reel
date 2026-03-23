@@ -1,8 +1,6 @@
 import {  Response } from 'express';
 import type { ApiResponse, ErrorResponse, AuthenticatedRequest } from '../types';
-import likeModel from '../models/like.model';
-import save from '../models/save.model';
-import foodModel from '../models/food.model';
+import actionService from '../services/action.service';
 
 interface LikeResponse {
   id: string;
@@ -33,21 +31,9 @@ export const likefood = async (
       return;
     }
 
-    const isAlreadyLiked = await likeModel.findOne({
-      userId: user.id,
-      food: foodId,
-    });
+    const result = await actionService.toggleLike(user.id, foodId);
 
-    if (isAlreadyLiked) {
-      await likeModel.deleteOne({
-        userId: user.id,
-        food: foodId,
-      });
-
-      await foodModel.findByIdAndUpdate(foodId, {
-        $inc: { likeCount: -1 },
-      });
-
+    if (result.toggled === 'off') {
       res.status(200).json({
         success: true,
         message: 'Food unliked successfully',
@@ -55,22 +41,13 @@ export const likefood = async (
       return;
     }
 
-    const like = await likeModel.create({
-      userId: user.id,
-      food: foodId,
-    });
-
-    await foodModel.findByIdAndUpdate(foodId, {
-      $inc: { likeCount: 1 },
-    });
-
     res.status(201).json({
       success: true,
       message: 'Food liked successfully',
       user: {
-        id: like._id.toString(),
-        userId: like.userId.toString(),
-        food: like.food.toString(),
+        id: result.entity!.id,
+        userId: result.entity!.userId,
+        food: result.entity!.foodId,
       },
     });
   } catch (error) {
@@ -99,22 +76,9 @@ export const saveFood = async (
       return;
     }
 
-    // checking saved already or not
-    const isSaved = await save.findOne({
-      userId: user.id,
-      food: foodId,
-    });
+    const result = await actionService.toggleSave(user.id, foodId);
 
-    if (isSaved) {
-      await save.deleteOne({
-        userId: user.id,
-        food: foodId,
-      });
-
-      await foodModel.findByIdAndUpdate(foodId, {
-        $inc: { saveCount: -1 },
-      });
-
+    if (result.toggled === 'off') {
       res.status(200).json({
         success: true,
         message: 'Removed from saved',
@@ -122,22 +86,13 @@ export const saveFood = async (
       return;
     }
 
-    const saveFood = await save.create({
-      userId: user.id,
-      food: foodId,
-    });
-
-    await foodModel.findByIdAndUpdate(foodId, {
-      $inc: { saveCount: 1 },
-    });
-
     res.status(201).json({
       success: true,
       message: 'Food saved successfully',
       user: {
-        id: saveFood._id.toString(),
-        userId: saveFood.userId.toString(),
-        foodId: saveFood.food.toString(),
+        id: result.entity!.id,
+        userId: result.entity!.userId,
+        foodId: result.entity!.foodId,
       },
     });
   } catch (error) {

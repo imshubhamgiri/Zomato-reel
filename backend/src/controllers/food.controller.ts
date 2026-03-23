@@ -6,16 +6,25 @@ import food from '../models/food.model';
 import storageService from '../service/storage.service';
 import { v4 as uuid } from 'uuid';
 import { error } from 'node:console';
-import { PipelineStage } from 'mongoose';
+import foodService from '../services/food.service';
 
 
 
 export const addFoodItem = async (
-  req: Request<{}, {}, AddFoodRequest> & { foodPartner?: any; file?: Express.Multer.File },
+  req: Request<{}, {}, AddFoodRequest> & { user?: any; file?: Express.Multer.File },
   res: Response<ApiResponse<UploadResponse> | ErrorResponse>
 ): Promise<void> => {
   try {
-    if (!req.foodPartner || !req.foodPartner.id || !req.file) {
+    const foodpartner = req.user;
+    if(foodpartner.type !== 'partner') {
+      res.status(403).json({
+        success: false,
+        message: 'Forbidden: Only food partners can add food items',
+        error: 'Unauthorized',
+      });
+      return;
+    }
+    if (!foodpartner.id || !req.file) {
       res.status(401).json({
         success: false,
         message: 'Unauthorized: No food partner info',
@@ -34,7 +43,7 @@ export const addFoodItem = async (
 
     const imageUploadResponse= await storageService.uploadVideo(file);
 
-    const foodPartnerId = req.foodPartner.id;
+    const foodPartnerId = req.user.id;
     const newFoodItem = new food({
       name,
       video: imageUploadResponse.url,
@@ -74,92 +83,7 @@ export const getFoodItems = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
-
-    const pipeline: PipelineStage[] = [
-      {
-        $lookup: {
-          from: 'foodpartners',
-          localField: 'foodPartner',
-          foreignField: '_id',
-          as: 'foodPartnerData',
-        },
-      },
-      {
-        $unwind: {
-          path: '$foodPartnerData',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $addFields: {
-          foodPartner:{ name: '$foodPartnerData.name', _id: '$foodPartner' }
-        },
-      },
-    ];
-
-    if (userId) {
-      pipeline.push(
-        {
-          $lookup: {
-            from: 'likes',
-            let: { foodId: '$_id', userId: userId },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $eq: ['$food', '$$foodId'] },
-                      { $eq: ['$userId', { $toObjectId: '$$userId' }] },
-                    ],
-                  },
-                },
-              },
-            ],
-            as: 'userLikeData',
-          },
-        },
-        {
-          $lookup: {
-            from: 'saves',
-            let: { foodId: '$_id', userId: userId },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $eq: ['$food', '$$foodId'] },
-                      { $eq: ['$userId', { $toObjectId: '$$userId' }] },
-                    ],
-                  },
-                },
-              },
-            ],
-            as: 'userSaveData',
-          },
-        },
-        {
-          $addFields: {
-            isLiked: { $gt: [{ $size: '$userLikeData' }, 0] },
-            isSaved: { $gt: [{ $size: '$userSaveData' }, 0] },
-          },
-        },
-        {
-          $project: {
-            userLikeData: 0,
-            userSaveData: 0,
-            foodPartnerData: 0,
-          },
-        }
-      );
-    } else {
-      pipeline.push({
-        $project: {
-          foodPartnerData: 0,
-        },
-      });
-    }
-
-    const foodItemsWithStatus: FoodItemWithStatus[] = await food.aggregate(pipeline);
+    const foodItemsWithStatus: FoodItemWithStatus[] = await foodService.getFoodItems(userId);
   
 
     res.status(200).json({
@@ -209,16 +133,16 @@ export const GetfoodById = async (
 };
 
 export const deleteFoodItem = async (
-  req: Request<{}, {}, { foodId: string }> & { foodPartner?: any },
+  req: Request<{}, {}, { foodId: string }> & { user?: any },
   res: Response<ApiResponse | ErrorResponse>
 ): Promise<void> => {
   const { foodId } = req.body;
 
-  if (!req.foodPartner || !req.foodPartner.id) {
+  if (!req.user || !req.user.id) {
     res.status(401).json({
       success: false,
-      message: 'Unauthorized: No food partner info',
-      error: 'Missing partner info',
+      message: 'Unauthorized: No user info',
+      error: 'Missing user info',
     });
     return;
   }
@@ -235,7 +159,7 @@ export const deleteFoodItem = async (
       return;
     }
 
-    if (fooditem.foodPartner.toString() !== req.foodPartner.id) {
+    if (fooditem.foodPartner.toString() !== req.user.id) {
       res.status(403).json({
         success: false,
         message: 'Forbidden: You can only delete your own food items',
@@ -262,16 +186,16 @@ export const deleteFoodItem = async (
 };
 
 export const updateFoodItem = async (
-  req: Request<{}, {}, UpdateFoodRequest> & { foodPartner?: any },
+  req: Request<{}, {}, UpdateFoodRequest> & { user?: any },
   res: Response<ApiResponse<UploadResponse> | ErrorResponse>
 ): Promise<void> => {
   const { foodId, name, description, price } = req.body;
 
-  if (!req.foodPartner || !req.foodPartner.id) {
+  if (!req.user || !req.user.id) {
     res.status(401).json({
       success: false,
-      message: 'Unauthorized: No food partner info',
-      error: 'Missing partner info',
+      message: 'Unauthorized: No user info',
+      error: 'Missing user info',
     });
     return;
   }
@@ -288,7 +212,7 @@ export const updateFoodItem = async (
       return;
     }
 
-    if (foodItem.foodPartner.toString() !== req.foodPartner.id) {
+    if (foodItem.foodPartner.toString() !== req.user.id) {
       res.status(403).json({
         success: false,
         message: 'Forbidden: You can only update your own food items',

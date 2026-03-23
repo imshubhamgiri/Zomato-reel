@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { FoodPartner } from '../models/foodPartner.model';
 import type { ApiResponse, ErrorResponse } from '../types';
+import profileService from '../services/profile.service';
 
 interface ProfileResponse {
   name: string;
@@ -22,21 +22,13 @@ export const getFoodPartnerProfile = async (
       return;
     }
 
-    const foodPartner = await FoodPartner.findById(id).lean();
-    if (!foodPartner) {
+    const profile = await profileService.getFoodPartnerProfile(id);
+    if (!profile) {
       res.status(404).json({ success: false, message: 'Food Partner not found', error: 'Not found' });
       return;
     }
 
-    const response: ProfileResponse = {
-      name: foodPartner.name,
-      restaurantName: foodPartner.restaurantName,
-      email: foodPartner.email,
-      phone: foodPartner.phone,
-      address: foodPartner.address,
-    };
-
-    res.status(200).json({ success: true, message: 'Profile retrieved successfully', data: response });
+    res.status(200).json({ success: true, message: 'Profile retrieved successfully', data: profile as ProfileResponse });
   } catch (error) {
     console.error('Error fetching food partner profile:', error);
     res.status(500).json({
