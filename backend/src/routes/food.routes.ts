@@ -1,18 +1,32 @@
 import express, { Router } from 'express';
 import * as foodController from '../controllers/food.controller';
-import { FoodPartnerAuthMiddleware, combineAuth } from '../middleware/auth';
+import { requireAuth, requireRole } from '../middleware/auth';
+import { validateAddFoodRequest, validateUpdateFoodRequest } from '../middleware/validation';
 import multer from 'multer';
 
 const foodroutes: Router = express.Router();
 const storage = multer.memoryStorage(); // IMPORTANT!
 const upload = multer({ storage: storage });
+const requirePartner = [requireAuth, requireRole(['partner'])];
 
-// food-related routes here
-foodroutes.post('/add', FoodPartnerAuthMiddleware, upload.single('video'), foodController.addFoodItem);
-foodroutes.delete('/delete', FoodPartnerAuthMiddleware, foodController.deleteFoodItem);
-// foodroutes.post('/trialadd',  foodController.addFoodItem); // Uncomment for testing purposes
-foodroutes.get('/listfood', combineAuth, foodController.getFoodItems);
+// Backward-compatible aliases (specific routes FIRST to avoid conflicts)
+foodroutes.post('/add', requirePartner, upload.single('video'), validateAddFoodRequest, foodController.addFoodItem);
+foodroutes.get('/listfood', requireAuth, foodController.getFoodItems);
 foodroutes.get('/getfood/:id', foodController.GetfoodById);
-foodroutes.put('/update', FoodPartnerAuthMiddleware, foodController.updateFoodItem);
+foodroutes.put('/update', requirePartner, validateUpdateFoodRequest, foodController.updateFoodItem);
+foodroutes.delete('/delete', requirePartner, foodController.deleteFoodItem);
+
+// Refined routes (generic routes LAST)
+foodroutes.post('/', requirePartner, upload.single('video'), validateAddFoodRequest, foodController.addFoodItem);
+foodroutes.get('/', requireAuth, foodController.getFoodItems);
+foodroutes.get('/partner/:id', foodController.GetfoodById);
+foodroutes.put('/:foodId', requirePartner, (req, _res, next) => {
+	req.body.foodId = req.params.foodId;
+	next();
+}, validateUpdateFoodRequest, foodController.updateFoodItem);
+foodroutes.delete('/:foodId', requirePartner, (req, _res, next) => {
+	req.body.foodId = req.params.foodId;
+	next();
+}, foodController.deleteFoodItem);
 
 export default foodroutes;

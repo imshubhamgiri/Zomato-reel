@@ -14,5 +14,10 @@ import { IFood } from '../types';
     timestamps: true
 });
 
+foodSchema.index({ foodPartner: 1, createdAt: -1 });
+foodSchema.index({ createdAt: -1 });
+foodSchema.index({ likeCount: -1 });
+
 const Food = model<IFood>('Food', foodSchema);
+
 export default Food;
