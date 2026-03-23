@@ -1,9 +1,26 @@
-import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import type { ApiResponse , ErrorResponse ,ProfileRegister , ProfileResponse ,FoodPartnerRegister,FoodPartnerLogin,UserLogin, PartnerResponse,} from '../types';
-import jwt from  'jsonwebtoken';
-import User from '../models/userModel';
-import { FoodPartner } from '../models/foodPartner.model';
+import type {
+  ApiResponse,
+  ErrorResponse,
+  ProfileRegister,
+  ProfileResponse,
+  FoodPartnerRegister,
+  FoodPartnerLogin,
+  UserLogin,
+  PartnerResponse,
+  AuthenticatedRequest,
+} from '../types';
+import {
+  getAccessCookieOptions,
+  getLoginCheckData,
+  getRefreshCookieOptions,
+  loginPartner,
+  loginUser,
+  registerPartner,
+  registerUser,
+  revokeAllRefreshTokensForUser,
+  rotateRefreshToken,
+} from '../services/auth.service';
 
 
 
@@ -12,49 +29,25 @@ export const register = async (
   res: Response<ApiResponse<ProfileResponse> | ErrorResponse>
 ): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const { profile, tokens } = await registerUser(req.body);
 
-    const existingUser = await User.findOne({ email }).lean();
-    if (existingUser) {
-      res.status(400).json({
-        success: false,
-        message: "User already exists",
-      });
-      return;
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save();
-
-    const token = jwt.sign(
-      { Id: newUser._id },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "24h" }
-    );
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      maxAge: 86400000, // 1 day
-    });
-
-    const profileResponse: ProfileResponse = {
-      id: newUser._id.toString(),
-      name: newUser.name,
-      email: newUser.email,
-    };
+    res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
+    res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+    res.cookie('token', tokens.accessToken, getAccessCookieOptions());
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
-      user: profileResponse,
+      message: 'User registered successfully',
+      user: profile,
+      tokens,
     });
   } catch (error) {
-    res.status(500).json({
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const statusCode = message === 'User already exists' ? 400 : 500;
+    res.status(statusCode).json({
       success: false,
-      message: "Server error",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: statusCode === 400 ? 'User already exists' : 'Server error',
+      error: message,
     });
   }
 };
@@ -65,47 +58,37 @@ export const login = async (
   res: Response<ApiResponse<ProfileResponse | ErrorResponse>>
 ): Promise<void> => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({email}).lean();     
-    if (!user) {
-      res.status(400).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-      return;
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      res.status(400).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-      return;
-    }
-    const token = jwt.sign({Id: user._id}, process.env.JWT_SECRET as string, {expiresIn: "24h"});
-    res.cookie("token", token, {httpOnly: true, secure: false, maxAge: 86400000}); // 1 day
-    const profileResponse: ProfileResponse = {
-      id: user._id.toString(),
-      name: user.name,
-        email: user.email,
-    };
+    const { profile, tokens } = await loginUser(req.body);
+
+    res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
+    res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+    res.cookie('token', tokens.accessToken, getAccessCookieOptions());
+
     res.status(200).json({
         success: true,
-        message: "Login successful",
-        user: profileResponse,
+        message: 'Login successful',
+        user: profile,
+        tokens,
     })
 }catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const statusCode = message === 'Invalid credentials' ? 400 : 500;
+    res.status(statusCode).json({
       success: false,
-      message: "Server error",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: statusCode === 400 ? 'Invalid credentials' : 'Server error',
+      error: message,
     });
   }
 }
 
-export const logoutuser = (_req: Request, res: Response) => {
-    res.clearCookie("token");
+export const logoutuser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    if (req.user) {
+      await revokeAllRefreshTokensForUser(req.user.id, req.user.type);
+    }
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.clearCookie('token');
     res.status(200).json({ message: 'Logout successful' });
 }
 
@@ -113,107 +96,121 @@ export const registerFoodPartner = async (
     req: Request<{}, {}, FoodPartnerRegister>,
     res: Response<ApiResponse<PartnerResponse> | ErrorResponse>
 ): Promise<void> => {
-    const { name, email, password , restaurantName, phone , address } = req.body;
     try {
-        
-        const existing = await FoodPartner.findOne({email}).lean()
-        if(existing){
-             res.status(400).json({
-                 success: false,
-                 message: 'Email already exists',
-                 });
-                 return;
-        }
-         
-         const hashedPassword = await bcrypt.hash(password , 10);
-       const newUser = new FoodPartner({ name, email, restaurantName, phone,address, password: hashedPassword });
-         await newUser.save();
-        const token = jwt.sign(
-            {Id:newUser._id},
-            process.env.JWT_SECRET as string,
-            {expiresIn:'1h'}
-        )
-        res.cookie('token',token , {httpOnly: true, secure: false, maxAge: 3600000}); // 1 hour
-       
-        const Profiledata: PartnerResponse = {
-            id: newUser._id.toString(),
-            name: newUser.name,
-            email: newUser.email,
-            restaurantName: newUser.restaurantName,
-            phone: newUser.phone,
-            address: newUser.address,
-        }
+      const { profile, tokens } = await registerPartner(req.body);
+
+      res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
+      res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+      res.cookie('token', tokens.accessToken, getAccessCookieOptions());
 
         res.status(201).json({
         success: true,
-        message:"Registration successful",
-        user: Profiledata
+        message:'Registration successful',
+        user: profile,
+        tokens,
        });
        return;
     } catch (error) {
-        console.log('Registration error', error)
-        res.status(500).json({
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        const statusCode = message === 'Email already exists' ? 400 : 500;
+        res.status(statusCode).json({
           success:false,
-          message:"server error",
-          error: error instanceof Error ? error.message : "Unknown error"
+          message: statusCode === 400 ? 'Email already exists' : 'server error',
+          error: message,
         })
     }
 
 }
 
 export const loginFoodPartner = async (req: Request<{}, {}, FoodPartnerLogin>, res: Response<ApiResponse<PartnerResponse> | ErrorResponse>): Promise<void> => {
-    
-    const { email, password } = req.body;
-    console.log("Login attempt for food partner:", email,password);
-    // Similar logic as user registration can be applied here
     try {
-        
-        const existing = await FoodPartner.findOne({email}).select('+password').lean()
+      const { profile, tokens } = await loginPartner(req.body);
 
-        if(!existing){
-           res.status(400).json({success: false, message:"invalid credential"})
-            return;
-        } 
-       const isMatch = await bcrypt.compare(password, existing.password);
-       if(!isMatch){
-          res.status(400).json({success: false, message:"invalid credential"})
-          return;
-       }
-       console.log('Food partner authenticated successfully');
-        const token = jwt.sign(
-            {Id:existing._id},
-            process.env.JWT_SECRET as string,
-            {expiresIn:'1h'}
-        )
-        res.cookie('token',token , {httpOnly: true, secure: false, maxAge: 3600000}); // 1 hour
-        
-        const profileResponse: PartnerResponse = {
-            id: existing._id.toString(),
-            name: existing.name,
-            email: existing.email,
-            restaurantName: existing.restaurantName,
-            phone: existing.phone,
-            address: existing.address,
-        }
+      res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
+      res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+      res.cookie('token', tokens.accessToken, getAccessCookieOptions());
 
         res.status(200).json({
         success: true,
-        message:"login successful",
-        user: profileResponse});
+        message:'login successful',
+        user: profile,
+        tokens,
+      });
         return;
     } catch (error) {
-        res.status(500).json({
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        const statusCode = message === 'Invalid credentials' ? 400 : 500;
+        res.status(statusCode).json({
           success:false,
-          message:"server error",
-          error: error instanceof Error ? error.message : "Unknown error"})
+          message: statusCode === 400 ? 'invalid credential' : 'server error',
+          error: message,
+        })
     }
 
 }
 
-export const logoutFoodpartner = (_req: Request, res: Response<ApiResponse>) => {
-    res.clearCookie("token");
+export const logoutFoodpartner = async (req: AuthenticatedRequest, res: Response<ApiResponse>): Promise<void> => {
+    if (req.user) {
+      await revokeAllRefreshTokensForUser(req.user.id, req.user.type);
+    }
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.clearCookie('token');
     res.status(200).json({
         success: true,
        message: 'FoodPartner Logged out successfully' 
       });
 }
+
+export const refreshToken = async (req: Request, res: Response<ApiResponse | ErrorResponse>): Promise<void> => {
+  const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
+  if (!incomingRefreshToken) {
+    res.status(401).json({
+      success: false,
+      message: 'Refresh token is required',
+      error: 'Missing refresh token',
+    });
+    return;
+  }
+
+  try {
+    const { tokens } = await rotateRefreshToken(incomingRefreshToken);
+
+    res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
+    res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+    res.cookie('token', tokens.accessToken, getAccessCookieOptions());
+
+    res.status(200).json({
+      success: true,
+      message: 'Tokens refreshed successfully',
+      data: tokens,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: 'Invalid refresh token',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+export const loginCheck = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Please Login First' });
+    return;
+  }
+
+  try {
+    const responseData = await getLoginCheckData({
+      Id: req.user.id,
+      email: req.user.email,
+      type: req.user.type,
+    });
+    res.status(200).json(responseData);
+  } catch (error) {
+    res.status(401).json({
+      message: 'Authentication failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
+    });
+  }
+};

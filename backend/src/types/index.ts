@@ -10,6 +10,7 @@ export interface ApiResponse<T = any> {
   user?: T;
   data?: T;
   foodItems?: T[];
+  tokens?: AuthTokens;
   error?: string;
 }
 
@@ -92,11 +93,24 @@ export interface IFood  {
  * Extended Request with authenticated user
  */
 export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    type: 'user' | 'partner';
-  };
+  user?: AuthUser;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  type: 'user' | 'partner';
+}
+
+export interface AuthTokenPayload {
+  Id: string;
+  email: string;
+  type: 'user' | 'partner';
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
 }
 
 /**

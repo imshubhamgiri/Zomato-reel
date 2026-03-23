@@ -1,48 +1,77 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { FoodPartner } from '../models/foodPartner.model';
-import User from '../models/userModel';
-import type { AuthenticatedRequest } from '../types';
+import type { AuthenticatedRequest, AuthTokenPayload } from '../types';
 
-export const FoodPartnerAuthMiddleware = async (
+const parsePayload = (decoded: JwtPayload): AuthenticatedRequest['user'] | null => {
+  const id = decoded.Id;
+  const email = decoded.email;
+  const type = decoded.type;
+
+  if (!id || !email || (type !== 'user' && type !== 'partner')) {
+    return null;
+  }
+
+  return {
+    id: String(id),
+    email: String(email),
+    type,
+  };
+};
+
+export const extractToken = (req: Request): string | null => {
+  const accessCookieToken = req.cookies?.accessToken;
+  if (accessCookieToken) {
+    return accessCookieToken;
+  }
+
+  const cookieToken = req.cookies?.token;
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.slice(7);
+  }
+
+  return null;
+};
+
+export const decodeAccessToken = (token: string): AuthTokenPayload => {
+  return jwt.verify(token, process.env.JWT_SECRET as string) as AuthTokenPayload;
+};
+
+export const attachAuthContext = async (
   req: AuthenticatedRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const token = req.cookies.token;
+    const token = extractToken(req);
     if (!token) {
-      res.status(401).json({ message: 'Please Login first' });
+      next();
       return;
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
-    const foodPartner = await FoodPartner.findById(decoded.Id);
+    const decoded = decodeAccessToken(token) as JwtPayload;
+    const principal = parsePayload(decoded);
 
-    if (!foodPartner) {
-      res.status(401).json({ message: 'Partner Invalid token' });
-      return;
+    if (principal) {
+      req.user = principal;
     }
-
-    req.user = {
-      id: foodPartner._id.toString(),
-      email: foodPartner.email,
-      type: 'partner',
-    };
-
-    next();
-  } catch (error) {
-    console.error('Auth error:', error);
-    res.status(401).json({ message: 'Authentication failed' });
+  } catch (_error) {
+    // Keep this middleware non-blocking; protected routes still enforce auth.
   }
+
+  next();
 };
 
-export const userAuthMiddleware = async (
+export const requireAuth = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const token = req.cookies.token;
+  const token = extractToken(req);
 
   if (!token) {
     res.status(401).json({ message: 'Please login first' });
@@ -50,20 +79,15 @@ export const userAuthMiddleware = async (
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
-    const user = await User.findById(decoded.Id);
+    const decoded = decodeAccessToken(token) as JwtPayload;
+    const principal = parsePayload(decoded);
 
-    if (!user) {
-      res.status(401).json({ message: 'User Invalid token' });
+    if (!principal) {
+      res.status(401).json({ message: 'Invalid token payload' });
       return;
     }
 
-    req.user = {
-      id: user._id.toString(),
-      email: user.email,
-      type: 'user',
-    };
-
+    req.user = principal;
     next();
   } catch (error) {
     res.status(401).json({
@@ -72,89 +96,22 @@ export const userAuthMiddleware = async (
   }
 };
 
-export const loginMiddleware = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    res.status(401).json({ message: 'Please Login First' });
-    return;
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
-    const user = (await User.findById(decoded.Id)) || (await FoodPartner.findById(decoded.Id));
-
-    if (!user) {
-      res.status(401).json({ message: 'Invalid token' });
+export const requireRole = (allowedRoles: Array<'user' | 'partner'>) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({ message: 'Please login first' });
       return;
     }
 
-    const userType = (user as any).restaurantName ? 'partner' : 'user';
-    const responseData: any = {
-      message: 'User found',
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      userType: userType,
-    };
-
-    if (userType === 'partner') {
-      responseData.restaurantName = (user as any).restaurantName;
-      responseData.phone = (user as any).phone;
-      responseData.address = (user as any).address;
+    if (!allowedRoles.includes(req.user.type)) {
+      res.status(403).json({ message: 'Forbidden' });
+      return;
     }
 
-    res.status(200).json(responseData);
-  } catch (error) {
-    res.status(401).json({
-      message: 'Authentication failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
-    });
-  }
+    next();
+  };
 };
 
-export const combineAuth = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    res.status(401).json({ message: 'Please Login first' });
-    return;
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
-
-    // FoodPartner check
-    const foodPartner = await FoodPartner.findById(decoded.Id);
-    if (foodPartner) {
-      req.user = {
-        id: foodPartner._id.toString(),
-        email: foodPartner.email,
-        type: 'partner',
-      };
-      return next();
-    }
-
-    // If not a partner, check for User
-    const user = await User.findById(decoded.Id);
-    if (user) {
-      req.user = {
-        id: user._id.toString(),
-        email: user.email,
-        type: 'user',
-      };
-      return next();
-    }
-
-    res.status(401).json({ message: 'Invalid token' });
-  } catch (error) {
-    console.error('Auth error:', error);
-    res.status(401).json({ message: 'Authentication failed' });
-  }
-};
+export const FoodPartnerAuthMiddleware = [requireAuth, requireRole(['partner'])];
+export const userAuthMiddleware = [requireAuth, requireRole(['user'])];
+export const combineAuth = requireAuth;
