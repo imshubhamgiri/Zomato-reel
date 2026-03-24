@@ -14,8 +14,9 @@ const PartnerProfileUser = () => {
   useEffect(() => {
     const fetchPartnerProfile = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/profile/foodpartner/${id}`);
-        setPartnerProfile(response.data);
+        const response = await axios.get(`${API_URL}/api/profile/foodPartners/${id}`);
+        setPartnerProfile(response.data.data);
+        console.log('Fetched partner profile:', response.data);
       } catch (error) {
         console.error('Error fetching partner profile:', error);
       }
@@ -23,11 +24,12 @@ const PartnerProfileUser = () => {
 
     const fetchFoodItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/food/getfood/${id}`,{
+        const response = await axios.get(`${API_URL}/api/foods/getfood/${id}`,{
           withCredentials: true
         });
         // const partnerFoods = response.data.fooditems?.filter(item => item.foodPartner._id === id) || [];
-        setFoodItems(response.data.fooditems || []);
+        setFoodItems(response.data.foodItems || []);
+          console.log('Fetched food items:', response.data);
       } catch (error) {
         console.error('Error fetching food items:', error);
       } finally {
@@ -102,7 +104,7 @@ const PartnerProfileUser = () => {
                       Partner Restaurant
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black mb-3 bg-linear-to-r from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400 bg-clip-text text-transparent">
-                      {partnerProfile.restaurantName || partnerProfile.restrauntName || 'Restaurant'}
+                      {partnerProfile.restaurantName || partnerProfile.restrauntName || partnerProfile.name || 'Restaurant'}
                     </h1>
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                       <svg className="w-5 h-5 text-orange-500 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">

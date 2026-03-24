@@ -13,18 +13,20 @@ function UserRegister() {
     const password = e.target.password.value;
 
     try {
-      await userAPI.register(name, email, password);      
-      // Check user type and navigate accordingly
-      const authCheck = await authAPI.checkAuth();
-      if (authCheck.userType === 'partner') {
-        navigate('/partner/profile');
-      } else {
-        navigate('/user/profile');
-      }
+     const {data} =  await userAPI.register(name, email, password); 
+     if(data.status == 201){  // Check user type and navigate accordingly
+       const authCheck = await authAPI.checkAuth();
+       if (authCheck.userType === 'partner') {
+         navigate('/partner/profile');
+       } else {
+         navigate('/user/profile');
+       }
+     }     
     } catch (error) {
-      console.error(error);
-      setError('Registration failed. Please try again.');
+      console.error(error?.message || 'registration failed');
+      setError(error?.response?.data?.error || error?.message || "Registration failed");
     }
+    console.log(error);
   };
 
   return (
