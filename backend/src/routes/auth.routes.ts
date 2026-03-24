@@ -14,15 +14,15 @@ const authRoutes = express.Router();
 
 //] authentication routes here
 // User Routes
-authRoutes.post('/user/login', authLimiter, validateUserLogin, authController.login)
-authRoutes.post('/user/register', authLimiter, validateUserRegister, authController.register)
-authRoutes.post('/user/logout', requireAuth, authController.logoutuser)
-authRoutes.get('/user/logout', requireAuth, authController.logoutuser)
+authRoutes.post('/users/login', authLimiter, validateUserLogin, authController.login)
+authRoutes.post('/users/register', authLimiter, validateUserRegister, authController.register)
+authRoutes.post('/users/logout', requireAuth, authController.logoutuser)
+authRoutes.get('/users/logout', requireAuth, authController.logoutuser)
 // Food Partner Routes
-authRoutes.post('/partner/register', authLimiter, validatePartnerRegister, authController.registerFoodPartner)
-authRoutes.post('/partner/login', authLimiter, validatePartnerLogin, authController.loginFoodPartner)
-authRoutes.post('/partner/logout', requireAuth, authController.logoutFoodpartner)
-authRoutes.get('/partner/logout', requireAuth, authController.logoutFoodpartner)
+authRoutes.post('/partners/register', authLimiter, validatePartnerRegister, authController.registerFoodPartner)
+authRoutes.post('/partners/login', authLimiter, validatePartnerLogin, authController.loginFoodPartner)
+authRoutes.post('/partners/logout', requireAuth, authController.logoutFoodpartner)
+authRoutes.get('/partners/logout', requireAuth, authController.logoutFoodpartner)
 
 authRoutes.post('/refresh', authLimiter, authController.refreshToken)
 authRoutes.get('/loginCheck', requireAuth, authController.loginCheck)

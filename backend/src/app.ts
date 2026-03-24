@@ -27,9 +27,9 @@ app.use(globalApiLimiter);
 
 app.use('/api/auth', authRoutes);
 
-app.use('/api/food', foodRoutes);
+app.use('/api/foods', foodRoutes);
 
-app.use('/api/profile', profileRoutes);
+app.use('/api/profiles', profileRoutes);
 app.use('/api/actions',actionRoutes)
 
 app.get('/', (_req, res) => {
