@@ -1,6 +1,6 @@
 # 🍽️ Zomato Reel - Food Discovery Platform
 
-A modern food ordering platform featuring Instagram/TikTok-style video reels where food partners showcase their dishes through engaging short videos. Built with the MERN stack and cookie-based authentication.
+A modern food ordering platform featuring Instagram/TikTok-style video reels where food partners showcase their dishes through engaging short videos. Built with MERN + TypeScript, featuring production-ready error handling, structured logging, and enterprise-grade architecture patterns.
 
 ## 🌐 Features
 
@@ -49,52 +49,77 @@ A modern food ordering platform featuring Instagram/TikTok-style video reels whe
 - **React Toastify** - Toast notifications
 
 ### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
+- **Node.js** + **TypeScript** - Typed runtime environment
+- **Express.js** - Lightweight web framework
 - **MongoDB** - NoSQL database
 - **Mongoose** - ODM for MongoDB
 - **JWT** - Token-based authentication
-- **Bcrypt** - Password hashing
+- **Bcrypt** - Password hashing (10 rounds)
 - **Multer** - File upload handling
 - **ImageKit** - Video CDN service
-- **Cookie-parser** - Cookie handling middleware
+- **Zod** - Runtime type validation
+- **Cookie-parser** - Secure httpOnly cookie handling
+
+### Architecture & Patterns (Backend)
+- **TypeScript** - Full type safety across codebase
+- **Custom Error Classes** - Type-safe error handling with operational vs programming error discrimination
+- **Async Error Handler** - Centralized error catching utility eliminating boilerplate try-catch blocks
+- **Repository Pattern** - Abstracted data access layer
+- **Middleware Pipeline** - Auth, validation, logging, rate-limiting, CORS, error handling
+- **Service Layer** - Business logic encapsulation
+- **Structured Logging** - Request/response logging with context
 
 ## 📁 Project Structure
 
 ```
 Zomato-reel/
-├── frontend/                # React frontend
+├── frontend/                # React frontend (stable, feature-complete)
 │   ├── src/
-│   │   ├── components/     # Reusable components
-│   │   ├── pages/          # Page components
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Page-level components
 │   │   │   ├── Home.jsx           # Video reel feed
 │   │   │   ├── UserLogin.jsx      # User authentication
 │   │   │   ├── UserRegister.jsx
 │   │   │   ├── PartnerLogin.jsx   # Partner authentication
 │   │   │   ├── PartnerRegister.jsx
-│   │   │   ├── Addfood.jsx        # Video upload
-│   │   │   └── PartnerProfileUser.jsx
-│   │   ├── services/       # API services
-│   │   └── config/         # Configuration files
+│   │   │   ├── Addfood.jsx        # Video upload interface
+│   │   │   └── PartnerProfile*.jsx
+│   │   ├── services/       # API client services
+│   │   └── config/         # Configuration
 │   └── package.json
 │
-├── backend/                # Express backend
+├── backend/                # Express backend (TypeScript, refactored)
 │   ├── src/
-│   │   ├── controllers/   # Route controllers
-│   │   │   ├── authController.js
-│   │   │   ├── food.controller.js
-│   │   │   └── actionController.js
-│   │   ├── models/        # Mongoose models
-│   │   │   ├── userModel.js
-│   │   │   ├── foodPartner.model.js
-│   │   │   ├── food.model.js
-│   │   │   ├── like.model.js
-│   │   │   └── save.model.js
-│   │   ├── routes/        # API routes
-│   │   ├── middleware/    # Auth middleware
-│   │   │   └── auth.js
-│   │   └── service/       # External services
-│   │       └── storage.service.js (ImageKit)
+│   │   ├── controllers/    # Route handlers
+│   │   │   ├── authController.ts
+│   │   │   ├── food.controller.ts
+│   │   │   ├── actionController.ts
+│   │   │   └── profileController.ts
+│   │   ├── services/       # Business logic layer
+│   │   │   ├── auth.service.ts      # Auth logic with typed errors
+│   │   │   ├── food.service.ts
+│   │   │   └── profile.service.ts
+│   │   ├── repositories/   # Data access layer
+│   │   │   ├── auth.repository.ts
+│   │   │   ├── food.repository.ts
+│   │   │   └── profile.repository.ts
+│   │   ├── middleware/     # Express middleware pipeline
+│   │   │   ├── errorHandler.ts    # Centralized error with type discrimination
+│   │   │   ├── auth.ts            # JWT verification & context attachment
+│   │   │   ├── validation.ts      # Zod schema validation
+│   │   │   ├── logging.ts         # Request/response logging
+│   │   │   ├── cors.ts            # CORS configuration
+│   │   │   └── rateLimiter.ts     # API rate limiting
+│   │   ├── routes/         # Express route definitions
+│   │   ├── models/         # Mongoose schemas
+│   │   ├── types/          # TypeScript interfaces & types
+│   │   ├── utils/          # Utility functions
+│   │   │   ├── asyncHandler.ts    # Async error wrapper
+│   │   │   └── error.ts           # Custom error classes
+│   │   ├── db/             # Database configuration
+│   │   ├── app.ts          # Express app setup
+│   │   └── server.ts       # Entry point
+│   ├── tsconfig.json
 │   └── package.json
 │
 └── README.md
@@ -164,6 +189,49 @@ VITE_API_URL=http://localhost:5000
 npm run dev
 ```
 Frontend runs on `http://localhost:5173`
+
+## 🏗️ Backend Architecture (Recent Refactor)
+
+The backend underwent a significant refactor to implement production-grade error handling and architecture patterns:
+
+### Error Handling System
+- **Custom Error Classes** (`AppError`, `AuthError`, `ConflictError`, `NotFoundError`, `ValidationError`, etc.)
+  - Type-safe error throwing: `throw new ConflictError('Email already exists')`
+  - Automatic status code assignment per error type
+  - `isOperational` flag to distinguish expected errors from programming bugs
+  
+- **Async Error Handler Utility**
+  - Eliminates repetitive try-catch blocks in controllers
+  - Centralized error catching: `export const register = asyncHandler(async (req, res) => { ... })`
+  - All promise rejections automatically routed to error middleware
+  
+- **Centralized Error Middleware**
+  - Type discrimination: checks `instanceof AppError` vs unknown errors
+  - Stack trace sanitization: hidden in production, visible in development
+  - Consistent error response format
+  - Logging with error context
+
+### Code Organization
+- **Service Layer**: Business logic with typed error throwing
+- **Repository Pattern**: Abstracted database queries
+- **Middleware Pipeline**: Auth → Validation → Logging → Rate-limiting → Routes → Error Handler
+- **Type Safety**: Full TypeScript codebase with interfaces for API contracts
+
+### Example: Error Flow
+```typescript
+// Service throws typed error
+if (existingUser) {
+  throw new ConflictError('Email already registered');  // statusCode: 409, isOperational: true
+}
+
+// Controller wrapped with asyncHandler (no try-catch needed!)
+export const register = asyncHandler(async (req, res) => {
+  const user = await registerUser(req.body);
+  res.status(201).json({ success: true, user });
+});
+
+// Error automatically caught → middleware → responds with 409 JSON
+```
 
 ## 📡 API Documentation
 
@@ -294,12 +362,15 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 ## 🔒 Security Features
 
 ✅ **Password hashing** with bcrypt (10 rounds)  
-✅ **JWT expiration** (1 hour)  
+✅ **JWT expiration** (15m access, 7d refresh)  
 ✅ **HttpOnly cookies** - Prevents XSS attacks  
 ✅ **CORS configuration** with credentials  
 ✅ **Protected routes** - Middleware verification  
-✅ **Input validation** - Mongoose schema validation  
+✅ **Input validation** - Zod schema validation before business logic  
 ✅ **File type validation** - Video uploads only  
+✅ **Stack trace sanitization** - Never exposed to clients in production  
+✅ **Error type discrimination** - Programming errors handled separately from operational errors  
+✅ **Rate limiting** - Global API throttling middleware  
 
 ## 📊 Database Schema
 
@@ -351,23 +422,38 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 
 ## 🎯 Future Enhancements
 
-- [ ] Order placement functionality
-- [ ] Real-time chat between users and partners
-- [ ] Advanced search and filters (cuisine, price, rating)
-- [ ] User reviews and ratings
+### Planned Features
+- [ ] Structured logging upgrade (Winston/Pino)
+- [ ] Error tracking service (Sentry integration)
+- [ ] Real-time chat system (WebSocket)
+- [ ] Advanced search and filters (cuisine, price, ratings)
+- [ ] User reviews and ratings system
 - [ ] Partner analytics dashboard
+- [ ] Payment gateway integration (Stripe/Razorpay)
+- [ ] Geolocation-based discovery
+- [ ] Video compression pipeline
+- [ ] Admin moderation dashboard
 - [ ] Push notifications
-- [ ] Payment gateway integration
-- [ ] Geolocation-based food discovery
-- [ ] Social sharing features
-- [ ] Video compression before upload
-- [ ] Admin dashboard for moderation
+- [ ] Order placement & tracking
 
-## 🐛 Known Issues
+### Refactoring Complete ✅
+- Migrated backend to TypeScript
+- Implemented type-safe error handling system
+- Removed repetitive try-catch boilerplate
+- Established repository pattern for data access
+- Standardized middleware pipeline
 
-- Video autoplay may require user interaction on some browsers
-- Large video files may take time to upload
-- Mobile video performance depends on device capabilities
+## � Project Status
+
+**Backend**: Production-ready with enterprise-grade error handling and TypeScript support  
+**Frontend**: Feature-complete and stable  
+**Database**: Fully structured with proper relationships  
+
+## 🐛 Known Limitations
+
+- Video autoplay requires user interaction on some browsers
+- Large video uploads (~500MB+) may timeout; recommend compression before upload
+- Real-time features require WebSocket upgrade (planned)
 
 ## 🤝 Contributing
 
@@ -384,8 +470,12 @@ This project is open source and available under the MIT License.
 ## 👨‍💻 Developer
 
 **Shubham Kumar**  
-- GitHub: [@imshubhamgiri](https://github.com/imshubhamgiri)
-- Email: skgiri569@gmail.com
+- GitHub: [@imshubhamgiri](https://github.com/imshubhamgiri)  
+- Portfolio: Food discovery platform with focus on type-safe backend architecture and production-grade error handling
+
+---
+
+**Latest Update**: Backend refactor complete. TypeScript migration, custom error handling system, and repository pattern implementation. Ready for scaling and integrating additional services.
 
 ## 🙏 Acknowledgments
 
@@ -396,7 +486,7 @@ This project is open source and available under the MIT License.
 
 ---
 
-**Note**: This is a portfolio/learning project demonstrating modern web development practices with video handling, authentication, and real-time interactions.
+**Note**: This project demonstrates enterprise-level full-stack development practices. The backend implements type-safe error handling, proper separation of concerns (repository/service/controller), and middleware-based request processing. Production deployment-ready with structured logging and error tracking hooks prepared for external services.
 
 ## 📸 Screenshots
 
