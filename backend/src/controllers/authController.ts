@@ -1,4 +1,5 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../utils/asyncHandler';
 import type {
   ApiResponse,
   ErrorResponse,
@@ -24,11 +25,11 @@ import {
 
 
 
-export const register = async (
-  req: Request<{}, {}, ProfileRegister>,
-  res: Response<ApiResponse<ProfileResponse> | ErrorResponse>
-): Promise<void> => {
-  try {
+export const register = asyncHandler(
+  async (
+    req: Request<{}, {}, ProfileRegister>,
+    res: Response<ApiResponse<ProfileResponse> | ErrorResponse>
+  ): Promise<void> => {
     const { profile, tokens } = await registerUser(req.body);
 
     res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
@@ -41,23 +42,15 @@ export const register = async (
       user: profile,
       tokens,
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    const statusCode = message === 'User already exists' ? 400 : 500;
-    res.status(statusCode).json({
-      success: false,
-      message: statusCode === 400 ? 'User already exists' : 'Server error',
-      error: message,
-    });
   }
-};
+);
 
 
-export const login = async (
-  req: Request<{}, {}, UserLogin>,
-  res: Response<ApiResponse<ProfileResponse | ErrorResponse>>
-): Promise<void> => {
-  try {
+export const login = asyncHandler(
+  async (
+    req: Request<{}, {}, UserLogin>,
+    res: Response<ApiResponse<ProfileResponse | ErrorResponse>>
+  ): Promise<void> => {
     const { profile, tokens } = await loginUser(req.body);
 
     res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
@@ -65,24 +58,16 @@ export const login = async (
     res.cookie('token', tokens.accessToken, getAccessCookieOptions());
 
     res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        user: profile,
-        tokens,
-    })
-}catch (error) {
-    console.error("Login error:", error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    const statusCode = message === 'Invalid credentials' ? 400 : 500;
-    res.status(statusCode).json({
-      success: false,
-      message: statusCode === 400 ? 'Invalid credentials' : 'Server error',
-      error: message,
+      success: true,
+      message: 'Login successful',
+      user: profile,
+      tokens,
     });
   }
-}
+);
 
-export const logoutuser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const logoutuser = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     if (req.user) {
       await revokeAllRefreshTokensForUser(req.user.id, req.user.type);
     }
@@ -90,66 +75,54 @@ export const logoutuser = async (req: AuthenticatedRequest, res: Response): Prom
     res.clearCookie('refreshToken');
     res.clearCookie('token');
     res.status(200).json({ message: 'Logout successful' });
-}
+  }
+);
 
-export const registerFoodPartner = async (
+export const registerFoodPartner = asyncHandler(
+  async (
     req: Request<{}, {}, FoodPartnerRegister>,
     res: Response<ApiResponse<PartnerResponse> | ErrorResponse>
-): Promise<void> => {
-    try {
-      const { profile, tokens } = await registerPartner(req.body);
+  ): Promise<void> => {
+    const { profile, tokens } = await registerPartner(req.body);
 
-      res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
-      res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
-      res.cookie('token', tokens.accessToken, getAccessCookieOptions());
+    res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
+    res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+    res.cookie('token', tokens.accessToken, getAccessCookieOptions());
 
-        res.status(201).json({
-        success: true,
-        message:'Registration successful',
-        user: profile,
-        tokens,
-       });
-       return;
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        const statusCode = message === 'Email already exists' ? 400 : 500;
-        res.status(statusCode).json({
-          success:false,
-          message: statusCode === 400 ? 'Email already exists' : 'server error',
-          error: message,
-        })
-    }
+    res.status(201).json({
+      success: true,
+      message: 'Registration successful',
+      user: profile,
+      tokens,
+    });
+  }
+);
 
-}
+export const loginFoodPartner = asyncHandler(
+  async (
+    req: Request<{}, {}, FoodPartnerLogin>,
+    res: Response<ApiResponse<PartnerResponse> | ErrorResponse>
+  ): Promise<void> => {
+    const { profile, tokens } = await loginPartner(req.body);
 
-export const loginFoodPartner = async (req: Request<{}, {}, FoodPartnerLogin>, res: Response<ApiResponse<PartnerResponse> | ErrorResponse>): Promise<void> => {
-    try {
-      const { profile, tokens } = await loginPartner(req.body);
+    res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
+    res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
+    res.cookie('token', tokens.accessToken, getAccessCookieOptions());
 
-      res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
-      res.cookie('refreshToken', tokens.refreshToken, getRefreshCookieOptions());
-      res.cookie('token', tokens.accessToken, getAccessCookieOptions());
+    res.status(200).json({
+      success: true,
+      message: 'login successful',
+      user: profile,
+      tokens,
+    });
+  }
+);
 
-        res.status(200).json({
-        success: true,
-        message:'login successful',
-        user: profile,
-        tokens,
-      });
-        return;
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        const statusCode = message === 'Invalid credentials' ? 400 : 500;
-        res.status(statusCode).json({
-          success:false,
-          message: statusCode === 400 ? 'invalid credential' : 'server error',
-          error: message,
-        })
-    }
-
-}
-
-export const logoutFoodpartner = async (req: AuthenticatedRequest, res: Response<ApiResponse>): Promise<void> => {
+export const logoutFoodpartner = asyncHandler(
+  async (
+    req: AuthenticatedRequest,
+    res: Response<ApiResponse>
+  ): Promise<void> => {
     if (req.user) {
       await revokeAllRefreshTokensForUser(req.user.id, req.user.type);
     }
@@ -157,24 +130,29 @@ export const logoutFoodpartner = async (req: AuthenticatedRequest, res: Response
     res.clearCookie('refreshToken');
     res.clearCookie('token');
     res.status(200).json({
-        success: true,
-       message: 'FoodPartner Logged out successfully' 
-      });
-}
-
-export const refreshToken = async (req: Request, res: Response<ApiResponse | ErrorResponse>): Promise<void> => {
-  const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
-
-  if (!incomingRefreshToken) {
-    res.status(401).json({
-      success: false,
-      message: 'Refresh token is required',
-      error: 'Missing refresh token',
+      success: true,
+      message: 'FoodPartner Logged out successfully',
     });
-    return;
   }
+);
 
-  try {
+export const refreshToken = asyncHandler(
+  async (
+    req: Request,
+    res: Response<ApiResponse | ErrorResponse>
+  ): Promise<void> => {
+    const incomingRefreshToken =
+      req.cookies?.refreshToken || req.body?.refreshToken;
+
+    if (!incomingRefreshToken) {
+      res.status(401).json({
+        success: false,
+        message: 'Refresh token is required',
+        error: 'Missing refresh token',
+      });
+      return;
+    }
+
     const { tokens } = await rotateRefreshToken(incomingRefreshToken);
 
     res.cookie('accessToken', tokens.accessToken, getAccessCookieOptions());
@@ -186,14 +164,8 @@ export const refreshToken = async (req: Request, res: Response<ApiResponse | Err
       message: 'Tokens refreshed successfully',
       data: tokens,
     });
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'Invalid refresh token',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
   }
-};
+);
 
 export const loginCheck = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   if (!req.user) {
