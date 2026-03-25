@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { ConflictError, AuthError } from '../utils/error';
 import type {
   AuthTokenPayload,
   AuthTokens,
@@ -69,7 +70,7 @@ export const registerUser = async (
 ): Promise<{ profile: ProfileResponse; tokens: AuthTokens }> => {
   const existingUser = await findUserPublicByEmail(payload.email);
   if (existingUser) {
-    throw new Error('User already exists');
+    throw new ConflictError('User with this email already exists');
   }
 
   const hashedPassword = await bcrypt.hash(payload.password, 10);
@@ -101,12 +102,12 @@ export const loginUser = async (
 ): Promise<{ profile: ProfileResponse; tokens: AuthTokens }> => {
   const user = await findUserByEmail(payload.email);
   if (!user) {
-    throw new Error('Invalid credentials');
+    throw new AuthError('Invalid credentials');
   }
 
   const isMatch = await bcrypt.compare(payload.password, user.password);
   if (!isMatch) {
-    throw new Error('Invalid credentials');
+    throw new AuthError('Invalid credentials');
   }
 
   await revokeAllRefreshTokensForUserRepo(user._id.toString(), 'user');
@@ -133,7 +134,7 @@ export const registerPartner = async (
 ): Promise<{ profile: PartnerResponse; tokens: AuthTokens }> => {
   const existingPartner = await findPartnerPublicByEmail(payload.email);
   if (existingPartner) {
-    throw new Error('Email already exists');
+    throw new ConflictError('Email already exists');
   }
 
   const hashedPassword = await bcrypt.hash(payload.password, 10);
@@ -167,12 +168,12 @@ export const loginPartner = async (
 ): Promise<{ profile: PartnerResponse; tokens: AuthTokens }> => {
   const partner = await findPartnerByEmail(payload.email);
   if (!partner) {
-    throw new Error('Invalid credentials');
+    throw new AuthError('Invalid credentials');
   }
 
   const isMatch = await bcrypt.compare(payload.password, partner.password);
   if (!isMatch) {
-    throw new Error('Invalid credentials');
+    throw new AuthError('Invalid credentials');
   }
 
   await revokeAllRefreshTokensForUserRepo(partner._id.toString(), 'partner');
