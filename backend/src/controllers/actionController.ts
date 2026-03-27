@@ -1,6 +1,8 @@
-import {  Response } from 'express';
+import { Response } from 'express';
 import type { ApiResponse, ErrorResponse, AuthenticatedRequest } from '../types';
 import actionService from '../services/action.service';
+import { asyncHandler } from '../utils/asyncHandler';
+import { AuthError } from '../utils/error';
 
 interface LikeResponse {
   id: string;
@@ -14,21 +16,16 @@ interface SaveResponse {
   foodId: string;
 }
 
-export const likefood = async (
-  req: AuthenticatedRequest,
-  res: Response<ApiResponse<LikeResponse> | ErrorResponse>
-): Promise<void> => {
-  try {
+export const likefood = asyncHandler(
+  async (
+    req: AuthenticatedRequest,
+    res: Response<ApiResponse<LikeResponse> | ErrorResponse>
+  ): Promise<void> => {
     const { foodId } = req.body;
     const user = req.user;
 
     if (!user) {
-      res.status(401).json({
-        success: false,
-        message: 'Unauthorized',
-        error: 'User not authenticated',
-      });
-      return;
+      throw new AuthError('User not authenticated');
     }
 
     const result = await actionService.toggleLike(user.id, foodId);
@@ -50,30 +47,19 @@ export const likefood = async (
         food: result.entity!.foodId,
       },
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Error liking the foodreel',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
   }
-};
+);
 
-export const saveFood = async (
-  req: AuthenticatedRequest,
-  res: Response<ApiResponse<SaveResponse> | ErrorResponse>
-): Promise<void> => {
-  const { foodId } = req.body;
-  const user = req.user;
+export const saveFood = asyncHandler(
+  async (
+    req: AuthenticatedRequest,
+    res: Response<ApiResponse<SaveResponse> | ErrorResponse>
+  ): Promise<void> => {
+    const { foodId } = req.body;
+    const user = req.user;
 
-  try {
     if (!user) {
-      res.status(401).json({
-        success: false,
-        message: 'Unauthorized',
-        error: 'User not authenticated',
-      });
-      return;
+      throw new AuthError('User not authenticated');
     }
 
     const result = await actionService.toggleSave(user.id, foodId);
@@ -95,11 +81,5 @@ export const saveFood = async (
         foodId: result.entity!.foodId,
       },
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Error saving the foodreel',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
   }
-};
+);

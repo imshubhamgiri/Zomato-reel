@@ -1,4 +1,5 @@
 import profileRepository from '../repositories/profile.repository';
+import { NotFoundError, ValidationError } from '../utils/error';
 
 interface PartnerProfile {
   name: string;
@@ -8,10 +9,17 @@ interface PartnerProfile {
   address: string;
 }
 
-const getFoodPartnerProfile = async (id: string): Promise<PartnerProfile | null> => {
+const getFoodPartnerProfile = async (id: string): Promise<PartnerProfile> => {
+  // Validate ID format before querying database
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ValidationError('Invalid partner ID format');
+  }
+
   const foodPartner = await profileRepository.getFoodPartnerById(id);
+  
+  // Throw error instead of returning null
   if (!foodPartner) {
-    return null;
+    throw new NotFoundError('Food Partner not found');
   }
 
   return {
