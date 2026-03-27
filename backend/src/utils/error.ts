@@ -3,7 +3,13 @@
  * isOperational = true: expected errors (bad input, user not found)
  * isOperational = false: programming errors (should crash!)
  */
-export abstract class AppError extends Error {
+class MyError extends Error {
+  constructor(message:string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+export abstract class AppError extends MyError {
   abstract statusCode: number;
   abstract isOperational: boolean;
 
@@ -20,7 +26,7 @@ export class ValidationError extends AppError {
 
   constructor(message: string = 'Validation failed') {
     super(message);
-    this.name = 'ValidationError';
+    // this.name = 'ValidationError';
   }
 }
 
@@ -31,7 +37,7 @@ export class AuthError extends AppError {
 
   constructor(message: string = 'Authentication failed') {
     super(message);
-    this.name = 'AuthError';
+    // this.name = 'AuthError';
   }
 }
 
@@ -42,7 +48,7 @@ export class ForbiddenError extends AppError {
 
   constructor(message: string = 'Access forbidden') {
     super(message);
-    this.name = 'ForbiddenError';
+    // this.name = 'ForbiddenError';
   }
 }
 
@@ -53,7 +59,7 @@ export class NotFoundError extends AppError {
 
   constructor(message: string = 'Resource not found') {
     super(message);
-    this.name = 'NotFoundError';
+    // this.name = 'NotFoundError';
   }
 }
 
@@ -64,7 +70,7 @@ export class ConflictError extends AppError {
 
   constructor(message: string = 'Conflict with existing data') {
     super(message);
-    this.name = 'ConflictError';
+    // this.name = 'ConflictError';
   }
 }
 
@@ -75,6 +81,6 @@ export class InternalError extends AppError {
 
   constructor(message: string = 'Internal server error') {
     super(message);
-    this.name = 'InternalError';
+    // this.name = 'InternalError';
   }
 }
