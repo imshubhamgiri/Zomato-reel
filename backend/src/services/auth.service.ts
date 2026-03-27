@@ -206,12 +206,12 @@ export const rotateRefreshToken = async (
 
   const tokenRecord = await findActiveRefreshToken(tokenHash);
   if (!tokenRecord) {
-    throw new Error('Invalid refresh token');
+    throw new AuthError('Invalid refresh token');
   }
 
   if (new Date(tokenRecord.expiresAt).getTime() < Date.now()) {
     await revokeRefreshTokenByHash(tokenHash);
-    throw new Error('Refresh token expired');
+    throw new AuthError('Refresh token expired');
   }
 
   await revokeRefreshTokenByHash(tokenHash);
@@ -230,7 +230,7 @@ export const getLoginCheckData = async (payload: AuthTokenPayload): Promise<Reco
   if (payload.type === 'partner') {
     const partner = await findPartnerById(payload.Id);
     if (!partner) {
-      throw new Error('Invalid token');
+      throw new AuthError('Invalid token');
     }
 
     return {
@@ -247,7 +247,7 @@ export const getLoginCheckData = async (payload: AuthTokenPayload): Promise<Reco
 
   const user = await findUserById(payload.Id);
   if (!user) {
-    throw new Error('Invalid token');
+    throw new AuthError('Invalid token');
   }
 
   return {

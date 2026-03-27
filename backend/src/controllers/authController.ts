@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import type {
   ApiResponse,
@@ -167,22 +167,23 @@ export const refreshToken = asyncHandler(
   }
 );
 
-export const loginCheck = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const loginCheck = asyncHandler(async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   if (!req.user) {
     res.status(401).json({ message: 'Please Login First' });
     return;
   }
 
-  try {
+  
     const responseData = await getLoginCheckData({
       Id: req.user.id,
       email: req.user.email,
       type: req.user.type,
     });
     res.status(200).json(responseData);
-  } catch (error) {
-    res.status(401).json({
-      message: 'Authentication failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
-    });
-  }
-};
+  
+  // catch (error) {
+  //   res.status(401).json({
+  //     message: 'Authentication failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
+  //   });
+  // }
+});
