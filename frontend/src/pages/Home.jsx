@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
 import axios from 'axios';
 import API_URL from '../config/Api.js';
+import VideoCard from '../components/ui/VideoCard';
 
 function Home() {
 const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -50,7 +51,7 @@ const [isLoggedIn, setisLoggenIn] = useState(() => localStorage.getItem('isLogge
     async function fetchVideos() {
 
       try {
-        const res = await axios.get(`${API_URL}/api/food/listfood`,{
+        const res = await axios.get(`${API_URL}/api/foods/listfood`,{
           withCredentials: true
         });
         const foodItems = res.data.data || [];
@@ -450,25 +451,7 @@ body::-webkit-scrollbar-thumb:hover {
                 key={video._id} 
                 className="reel-item flex items-center justify-center bg-black"
               >
-                {/* Video */}
-                <video
-                  ref={(el) => (videoRefs.current[index] = el)}
-                  data-id={video._id}
-                  className="h-full w-full object-cover md:object-contain"
-                  src={video.video}
-                  loop
-                  playsInline
-                  muted={isMuted} 
-                  onClick={(e) => {
-                    if (isMuted) {
-                        setIsMuted(false);
-                    } else {
-                        if (e.target.paused) e.target.play();
-                        else e.target.pause();
-                    }
-                  }}
-                />
-
+                <VideoCard video={video} index={index} videoRefs={videoRefs} isMuted={isMuted} setIsMuted={setIsMuted} />
                 {/* Mute Indicator */}
                 {isMuted && (
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/40 p-4 rounded-full pointer-events-none backdrop-blur-sm animate-pulse z-10">
