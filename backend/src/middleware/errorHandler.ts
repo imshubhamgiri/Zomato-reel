@@ -4,6 +4,7 @@ import { AppError } from '../utils/error';
 interface ClientErrorResponse {
   success: false;
   message: string;
+  name?: string;
   error?: string | object;
   timestamp?: string;
 }
@@ -31,6 +32,7 @@ export const errorHandler = (
     const response: ClientErrorResponse = {
       success: false,
       message: err.message,
+      name: err.name,
       timestamp: new Date().toISOString(),
     };
 
