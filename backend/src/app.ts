@@ -10,11 +10,15 @@ import logger from './middleware/logging';
 import { attachAuthContext } from './middleware/auth';
 import { globalApiLimiter } from './middleware/rateLimiter';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { helmetMiddleware } from './middleware/helmet';
 
 
 dotenv.config();
 
 const app = express();
+
+app.use(helmetMiddleware);
+app.use(globalApiLimiter);
 
 app.use(cookieParser());
 app.use(express.json());
@@ -23,7 +27,6 @@ app.use(express.json());
 app.use(corsMiddleware);
 app.use(attachAuthContext);
 app.use(logger);
-app.use(globalApiLimiter);
 
 app.use('/api/auth', authRoutes);
 
