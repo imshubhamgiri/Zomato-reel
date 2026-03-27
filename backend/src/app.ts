@@ -39,6 +39,17 @@ app.get('/', (_req, res) => {
   res.send('Hello, World!');
 });
 
+// Health check endpoint
+app.get('/health', (_req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    service: 'Zomato-Reel API'
+  });
+});
+
 app.use(notFoundHandler);
 app.use(errorHandler);
 
