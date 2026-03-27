@@ -13,7 +13,7 @@ const apiClient = axios.create({
 // User Authentication APIs
 export const userAPI = {
   register: async (name, email, password) => {
-    const response = await apiClient.post('/api/auth/user/register', {
+    const response = await apiClient.post('/api/auth/users/register', {
       name,
       email,
       password,
@@ -22,7 +22,7 @@ export const userAPI = {
   },
 
   login: async (email, password) => {
-    const response = await apiClient.post('/api/auth/user/login', {
+    const response = await apiClient.post('/api/auth/users/login', {
       email,
       password,
     });
@@ -30,12 +30,12 @@ export const userAPI = {
   },
 
   logout: async () => {
-    const response = await apiClient.get('/api/auth/user/logout');
+    const response = await apiClient.get('/api/auth/users/logout');
     return response.data;
   },
 
   getProfile: async () => {
-    const response = await apiClient.get('/api/auth/user/profile');
+    const response = await apiClient.get('/api/auth/users/profile');
     return response.data;
   },
 };
@@ -43,12 +43,12 @@ export const userAPI = {
 // Partner Authentication APIs
 export const partnerAPI = {
   register: async (data) => {
-    const response = await apiClient.post('/api/auth/partner/register', data);
+    const response = await apiClient.post('/api/auth/partners/register', data);
     return response.data;
   },
 
   login: async (email, password) => {
-    const response = await apiClient.post('/api/auth/partner/login', {
+    const response = await apiClient.post('/api/auth/partners/login', {
       email,
       password,
     });
@@ -56,12 +56,12 @@ export const partnerAPI = {
   },
 
   logout: async () => {
-    const response = await apiClient.get('/api/auth/partner/logout');
+    const response = await apiClient.get('/api/auth/partners/logout');
     return response.data;
   },
 
   getProfile: async () => {
-    const response = await apiClient.get('/api/auth/partner/profile');
+    const response = await apiClient.get('/api/auth/partners/profile');
     return response.data;
   },
 };

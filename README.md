@@ -57,6 +57,7 @@ A modern food ordering platform featuring Instagram/TikTok-style video reels whe
 - **Bcrypt** - Password hashing (10 rounds)
 - **Multer** - File upload handling
 - **ImageKit** - Video CDN service
+- **Helmet** - HTTP security headers middleware
 - **Zod** - Runtime type validation
 - **Cookie-parser** - Secure httpOnly cookie handling
 
@@ -64,10 +65,11 @@ A modern food ordering platform featuring Instagram/TikTok-style video reels whe
 - **TypeScript** - Full type safety across codebase
 - **Custom Error Classes** - Type-safe error handling with operational vs programming error discrimination
 - **Async Error Handler** - Centralized error catching utility eliminating boilerplate try-catch blocks
-- **Repository Pattern** - Abstracted data access layer
-- **Middleware Pipeline** - Auth, validation, logging, rate-limiting, CORS, error handling
-- **Service Layer** - Business logic encapsulation
-- **Structured Logging** - Request/response logging with context
+- **Repository Pattern** - Abstracted data access layer for clean data access
+- **Middleware Pipeline** - Helmet, rate-limiting, CORS, auth, validation, logging, error handling
+- **Service Layer** - Business logic encapsulation separate from controllers
+- **Structured Logging** - Request/response logging with context and error tracking
+- **RESTful Endpoints** - Plural resource names and standard HTTP methods (GET, POST, PATCH, DELETE)
 
 ## 📁 Project Structure
 
@@ -104,12 +106,13 @@ Zomato-reel/
 │   │   │   ├── food.repository.ts
 │   │   │   └── profile.repository.ts
 │   │   ├── middleware/     # Express middleware pipeline
+│   │   │   ├── helmet.ts          # HTTP security headers (CSP, X-Frame-Options, etc.)
 │   │   │   ├── errorHandler.ts    # Centralized error with type discrimination
 │   │   │   ├── auth.ts            # JWT verification & context attachment
 │   │   │   ├── validation.ts      # Zod schema validation
 │   │   │   ├── logging.ts         # Request/response logging
-│   │   │   ├── cors.ts            # CORS configuration
-│   │   │   └── rateLimiter.ts     # API rate limiting
+│   │   │   ├── rateLimiter.ts     # Global API rate limiting
+│   │   │   └── cors.ts            # CORS configuration
 │   │   ├── routes/         # Express route definitions
 │   │   ├── models/         # Mongoose schemas
 │   │   ├── types/          # TypeScript interfaces & types
@@ -235,61 +238,120 @@ export const register = asyncHandler(async (req, res) => {
 
 ## 📡 API Documentation
 
+### Middleware Pipeline
+All requests pass through the following middleware stack (order matters):
+1. **Helmet** - HTTP security headers (CSP, X-Frame-Options, etc.)
+2. **Rate Limiter** - Global API throttling
+3. **Cookie Parser** - Parse httpOnly cookies
+4. **JSON Parser** - Parse request bodies
+5. **CORS** - Cross-origin resource sharing
+6. **Auth Context** - Attach user/partner context if authenticated
+7. **Logger** - Request/response logging
+8. **Route Handlers**
+9. **Error Handler** - Centralized error response formatting
+
 ### Authentication Endpoints
 
-#### User Routes
+#### User Routes (Plural)
 ```http
-POST /api/auth/user/register
-POST /api/auth/user/login
-GET  /api/auth/user/logout
+POST /api/auth/users/register
+# Body: { name, email, password }
+# Response: { user: {...}, token: "..." }
+
+POST /api/auth/users/login
+# Body: { email, password }
+# Response: { user: {...}, token: "..." }
+
+POST /api/auth/users/logout
+GET  /api/auth/users/logout
+# Clears authentication cookie
 ```
 
-#### Partner Routes
+#### Partner Routes (Plural)
 ```http
-POST /api/auth/partner/register
-POST /api/auth/partner/login
-GET  /api/auth/partner/logout
+POST /api/auth/partners/register
+# Body: { name, restaurantName, email, phone, address, password }
+# Response: { partner: {...}, token: "..." }
+
+POST /api/auth/partners/login
+# Body: { email, password }
+# Response: { partner: {...}, token: "..." }
+
+POST /api/auth/partners/logout
+GET  /api/auth/partners/logout
+# Clears authentication cookie
 ```
 
 #### Auth Check
 ```http
 GET /api/auth/loginCheck
 # Returns user type (user/partner) and profile data
+# Protected: Requires valid JWT in cookie
+
+POST /api/auth/refresh
+# Refresh expired access token
+# Uses refresh token from secure cookie
 ```
 
-### Food Endpoints
+### Food Endpoints (RESTful Plural)
 
+#### List & Create
 ```http
-POST /api/food/add
+GET /api/foods
+# Protected: User authentication required
+# Returns: Array of all food items with like/save status
+
+POST /api/foods
 # Protected: Partner only
 # Content-Type: multipart/form-data
 # Body: { name, description, price, video (file) }
-
-GET /api/food/listfood
-# Protected: User authentication required
-# Returns: Array of food items with like/save status
-
-GET /api/food/getfood/:id
-# Get single food item by ID
+# Alternative path: POST /api/foods/add
 ```
 
-### Action Endpoints
+#### Get Single Food Item
+```http
+GET /api/foods/partners/:id
+# Get all food items by a specific partner
+# Alternative path: GET /api/foods/getfood/:id
+```
+
+#### Update & Delete
+```http
+PATCH /api/foods/:foodId
+# Protected: Partner only (owner of food item)
+# Body: { name, description, price }
+# Alternative path: PUT /api/foods/update
+
+DELETE /api/foods/:foodId
+# Protected: Partner only (owner of food item)
+# Alternative path: DELETE /api/foods/delete?foodId=...
+```
+
+### Action Endpoints (Interactions)
 
 ```http
 POST /api/actions/like
+# Protected: User authentication required
 # Body: { foodId }
 # Toggles like on food item
+# Response: { isLiked: boolean, likeCount: number }
 
 POST /api/actions/save
+# Protected: User authentication required
 # Body: { foodId }
 # Toggles save on food item
+# Response: { isSaved: boolean, saveCount: number }
 ```
 
-### Profile Endpoints
+### Profile Endpoints (Plural)
 
 ```http
-GET /api/profile/foodpartner/:id
-# Get food partner profile and their dishes
+GET /api/profiles/foodpartner/:id
+# Get food partner profile and all their dishes
+# Returns: { partner: {...}, foods: [...], totalLikes: number }
+
+GET /api/profiles/user/:id
+# Get user profile information
 ```
 
 ## 🔑 Key Features Implementation
@@ -361,16 +423,18 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 
 ## 🔒 Security Features
 
+✅ **Helmet middleware** - HTTP security headers (CSP, X-Frame-Options, X-Content-Type-Options, etc.)  
 ✅ **Password hashing** with bcrypt (10 rounds)  
 ✅ **JWT expiration** (15m access, 7d refresh)  
 ✅ **HttpOnly cookies** - Prevents XSS attacks  
-✅ **CORS configuration** with credentials  
-✅ **Protected routes** - Middleware verification  
+✅ **CORS configuration** - Restricted origins, with credentials support  
+✅ **Protected routes** - Middleware-based role verification  
 ✅ **Input validation** - Zod schema validation before business logic  
 ✅ **File type validation** - Video uploads only  
+✅ **CSP Policy** - Content Security Policy for media (ImageKit CDN whitelisted)  
 ✅ **Stack trace sanitization** - Never exposed to clients in production  
 ✅ **Error type discrimination** - Programming errors handled separately from operational errors  
-✅ **Rate limiting** - Global API throttling middleware  
+✅ **Rate limiting** - Global API throttling to prevent abuse  
 
 ## 📊 Database Schema
 

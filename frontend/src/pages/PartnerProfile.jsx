@@ -50,7 +50,7 @@ function PartnerProfile() {
     }
     try {
       const fetchFoodItems = async () => {
-        const response = await axios.get(`${API_URL}/api/food/getfood/${id}`, {
+        const response = await axios.get(`${API_URL}/api/foods/getfood/${id}`, {
           withCredentials: true
         });
         setFoodItems(response.data.fooditems || []);
@@ -98,7 +98,7 @@ function PartnerProfile() {
   }
 
  async function deleteVideo(foodId) {
-     await axios.delete(`${API_URL}/api/food/delete`, {
+     await axios.delete(`${API_URL}/api/foods/delete`, {
       data: { foodId },
       withCredentials: true
     }).then(() => {
@@ -116,7 +116,7 @@ function PartnerProfile() {
     console.log(formdata)
     
     try {
-      const response = await axios.put(`${API_URL}/api/food/update`, formdata, {
+      const response = await axios.put(`${API_URL}/api/foods/update`, formdata, {
         withCredentials: true
       });
       
