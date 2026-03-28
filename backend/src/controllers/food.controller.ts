@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import type { ApiResponse, ErrorResponse, AuthenticatedRequest, FoodItemWithStatus, AddFoodRequest, UploadResponse, File, FoodItemResponse, UpdateFoodRequest } from '../types';
+import type { ApiResponse, ErrorResponse, AuthenticatedRequest, FoodItemWithStatus, AddFoodRequest, UploadResponse, File, FoodItemResponse, UpdateFoodRequest, PaginationResponse } from '../types';
 import food from '../models/food.model';
 import storageService from '../service/storage.service';
 import { v4 as uuid } from 'uuid';
@@ -62,15 +62,29 @@ export const addFoodItem = asyncHandler(
 export const getFoodItems = asyncHandler(
   async (
     req: AuthenticatedRequest,
-    res: Response<ApiResponse<FoodItemWithStatus[]> | ErrorResponse>
+    res: Response<PaginationResponse<FoodItemWithStatus> | ErrorResponse>
   ): Promise<void> => {
     const userId = req.user?.id;
-    const foodItemsWithStatus: FoodItemWithStatus[] = await foodService.getFoodItems(userId);
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 2;
+    const { id, lastCreatedAt } = req.query;
+
+    const paginatedResponse = await foodService.getFoodItems(
+      userId as string,
+      limit,
+      id as string,
+      lastCreatedAt as string
+    );
 
     res.status(200).json({
       success: true,
       message: 'Food items retrieved successfully',
-      data: foodItemsWithStatus,
+      data: paginatedResponse.foods,
+      pagination: {
+        total: paginatedResponse.total,
+        limit,
+        hasMore: paginatedResponse.hasMore,
+        nextCursor: paginatedResponse.nextCursor,
+      },
     });
   }
 );
