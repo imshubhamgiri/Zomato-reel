@@ -13,6 +13,14 @@ export interface ApiResponse<T = any> {
   tokens?: AuthTokens;
   error?: string;
 }
+export interface PaginationResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    total: number;
+    limit: number;
+    hasMore: boolean;
+    nextCursor: { id: string; lastCreatedAt: string } | null;
+  };
+}
 
 export interface Like{
 user: Types.ObjectId,
