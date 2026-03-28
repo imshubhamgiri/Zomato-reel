@@ -15,6 +15,7 @@ import { IFood } from '../types';
 });
 
 foodSchema.index({ foodPartner: 1, createdAt: -1 });
+foodSchema.index({ _id: 1, createdAt: -1 });
 foodSchema.index({ createdAt: -1 });
 foodSchema.index({ likeCount: -1 });
 
