@@ -1,13 +1,13 @@
 import { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from '../types';
 
-const logger = (req: AuthenticatedRequest, _res: Response, next: NextFunction): void => {
+const logger = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   const startedAt = Date.now();
   const userTag = req.user ? `${req.user.type}:${req.user.id}` : 'anonymous';
 
-  req.on('end', () => {
+  res.on('finish', () => {
     const durationMs = Date.now() - startedAt;
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} user=${userTag} ${durationMs}ms`);
+    console.log(`[${new Date().toISOString()}] ${res.statusCode} ${req.method} ${req.originalUrl} user=${userTag} ${durationMs}ms`);
   });
 
   next();
