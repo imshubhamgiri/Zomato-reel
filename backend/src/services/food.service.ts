@@ -1,11 +1,28 @@
-import type { FoodItemWithStatus } from '../types';
+// import type { FoodItemWithStatus } from '../types';
 import foodRepository from '../repositories/food.repository';
 import { ValidationError, NotFoundError, ForbiddenError } from '../utils/error';
 import food from '../models/food.model';
 
-const getFoodItems = async (userId?: string): Promise<FoodItemWithStatus[]> => {
-  return foodRepository.getFoodItemsWithUserState(userId);
+const getFoodItems = async (
+  userId?: string,
+  limit?: number,
+  lastPartner?: string,
+  lastCreatedAt?: string
+) => {
+  return foodRepository.getFoodItemsWithUserState(
+    userId,
+    limit || 2,
+    lastPartner,
+    lastCreatedAt
+  );
 };
+
+// const addFoodItem = async (foodData: any, userId: string): Promise<any> => {
+//   if (!userId) {
+//     throw new ValidationError('User ID is required to add a food item');
+//   }
+//   return foodRepository.addFoodItem(foodData, userId);
+// };
 
 const getFoodByPartnerId = async (partnerId: string): Promise<any[]> => {
   if (!partnerId.match(/^[0-9a-fA-F]{24}$/)) {
@@ -55,4 +72,5 @@ export default {
   getFoodByPartnerId,
   deleteFoodItem,
   checkFoodOwnership,
+  // addFoodItem,
 };
