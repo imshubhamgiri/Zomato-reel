@@ -29,6 +29,7 @@ function PartnerLogin() {
   };
 
   return (
+    <div className='grid grid-cols-2'>
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="flex justify-start">
@@ -118,6 +119,11 @@ function PartnerLogin() {
           </div>
         </form>
       </div>
+    </div>
+
+    <div className='hidden md:block bg-purple-50 text-white p-10'>
+      
+    </div>
     </div>
   );
 }
