@@ -10,6 +10,7 @@ import PartnerProfile from './pages/PartnerProfile';
 import PartnerProfileUser from './pages/PartnerProfileUser';
 import Addfood from './pages/Addfood';
 import LandingPage from './pages/LandingPgae';
+import BottomNav from './components/BottomNav';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path='/partner/addfood' element={<Addfood/>}/>
         <Route path="/" element={<LandingPage />} />
       </Routes>
+      <BottomNav />
       
     </>
   )
