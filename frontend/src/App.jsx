@@ -9,12 +9,13 @@ import PartnerRegister from './pages/PartnerRegister';
 import PartnerProfile from './pages/PartnerProfile';
 import PartnerProfileUser from './pages/PartnerProfileUser';
 import Addfood from './pages/Addfood';
+import LandingPage from './pages/LandingPgae';
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/check" element={<Home />} />
         <Route path="/user/login" element={<UserLogin />} />
         <Route path="/user/register" element={<UserRegister />} />
         <Route path="/user/profile" element={<UserProfile />} />
@@ -23,6 +24,7 @@ function App() {
         <Route path="/partner/profile" element={<PartnerProfile />} />
         <Route path="/profile/foodpartner/:id" element={<PartnerProfileUser />} />
         <Route path='/partner/addfood' element={<Addfood/>}/>
+        <Route path="/" element={<LandingPage />} />
       </Routes>
       
     </>
