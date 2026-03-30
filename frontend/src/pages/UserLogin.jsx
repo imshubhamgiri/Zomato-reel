@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { userAPI, authAPI } from '../services/api';
+import { Mail } from 'lucide-react';
 
 function UserLogin() {
   const [error, setError] = useState('');
@@ -86,6 +87,7 @@ function UserLogin() {
     `;
 
   return (
+    <div className='grid grid-cols-2'>
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <style>{customStyles}</style>
       <div className="max-w-md w-full space-y-8 ">
@@ -107,19 +109,22 @@ function UserLogin() {
         </div>
         <form className="mt-8 space-y-6  " onSubmit={handleSubmit}>
           <div className="space-y-4 initial-hidden animate-slideInLeft delay-300">
-            <div>
+            <div className='relative'>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email address
               </label>
+              <div className='relative mt-1'>
               <input
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="block w-full py-2 pr-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="you@example.com"
-              />
+                />
+              <Mail className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' size={18} />
+                </div>
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -176,6 +181,13 @@ function UserLogin() {
           </div>
         </form>
       </div>
+      <div>
+      </div>
+      </div>
+      <div className='hidden md:block w-full h-screen p-10'>
+        <img 
+        src="https://pub-aaa82e9851064d22b954c3ebbafc9ae6.r2.dev/legacy/webp/juicy-cheeseburger-5uNrwj9W_yiI-AAleYCvk.webp" className='w-full h-full object-cover rounded-2xl' alt="Login visual" />
+        </div>
     </div>
   );
 }
