@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
-import { TimerReset } from 'lucide-react'
+import { MoonIcon, Sun, TimerReset ,  } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
 const LandingPage = () => {
+    const {theme, toggleTheme} = useTheme()
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-50 to-white">
       {/* Header/Navigation */}
@@ -24,6 +26,14 @@ const LandingPage = () => {
                 Login
               </Link>
               <button className="text-2xl">🛒</button>
+             <div className="mt-auto  border-slate-100 dark:border-slate-800 ">
+                 <button
+                     onClick={() => {toggleTheme() , console.log(theme)}}
+                     className=" w-full flex items-center justify-center gap-2 rounded-lg p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-200"
+                         >
+                         {theme === "light" ? <MoonIcon /> : <Sun />}
+                 </button>
+             </div>
             </div>
           </div>
         </div>
