@@ -1,4 +1,4 @@
-import { Activity,  Home, User,  Utensils,  Video } from "lucide-react"
+import { Home, MenuIcon, User, Utensils, Video } from "lucide-react"
 import { NavLink } from "react-router-dom"
 
 const BottomNav = () => {
@@ -6,18 +6,21 @@ const BottomNav = () => {
         {path:'/' ,label:'Home', icon:Home},
         {path:'/food' ,label:'Food', icon:Utensils},
         {path:'/reel' ,label:'Reel', icon:Video},
-        {path:'/activity' ,label:'Activity', icon:Activity},
-        {path:'/profile' ,label:'Profile', icon:User},
+        {path:'/menu' ,label:'Menu', icon:MenuIcon},
+        {path:'/user/profile' ,label:'Profile', icon:User},
     ]
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 pb-safe
-    px-4 border-t border-slate-100 dark:border-slate-800 lg:hidden transition-colors duration-200">
-      <div className="flex justify-around">
+    <nav className="fixed bottom-3 left-1/2 z-50 w-[calc(100%-1rem)]
+     max-w-xl -translate-x-1/2 rounded-3xl border border-white/45
+      bg-white/45 px-2 py-1.5 shadow-[0_10px_32px_rgba(15,23,42,0.22)] backdrop-blur-xl
+       supports-backdrop-filter:bg-white/35 dark:border-white/10 dark:bg-slate-900/55 
+       dark:shadow-[0_10px_30px_rgba(2,6,23,0.55)] ">
+      <div className="flex items-center justify-around gap-1">
         {navitems.map((item) => (
-          <NavLink key={item.path} to={item.path} className={({ isActive }) => `flex flex-col items-center gap-1 px-4 py-2 text-sm font-medium rounded-2xl transition-all duration-200
-           ${isActive ? 'text-green-600 dark:text-green-400' : 'text-white'} hover:text-foreground`}>
+          <NavLink key={item.path} to={item.path} className={({ isActive }) => `group flex min-w-14 flex-col items-center gap-0.5 rounded-2xl px-3 py-2 text-[10px] font-medium tracking-tight transition-all duration-200
+           ${isActive ? 'bg-white/70 text-slate-900 shadow-sm dark:bg-slate-800/80 dark:text-slate-100' : 'text-slate-600/90 hover:bg-white/40 hover:text-slate-900 dark:text-slate-300/85 dark:hover:bg-slate-800/45 dark:hover:text-slate-100'}`}>
             <item.icon className="w-5 h-5" />
-            <span className="mt-1">{item.label}</span>
+            <span>{item.label}</span>
           </NavLink>
         ))}
       </div>
