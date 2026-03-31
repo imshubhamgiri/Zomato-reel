@@ -87,8 +87,8 @@ function UserLogin() {
     `;
 
   return (
-    <div className='grid grid-cols-2'>
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className='grid grid-cols-2 '>
+    <div className="min-h-screen flex items-center col-span-2 md:col-span-1 justify-center bg-linear-to-br from-green-100 to-blue-100 dark:from-gray-800 dark:to-gray-900 px-4">
       <style>{customStyles}</style>
       <div className="max-w-md w-full space-y-8 ">
         <div className="flex justify-start">
@@ -156,7 +156,7 @@ function UserLogin() {
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-red-600 hover:text-red-500 dark:text-red-400">
+              <a href="#" className="font-medium text-blue-600 hover:text-red-500 dark:text-red-400">
                 Forgot password?
               </a>
             </div>
@@ -165,7 +165,7 @@ function UserLogin() {
           <div className='initial-hidden animate-fadeInDown'>
             <button
               type="submit"
-              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               disabled={loading}>
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
@@ -174,7 +174,7 @@ function UserLogin() {
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
-              <Link to="/user/register" className="font-medium text-red-600 hover:text-red-500 dark:text-red-400">
+              <Link to="/user/register" className="font-medium text-blue-600 hover:text-red-500 dark:text-red-400">
                 Sign up
               </Link>
             </p>
@@ -184,7 +184,7 @@ function UserLogin() {
       <div>
       </div>
       </div>
-      <div className='hidden md:block w-full h-screen p-10'>
+      <div className='hidden sm:block w-full h-screen p-10'>
         <img 
         src="https://pub-aaa82e9851064d22b954c3ebbafc9ae6.r2.dev/legacy/webp/juicy-cheeseburger-5uNrwj9W_yiI-AAleYCvk.webp" className='w-full h-full object-cover rounded-2xl' alt="Login visual" />
         </div>

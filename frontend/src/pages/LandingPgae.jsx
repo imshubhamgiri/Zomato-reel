@@ -4,9 +4,9 @@ import { useTheme } from '../context/ThemeContext'
 const LandingPage = () => {
     const {theme, toggleTheme} = useTheme()
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-50  to-white">
       {/* Header/Navigation */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white border-b dark:bg-slate-900 transition-colors duration-200 border-gray-200 dark:border-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -14,11 +14,11 @@ const LandingPage = () => {
               <span className="text-orange-500 text-xl">🍽️</span>
             </div>
             
-            <nav className="hidden md:flex items-center gap-8">
-              <Link to="/" className="text-gray-700 hover:text-gray-900 font-medium">Home</Link>
-              <Link to="/" className="text-gray-700 hover:text-gray-900 font-medium">Blog</Link>
-              <Link to="/" className="text-gray-700 hover:text-gray-900 font-medium">About us</Link>
-              <button className="text-gray-700 hover:text-gray-900 font-medium">EN</button>
+            <nav className="hidden md:flex items-center dark:text-white gap-8">
+              <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Home</Link>
+              <Link to="/blog" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Blog</Link>
+              <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">About us</Link>
+              <button className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">EN</button>
             </nav>
             
             <div className="flex items-center gap-4">
@@ -40,12 +40,12 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-linear-to-r from-green-50 to-orange-50 py-12 md:py-20">
+      <section className="bg-linear-to-r from-green-50 to-orange-50 dark:from-stone-800 dark:to-black transition-colors duration-300 py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             {/* Left Content */}
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-bold text-green-800 leading-tight">
+              <h1 className="text-4xl md:text-5xl font-bold text-green-800 dark:text-yellow-100 leading-tight">
                 Order food online from your favourite local restaurants.
               </h1>
               
@@ -54,7 +54,7 @@ const LandingPage = () => {
               </p>
               
               {/* Search Bar */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-col sm:flex-row">
                 <div className="flex-1 flex items-center bg-white rounded-full px-4 py-3 border border-gray-200">
                   <span className="text-orange-500 text-xl mr-3">📍</span>
                   <input 
@@ -71,10 +71,10 @@ const LandingPage = () => {
             
             {/* Right Content - Image */}
             <div className="relative hidden md:block">
-              <div className="bg-linear-to-br from-lime-300 to-green-400 rounded-full w-96 h-96 flex items-center justify-center mx-auto">
+              <div className="bg-linear-to-br from-lime-300 to-green-400 dark:from-slate-600 dark:to-slate-800 rounded-full w-96 h-96 flex items-center justify-center mx-auto">
                 <div className="text-center">
                   <div className="text-6xl mb-4">🥗</div>
-                  <p className="text-green-800 font-semibold">Fresh & Healthy</p>
+                  <p className="text-green-800 dark:text-slate-300 font-semibold">Fresh & Healthy</p>
                 </div>
               </div>
             </div>
