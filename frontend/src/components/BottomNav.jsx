@@ -4,9 +4,9 @@ import { NavLink } from "react-router-dom"
 const BottomNav = () => {
      const navitems =[
         {path:'/' ,label:'Home', icon:Home},
-        {path:'/food' ,label:'Food', icon:Utensils},
-        {path:'/reel' ,label:'Reel', icon:Video},
         {path:'/menu' ,label:'Menu', icon:MenuIcon},
+        {path:'/reel' ,label:'Reel', icon:Video},
+        {path:'/food' ,label:'Food', icon:Utensils},
         {path:'/user/profile' ,label:'Profile', icon:User},
     ]
   return (
