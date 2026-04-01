@@ -1,18 +1,21 @@
 import { Link } from 'react-router-dom'
-import { MoonIcon, Sun, TimerReset ,  } from 'lucide-react'
+import { ArrowBigDown, ArrowDown, ChevronDown, LocationEditIcon, MoonIcon, Search, Sun, TimerReset ,  } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 const LandingPage = () => {
     const {theme, toggleTheme} = useTheme()
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50  to-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-50 relative  to-white">
       {/* Header/Navigation */}
-      <header className="bg-white border-b dark:bg-slate-900 transition-colors duration-200 border-gray-200 dark:border-slate-500">
+      <header className="bg-white border-b bg-linear-to-r dark:from-stone-800 dark:to-black transition-colors duration-200 border-gray-200 dark:border-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-green-600">FoodReel</span>
-              <span className="text-orange-500 text-xl">🍽️</span>
+           <div className='flex flex-col text-gray-500 dark:text-gray-400 gap-1'>
+            <div className='flex items-center gap-2'>
+              <span><LocationEditIcon size={16} /></span>Location</div>
+            <div>
+                <span className='text-medium flex items-center gap-1 text-gray-500 dark:text-white'>Bangalore<ChevronDown size={16} /></span>
             </div>
+           </div>
             
             <nav className="hidden md:flex items-center dark:text-white gap-8">
               <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Home</Link>
@@ -22,9 +25,6 @@ const LandingPage = () => {
             </nav>
             
             <div className="flex items-center gap-4">
-              <Link to="/user/login" className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 font-medium">
-                Login
-              </Link>
               <button className="text-2xl">🛒</button>
              <div className="mt-auto  border-slate-100 dark:border-slate-800 ">
                  <button
@@ -40,61 +40,32 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-linear-to-r from-green-50 to-orange-50 dark:from-stone-800 dark:to-black transition-colors duration-300 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Left Content */}
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-bold text-green-800 dark:text-yellow-100 leading-tight">
-                Order food online from your favourite local restaurants.
-              </h1>
-              
-              <p className="text-gray-600 text-lg">
-                Freshly made food delivered to your door.
-              </p>
-              
-              {/* Search Bar */}
-              <div className="flex gap-2 flex-col sm:flex-row">
-                <div className="flex-1 flex items-center bg-white rounded-full px-4 py-3 border border-gray-200">
-                  <span className="text-orange-500 text-xl mr-3">📍</span>
-                  <input 
-                    type="text" 
-                    placeholder="Enter your location" 
-                    className="flex-1 outline-none text-gray-700"
-                  />
-                </div>
-                <button className="bg-green-600 text-white px-8 py-3 rounded-full hover:bg-green-700 font-medium transition">
-                  🔍 Search
-                </button>
-              </div>
-            </div>
-            
-            {/* Right Content - Image */}
-            <div className="relative hidden md:block">
-              <div className="bg-linear-to-br from-lime-300 to-green-400 dark:from-slate-600 dark:to-slate-800 rounded-full w-96 h-96 flex items-center justify-center mx-auto">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🥗</div>
-                  <p className="text-green-800 dark:text-slate-300 font-semibold">Fresh & Healthy</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Delivery Stats */}
-          <div className="mt-12 flex items-center gap-4">
-            <div className="bg-orange-500 rounded-full w-12 h-12 flex items-center justify-center text-white text-xl">
-              ✓
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">200k+</p>
-              <p className="text-gray-600">People Delivered</p>
-            </div>
+      <section className="bg-linear-to-r from-green-50 px-5 to-orange-50 dark:from-stone-800 dark:to-black transition-colors duration-300 py-12 md:py-20">
+        <div className='w-full sticky top-10 z-50 max-w-2xl mb-5 mx-auto'>
+          <div className='flex relative items-center gap-2 text-sm w-full  text-black dark:text-gray-50 mb-3'>
+            <input type="text" className=' bg-gray-400 dark:supports-backdrop-filter:bg-white/20 p-4 opacity-80 backdrop-blur-2xl pl-10 rounded-3xl w-full 
+            max-w-2xl outline-0 focus:ring-2 focus:ring-blue-500' placeholder='Search for restaurants or dishes...' />
+            <Search className='size-5 text-gray-500 absolute left-3 dark:text-gray-400' />
           </div>
         </div>
+        <div className="max-w-7xl  pb-5 relative flex flex-col gap-5 rounded-2xl p-2.5 px-4  bg-amber-300 sm:px-6 lg:px-8">
+          <div className='flex flex-col gap-3 '>
+          <h1 className='font-semibold text-xl'>Gonna be A Good Day!</h1> 
+            <span className='flex flex-col text-sm text-gray-700 dark:text-gray-800'>
+              Free delivery for all orders above ₹500. Use code <span className='font-bold'>FREEDOM</span> at checkout. Hurry, offer ends soon!
+            </span>
+          </div>
+            <button className='bg-black text-white font-medium p-2 w-fit rounded-xl'>
+              Order Now
+            </button>
+            <div className='text-center right-1 top-10 opacity-75'>
+              <img src="/foodpng.png" className='size-35' alt="noimg" />
+            </div>
+          </div>
       </section>
 
       {/* Explore Section */}
-      <section className="py-16 md:py-24 bg-yellow-50">
+      <section className="py-16 md:py-24 bg-yellow-50 dark:bg-stone-900 transition-colors duration-300  ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left - Image */}
@@ -123,7 +94,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="bg-gray-50 py-16 md:py-24">
+      <section className="bg-gray-50 py-16 md:py-24 dark:bg-stone-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8">
             {/* Feature 1 */}
@@ -163,7 +134,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer CTA */}
-      <section className="bg-linear-to-r from-purple-300 via-gray-10 to-orange-900 py-16 text-center">
+      <section className=" dark:bg-black  py-16 text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to order your favorite food?
