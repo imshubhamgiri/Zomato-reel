@@ -1,9 +1,26 @@
 import { Link } from 'react-router-dom'
-import { ArrowBigDown, ArrowDown, ChevronDown, LocationEditIcon, MoonIcon, Search, Sun, TimerReset ,  } from 'lucide-react'
+import { ArrowBigDown, ArrowDown, ChevronDown, ChevronUp, LocationEditIcon, MoonIcon, Search, Sun, TimerReset ,  } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import { useState, useRef, useEffect } from 'react'
 const LandingPage = () => {
     const {theme, toggleTheme} = useTheme()
+    const [city , setCity] = useState('Bangalore')
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef(null)
+    const cities = ['Bangalore', 'Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal', 'Visakhapatnam', 'Pimpri-Chinchwad', 'Patna', 'Vadodara', 'Ghaziabad']
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsOpen(false)
+        }
+      }
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
   return (
+    <>
     <div className="min-h-screen bg-linear-to-b from-gray-50 relative  to-white">
       {/* Header/Navigation */}
       <header className="bg-white border-b bg-linear-to-r dark:from-stone-800 dark:to-black transition-colors duration-200 border-gray-200 dark:border-slate-500">
@@ -12,8 +29,37 @@ const LandingPage = () => {
            <div className='flex flex-col text-gray-500 dark:text-gray-400 gap-1'>
             <div className='flex items-center gap-2'>
               <span><LocationEditIcon size={16} /></span>Location</div>
-            <div>
-                <span className='text-medium flex items-center gap-1 text-gray-500 dark:text-white'>Bangalore<ChevronDown size={16} /></span>
+            <div className='hover:scale-100 relative' ref={dropdownRef}>
+              <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className='city-selector-btn'
+              >
+                <span className='city-text'>{city}</span>
+                {isOpen ? <ChevronUp size={16} className='shrink-0' /> : <ChevronDown size={16} className='shrink-0' />}
+              </button>
+              
+              {isOpen && (
+                <div 
+                  className='absolute top-full left-0 mt-2 w-48 bg-gray-900/40 backdrop-blur-lg border border-white/20 rounded-lg overflow-hidden z-50 max-h-40 overflow-y-auto dropdown-scroll'
+                  style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                  }}
+                >
+                  {cities.map((cityName) => (
+                    <button
+                      key={cityName}
+                      onClick={() => {
+                        setCity(cityName)
+                        setIsOpen(false)
+                      }}
+                      className='w-full text-left px-3 py-2 text-white hover:bg-gray-800/50 transition-colors duration-150'
+                    >
+                      {cityName}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
            </div>
             
@@ -41,9 +87,9 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="bg-linear-to-r from-green-50 px-5 to-orange-50 dark:from-stone-800 dark:to-black transition-colors duration-300 py-12 md:py-20">
-        <div className='w-full sticky top-10 z-50 max-w-2xl mb-5 mx-auto'>
+        <div className='w-full z-50 max-w-2xl mb-5 mx-auto'>
           <div className='flex relative items-center gap-2 text-sm w-full  text-black dark:text-gray-50 mb-3'>
-            <input type="text" className=' bg-gray-400 dark:supports-backdrop-filter:bg-white/20 p-4 opacity-80 backdrop-blur-2xl pl-10 rounded-3xl w-full 
+            <input type="text" className=' bg-gray-400 dark:supports-backdrop-filter:bg-white/10 p-4 opacity-95 backdrop-blur-xl pl-10 rounded-3xl w-full 
             max-w-2xl outline-0 focus:ring-2 focus:ring-blue-500' placeholder='Search for restaurants or dishes...' />
             <Search className='size-5 text-gray-500 absolute left-3 dark:text-gray-400' />
           </div>
@@ -145,6 +191,7 @@ const LandingPage = () => {
         </div>
       </section>
     </div>
+    </>
   )
 }
 
