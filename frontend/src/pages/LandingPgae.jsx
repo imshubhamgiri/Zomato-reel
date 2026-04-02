@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowBigDown, ArrowDown, ChevronDown, ChevronUp, LocationEditIcon, MoonIcon, Search, Sun, TimerReset ,  } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
+import ImageSlider from '../components/ImageSlider'
 const LandingPage = () => {
     const {theme, toggleTheme} = useTheme()
     const [city , setCity] = useState('Bangalore')
@@ -29,7 +30,7 @@ const LandingPage = () => {
            <div className='flex flex-col text-gray-500 dark:text-gray-400 gap-1'>
             <div className='flex items-center gap-2'>
               <span><LocationEditIcon size={16} /></span>Location</div>
-            <div className='hover:scale-100 relative' ref={dropdownRef}>
+            <div className='hover:scale-100 relative ' ref={dropdownRef}>
               <button 
                 onClick={() => setIsOpen(!isOpen)}
                 className='city-selector-btn'
@@ -94,20 +95,34 @@ const LandingPage = () => {
             <Search className='size-5 text-gray-500 absolute left-3 dark:text-gray-400' />
           </div>
         </div>
-        <div className="max-w-7xl  pb-5 relative flex flex-col gap-5 rounded-2xl p-2.5 px-4  bg-amber-300 sm:px-6 lg:px-8">
-          <div className='flex flex-col gap-3 '>
-          <h1 className='font-semibold text-xl'>Gonna be A Good Day!</h1> 
-            <span className='flex flex-col text-sm text-gray-700 dark:text-gray-800'>
+
+
+        {/* Promo Banner */}
+        <div className="max-w-7xl h-85  pb-5 relative flex flex-col md:flex-row gap-5 rounded-2xl p-2.5 px-4 mx-auto bg-amber-300 sm:px-6 lg:px-8">
+          <div className='flex flex-col gap-3 lg:gap-9 md:w-1/2'>
+          <h1 className='font-semibold text-xl md:text-4xl'>Gonna be A Good Day!</h1> 
+            <span className='flex flex-col text-sm md:text-2xl text-gray-700 dark:text-gray-800'>
               Free delivery for all orders above ₹500. Use code <span className='font-bold'>FREEDOM</span> at checkout. Hurry, offer ends soon!
             </span>
-          </div>
-            <button className='bg-black text-white font-medium p-2 w-fit rounded-xl'>
+            <button className='bg-black text-white font-medium lg:text-xl hover:scale-105 lg:font-semibold p-2  lg:px-6 lg:py-3 w-fit rounded-xl'>
               Order Now
             </button>
-            <div className='text-center right-1 top-10 opacity-75'>
-              <img src="/foodpng.png" className='size-35' alt="noimg" />
-            </div>
           </div>
+          
+          {/* Image Slider */}
+          <div className='md:w-1/2  md:h-auto'>
+            <ImageSlider 
+              images={[
+                '/foodpng.png',
+                'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop',
+                'https://images.unsplash.com/photo-1518779033015-51a34cb811cf?w=400&h=400&fit=crop',
+                'https://images.unsplash.com/photo-1546433478-dbdc4be3a42e?w=400&h=400&fit=crop',
+              ]}
+              autoPlay={true}
+              autoPlayInterval={5000}
+            />
+          </div>
+        </div>
       </section>
 
       {/* Explore Section */}
