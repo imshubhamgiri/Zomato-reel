@@ -39,11 +39,11 @@ const getFoodItemsWithUserState = async (
     cursorMatch = { createdAt: { $lt: new Date(lastCreatedAt) } };
   }
 
-  if (cursorMatch && Object.keys(cursorMatch).length > 0) {
-    console.log('Cursor match:', JSON.stringify(cursorMatch, null, 2));
-  } else {
-    console.log('No cursor filter applied - fetching from start');
-  }
+  // if (cursorMatch && Object.keys(cursorMatch).length > 0) {
+  //   console.log('Cursor match:', JSON.stringify(cursorMatch, null, 2));
+  // } else {
+  //   console.log('No cursor filter applied - fetching from start');
+  // }
   //  to detect if more results exist
   const fetchLimit = limit + 1;
 
