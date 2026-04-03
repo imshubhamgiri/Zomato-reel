@@ -10,6 +10,80 @@ const apiClient = axios.create({
   },
 });
 
+// Flag to prevent infinite refresh token loops
+let isRefreshing = false;
+let failedQueue = [];
+
+// Queue requests while token is being refreshed
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+// Response Interceptor for handling token expiration
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Check if error is 401 (Unauthorized) and not already a retry
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If already refreshing, queue the request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(() => {
+          // Retry the original request with new cookies
+          return apiClient(originalRequest);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Attempt to refresh the token
+        await axios.post(`${API_URL}/api/auth/refresh`, {}, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // New cookies are automatically set by the server
+        // Process any queued requests
+        processQueue(null);
+        
+        // Retry the original request with new cookies (sent automatically via withCredentials)
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        // Refresh token failed - redirect to login
+        processQueue(refreshError, null);
+        
+        // Clear any stored tokens
+        if (typeof window !== 'undefined') {
+          // Redirect to appropriate login page based on user type
+          const isPartner = window.location.pathname.includes('partner');
+          window.location.href = isPartner ? '/partner/login' : '/user/login';
+        }
+        
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 // User Authentication APIs
 export const userAPI = {
   register: async (name, email, password) => {
@@ -74,4 +148,22 @@ export const authAPI = {
   },
 };
 
+export const foodAPI = {
+  getAllFoods:async(param)=>{
+    const response = await apiClient.get('/api/foods?'+param.toString());
+    return response.data;
+  }
+}
 export default apiClient;
+
+export const useractions = {
+  likeFood: async (foodId) => {
+    const response = await apiClient.post(`/api/foods/like`, { foodId });
+    return response.data;
+  },
+
+  saveFood: async (foodId) => {
+    const response = await apiClient.post(`/api/foods/save`, { foodId });
+    return response.data;
+  }
+}
