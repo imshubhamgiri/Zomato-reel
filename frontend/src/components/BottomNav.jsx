@@ -10,9 +10,8 @@ const BottomNav = () => {
         {path:'/user/profile' ,label:'Profile', icon:User},
     ]
   return (
-    <nav className="fixed bottom-3 left-1/2 z-50 w-[calc(100%-1rem)]
-     max-w-xl -translate-x-1/2 rounded-3xl border border-white/45
-      bg-white/45 px-2 py-1.5 shadow-[0_10px_32px_rgba(15,23,42,0.22)] backdrop-blur-xl
+    <nav className="bottom-nav-responsive  z-50 border border-white/45
+       px-2 py-1.5 shadow-[0_10px_32px_rgba(15,23,42,0.22)] backdrop-blur-xl
        supports-backdrop-filter:bg-white/35 dark:border-white/10 dark:bg-slate-900/55 
        dark:shadow-[0_10px_30px_rgba(2,6,23,0.55)] ">
       <div className="flex items-center justify-around gap-1">

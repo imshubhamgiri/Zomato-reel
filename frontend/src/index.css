@@ -24,3 +24,58 @@
 .city-text {
   @apply truncate flex-1 min-w-0;
 }
+
+.video-feed {
+      @apply snap-y snap-mandatory overflow-y-scroll h-screen;
+        /* scroll-snap-type: y mandatory; 
+        overflow-y: scroll;
+        height: 100vh;
+        /* Hide scrollbar for cleaner look */
+        &::-webkit-scrollbar {
+           display: none;
+          }
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        /* scroll-behavior: smooth; */ 
+    }
+
+    .video-feed::-webkit-scrollbar {
+      @apply hidden;
+        /* display: none; */
+    }
+    /* .reel-item {
+        scroll-snap-align: start;
+        height: 100vh;
+        width: 100%;
+        position: relative;
+    } */
+    .reel-item{
+      @apply h-screen w-full relative snap-start;
+    }
+
+/* BottomNav responsive at 964px */
+@media (max-width: 963px) {
+  .bottom-nav-responsive {
+    position: sticky;
+    background-color: black;
+    width: 100%;
+    border-radius: 0;
+    border: none;
+    bottom: 0;
+    left: auto;
+    transform: none;
+    margin: 0;
+  }
+}
+
+@media (min-width: 964px) {
+  .bottom-nav-responsive {
+    position: fixed;
+    bottom: 0.75rem;
+    left: 50%;
+    width: calc(100% - 1rem);
+    max-width: 48rem;
+    border-radius: 1.5rem;
+    transform: translateX(-50%);
+  }
+}
