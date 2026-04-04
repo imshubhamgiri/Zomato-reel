@@ -3,6 +3,7 @@ import { ArrowBigDown, ArrowDown, ChevronDown, ChevronUp, LocationEditIcon, Moon
 import { useTheme } from '../context/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
 import ImageSlider from '../components/ImageSlider'
+import myimage from '../assets/food-logo.png'
 const LandingPage = () => {
     const {theme, toggleTheme} = useTheme()
     const [city , setCity] = useState('Bangalore')
@@ -24,7 +25,7 @@ const LandingPage = () => {
     <>
     <div className="min-h-screen bg-linear-to-b from-gray-50 relative  to-white">
       {/* Header/Navigation */}
-      <header className="bg-white border-b bg-linear-to-r dark:from-stone-800 dark:to-black transition-colors duration-200 border-gray-200 dark:border-slate-500">
+      <header className="bg-white border-b bg-linear-to-r max-h-23  dark:from-stone-800 dark:to-black transition-colors duration-200 border-gray-200 dark:border-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
            <div className='flex flex-col text-gray-500 dark:text-gray-400 gap-1'>
@@ -41,7 +42,7 @@ const LandingPage = () => {
               
               {isOpen && (
                 <div 
-                  className='absolute top-full left-0 mt-2 w-48 bg-gray-900/40 backdrop-blur-lg border border-white/20 rounded-lg overflow-hidden z-50 max-h-40 overflow-y-auto dropdown-scroll'
+                  className='absolute top-full left-0 mt-2 w-48 bg-gray-900/40 backdrop-blur-lg border border-white/20 rounded-lg overflow-hidden z-60 max-h-40 overflow-y-auto dropdown-scroll'
                   style={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
@@ -64,11 +65,14 @@ const LandingPage = () => {
             </div>
            </div>
             
-            <nav className="hidden md:flex items-center dark:text-white gap-8">
-              <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Home</Link>
+            <nav className="flex flex-col h-fit items-center dark:text-white ">
+              {/* <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Home</Link>
               <Link to="/blog" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Blog</Link>
               <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">About us</Link>
-              <button className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">EN</button>
+              <button className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">EN</button> */}
+              <div className=' text-shadow-blue-400'>Food</div>
+              <div className=' text-shadow-blue-400'>In</div>
+              <div className=' text-shadow-blue-400'>Reels</div>
             </nav>
             
             <div className="flex items-center gap-4">
@@ -98,7 +102,7 @@ const LandingPage = () => {
 
 
         {/* Promo Banner */}
-        <div className="max-w-7xl h-85  pb-5 relative flex flex-col md:flex-row gap-5 rounded-2xl p-2.5 px-4 mx-auto bg-amber-300 sm:px-6 lg:px-8">
+        <div className="max-w-7xl h-auto  pb-5 relative flex flex-col md:flex-row gap-5 rounded-2xl p-2.5 px-4 mx-auto bg-amber-300 sm:px-6 lg:px-8">
           <div className='flex flex-col gap-3 lg:gap-9 md:w-1/2'>
           <h1 className='font-semibold text-xl md:text-4xl'>Gonna be A Good Day!</h1> 
             <span className='flex flex-col text-sm md:text-2xl text-gray-700 dark:text-gray-800'>
@@ -110,7 +114,7 @@ const LandingPage = () => {
           </div>
           
           {/* Image Slider */}
-          <div className='md:w-1/2  md:h-auto'>
+          <div className='md:w-1/2  md:h-82 '>
             <ImageSlider 
               images={[
                 '/foodpng.png',
