@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { userAPI, authAPI } from '../services/api';
 import { Mail } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
+import { useEffect } from 'react';
 
 function UserLogin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, user, isAuthenticated, isAuthLoading } = useAppContext();
+
+  useEffect(() => {
+    // If auth finishes loading and user is already authenticated, don't let them see login
+    if (!isAuthLoading && user && isAuthenticated) {
+      if (user.userType === 'partner') {
+        navigate('/partner/profile');
+      } else {
+        navigate('/user/profile');
+      }
+    }
+  }, [user, isAuthenticated, isAuthLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,14 +29,8 @@ function UserLogin() {
 
     try {
       setLoading(true);
-      await userAPI.login(email, password);
-      // Check user type and navigate accordingly
-      const authCheck = await authAPI.checkAuth();
-      if (authCheck.userType === 'partner') {
-        navigate('/partner/profile');
-      } else {
-        navigate('/user/profile');
-      }
+      await login({ email, password });
+      navigate('/user/profile');
     } catch (error) {
       console.error(error);
       setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
