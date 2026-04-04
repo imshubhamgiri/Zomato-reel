@@ -13,7 +13,7 @@ import type {
 } from '../types';
 import {
   getAccessCookieOptions,
-  getLoginCheckData,
+  getAuthMeData,
   getRefreshCookieOptions,
   loginPartner,
   loginUser,
@@ -167,14 +167,14 @@ export const refreshToken = asyncHandler(
   }
 );
 
-export const loginCheck = asyncHandler(async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getMe = asyncHandler(async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   if (!req.user) {
     res.status(401).json({ message: 'Please Login First' });
     return;
   }
 
   
-    const responseData = await getLoginCheckData({
+    const responseData = await getAuthMeData({
       Id: req.user.id,
       email: req.user.email,
       type: req.user.type,
