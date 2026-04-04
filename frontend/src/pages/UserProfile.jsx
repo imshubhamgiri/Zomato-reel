@@ -2,40 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { authAPI } from '../services/api';
+import { useAppContext } from '../context/AppContext';
 
 function UserProfile() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user, isAuthLoading } = useAppContext();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await authAPI.checkAuth();
-        if (response.userType !== 'user') {
-          navigate('/partner/profile');
-          return;
-        }
-        setUser(response);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        navigate('/user/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchUserData();
-  }, [navigate]);
+    // Only redirect if auth loading is complete and no user was found
+    if (!isAuthLoading && !user) {
+      navigate('/user/login');
+    }
+  }, [user, isAuthLoading, navigate]);
 
-  if (loading) {
+  // While checking auth state on refresh, show a nice loading screen
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
+        <div className="text-gray-600 dark:text-gray-400">Loading your profile...</div>
       </div>
     );
   }
 
+  // Double check user exists before trying to render properties
   if (!user) {
     return null;
   }
