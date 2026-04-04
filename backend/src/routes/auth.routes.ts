@@ -25,6 +25,6 @@ authRoutes.post('/partners/logout', requireAuth, authController.logoutFoodpartne
 authRoutes.get('/partners/logout', requireAuth, authController.logoutFoodpartner)
 
 authRoutes.post('/refresh', authLimiter, authController.refreshToken)
-authRoutes.get('/loginCheck', requireAuth, authController.loginCheck)
+authRoutes.get('/me', requireAuth, authController.getMe)
 
 export default authRoutes;
