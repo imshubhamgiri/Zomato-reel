@@ -226,13 +226,14 @@ export const rotateRefreshToken = async (
   return { tokens, payload };
 };
 
-export const getLoginCheckData = async (payload: AuthTokenPayload): Promise<Record<string, unknown>> => {
+export const getAuthMeData = async (payload: AuthTokenPayload): Promise<Record<string, unknown>> => {
   if (payload.type === 'partner') {
     const partner = await findPartnerById(payload.Id);
     if (!partner) {
       throw new AuthError('Invalid token');
     }
 
+    // Only return lightweight core session essentials
     return {
       message: 'User found',
       id: partner._id.toString(),
@@ -240,8 +241,6 @@ export const getLoginCheckData = async (payload: AuthTokenPayload): Promise<Reco
       email: partner.email,
       userType: 'partner',
       restaurantName: partner.restaurantName,
-      phone: partner.phone,
-      address: partner.address,
     };
   }
 
@@ -250,6 +249,7 @@ export const getLoginCheckData = async (payload: AuthTokenPayload): Promise<Reco
     throw new AuthError('Invalid token');
   }
 
+  // Only return lightweight core session essentials
   return {
     message: 'User found',
     id: user._id.toString(),
