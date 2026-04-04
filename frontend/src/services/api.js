@@ -86,20 +86,13 @@ apiClient.interceptors.response.use(
 
 // User Authentication APIs
 export const userAPI = {
-  register: async (name, email, password) => {
-    const response = await apiClient.post('/api/auth/users/register', {
-      name,
-      email,
-      password,
-    });
+  register: async (userData) => {
+    const response = await apiClient.post('/api/auth/users/register', userData);
     return response.data;
   },
 
-  login: async (email, password) => {
-    const response = await apiClient.post('/api/auth/users/login', {
-      email,
-      password,
-    });
+  login: async (userData) => {
+    const response = await apiClient.post('/api/auth/users/login', userData);
     return response.data;
   },
 
@@ -116,16 +109,13 @@ export const userAPI = {
 
 // Partner Authentication APIs
 export const partnerAPI = {
-  register: async (data) => {
-    const response = await apiClient.post('/api/auth/partners/register', data);
+  register: async (partnerData) => {
+    const response = await apiClient.post('/api/auth/partners/register', partnerData);
     return response.data;
   },
 
-  login: async (email, password) => {
-    const response = await apiClient.post('/api/auth/partners/login', {
-      email,
-      password,
-    });
+  login: async (partnerData) => {
+    const response = await apiClient.post('/api/auth/partners/login', partnerData);
     return response.data;
   },
 
@@ -143,7 +133,7 @@ export const partnerAPI = {
 // Auth check API
 export const authAPI = {
   checkAuth: async () => {
-    const response = await apiClient.get('/api/auth/loginCheck');
+    const response = await apiClient.get('/api/auth/me');
     return response.data;
   },
 };
