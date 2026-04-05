@@ -3,6 +3,7 @@ import { ArrowBigDown, ArrowDown, ChevronDown, ChevronUp, LocationEditIcon, Moon
 import { useTheme } from '../context/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
 import ImageSlider from '../components/ImageSlider'
+import FoodFeed from '../components/FoodFeed'
 import myimage from '../assets/food-logo.png'
 const LandingPage = () => {
     const {theme, toggleTheme} = useTheme()
@@ -157,6 +158,9 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Trending Food Section */}
+      <FoodFeed />
 
       {/* Features Section */}
       <section className="bg-gray-50 py-16 md:py-24 dark:bg-stone-800 transition-colors duration-300">
