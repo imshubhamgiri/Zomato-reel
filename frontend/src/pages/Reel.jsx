@@ -10,31 +10,40 @@ const Reel = () => {
      const videoRefs = useRef([]);
      const [currentVideoId, setCurrentVideoId] = useState(null);
      const [isMuted, setIsMuted] = useState(true);
-     const [cursor , setCursor] = useState('default');
-     const [hasMore, setHasMore] = useState(true);
+     const cursor = useRef('default');
+     const hasMore = useRef(true);
+     const isLoading = useRef(false);
+     
      const getVideos = async () => {
-    const param = new URLSearchParams({
-        limit:2,
-     ...(cursor?.id && { id: cursor.id }),
-    ...(cursor?.lastCreatedAt && { lastCreatedAt: cursor.lastCreatedAt })
-    });
-        if(hasMore) await foodAPI.getAllFoods(param).then((res) => {
-            //set data to videos
+        if (!hasMore.current || isLoading.current) return;
+        isLoading.current = true;
+        
+        const param = new URLSearchParams({
+            limit: 2,
+            ...(cursor.current?.id && { id: cursor.current.id }),
+            ...(cursor.current?.lastCreatedAt && { lastCreatedAt: cursor.current.lastCreatedAt })
+        });
+        
+        await foodAPI.getAllFoods(param).then((res) => {
             console.log(res);
-          setVideos((prev) => [...prev, ...(res.data || [])]);
-          setHasMore(res.pagination.hasMore) 
-          setCursor(res.pagination.nextCursor);
-          const fooditems = res.data.data || [];
-        // Set the first video as the current video
-          if(fooditems.length > 0) {
-            setCurrentVideoId(fooditems[0]._id);
-          }
-
+            setVideos((prev) => {
+                // Prevent duplicate videos if overlapping calls happen
+                const existingIds = new Set(prev.map(v => v._id));
+                const newVideos = (res.data || []).filter(v => !existingIds.has(v._id)); // Filter out duplicates
+                return [...prev, ...newVideos];
+            });
+            hasMore.current = res.pagination.hasMore; 
+            cursor.current = res.pagination.nextCursor;
+            const fooditems = res.data || [];
+            if(fooditems.length > 0 && !currentVideoId) {
+                setCurrentVideoId(fooditems[0]._id);
+            }
         }).catch((err) => {
-          console.error("Error fetching videos:", err);
+            console.error("Error fetching videos:", err);
+        }).finally(() => {
+            isLoading.current = false;
         });
      }
-
 
     useEffect(() => {
       getVideos();
@@ -143,15 +152,30 @@ const Reel = () => {
         observer.observe(video);
       }
     });
-  
-    
-    return () => {
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = videoFeedRef.current;
+      if (scrollTop + clientHeight >= scrollHeight - 200) {
+        getVideos();
+      }
+    };
+
+    // Attach scroll listener for infinite scrolling 
+    const currentScrollRef = videoFeedRef.current;
+    if (currentScrollRef) { // Check if ref is available
+        currentScrollRef.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {  // Cleanup observer and event listener on unmount or when videos change
       videoRefs.current.forEach((video) => {
         if (video) {
           observer.unobserve(video);
         }
       });
       observer.disconnect();
+      if (currentScrollRef) {
+          currentScrollRef.removeEventListener('scroll', handleScroll);
+      }
     };
   }, [videos]);
 
