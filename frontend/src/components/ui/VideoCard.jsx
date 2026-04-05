@@ -1,4 +1,3 @@
-import React from 'react'
 
 const VideoCard = ({ video , index , videoRefs , isMuted , setIsMuted }) => {
   return (
