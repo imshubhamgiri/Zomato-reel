@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
-import { authAPI } from '../services/api';
+import ProfileSidebar from '../components/ProfileSidebar';
+import ProfileInfo from '../components/ProfileInfo';
 import { useAppContext } from '../context/AppContext';
 
 function UserProfile() {
   const navigate = useNavigate();
   const { user, isAuthLoading } = useAppContext();
+  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     // Only redirect if auth loading is complete and no user was found
@@ -18,8 +20,8 @@ function UserProfile() {
   // While checking auth state on refresh, show a nice loading screen
   if (isAuthLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400">Loading your profile...</div>
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-emerald-50 via-white to-cyan-50 dark:from-stone-950 dark:via-slate-950 dark:to-black">
+        <div className="text-slate-600 dark:text-slate-300">Loading your profile...</div>
       </div>
     );
   }
@@ -30,12 +32,12 @@ function UserProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-linear-to-b from-emerald-50 via-white to-cyan-50 dark:from-stone-950 dark:via-slate-950 dark:to-black">
       {/* Header with Profile Dropdown */}
-      <div className="bg-white dark:bg-gray-800 shadow">
+      <div className="bg-linear-to-r from-white/90 to-emerald-50/80 dark:from-stone-900/90 dark:to-slate-950/90 backdrop-blur-xl shadow-sm border-b border-emerald-100/70 dark:border-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <Link to="/" className="inline-flex items-center text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
@@ -46,64 +48,84 @@ function UserProfile() {
         </div>
       </div>
 
-      {/* Profile Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-          {/* Profile Header */}
-          <div className="bg-linear-to-r from-red-500 to-orange-500 px-8 py-12">
-            <div className="flex items-center space-x-6">
-              <div className="w-24 h-24 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-3xl font-bold text-red-600 dark:text-red-400">
-                {user.name.charAt(0)}
-              </div>
-              <div className="text-white">
-                <h1 className="text-3xl font-bold">{user.name}</h1>
-                <p className="text-red-100 mt-1">Food Lover</p>
-              </div>
-            </div>
+      {/* Main Layout Area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Sidebar */}
+          <div className="w-full lg:w-1/4 shrink-0">
+             <ProfileSidebar user={user} activeTab={activeTab} setActiveTab={setActiveTab} />
           </div>
 
-          {/* Profile Details */}
-          <div className="px-8 py-8 space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Personal Information
-              </h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Email Address
-                  </label>
-                  <p className="text-gray-900 dark:text-white">{user.email}</p>
+          {/* Right Content Area */}
+          <div className="flex-1 bg-white/85 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-emerald-100/40 dark:shadow-black/30 border border-emerald-100/60 dark:border-slate-800 min-h-[600px] overflow-hidden">
+             {activeTab === 'profile' && <ProfileInfo user={user} />}
+             
+             {activeTab === 'orders' && (
+                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
+                  <svg className="w-20 h-20 text-emerald-300 dark:text-emerald-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">My Orders</h2>
+                  <p className="text-slate-500 dark:text-slate-300 max-w-sm mb-6">You haven't placed any orders yet. Discover some amazing food!</p>
+                  <button onClick={() => navigate('/')} className="px-6 py-2.5 bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-emerald-500/30 transition-all">
+                      Browse Food
+                    </button>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Phone Number
-                  </label>
-                  <p className="text-gray-900 dark:text-white">{user.phone || 'Not added Yet/N/A'}</p>
+             )}
+             
+             {activeTab === 'saved' && (
+                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
+                  <svg className="w-20 h-20 text-emerald-300 dark:text-emerald-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Saved Reels & Foods</h2>
+                  <p className="text-slate-500 dark:text-slate-300 max-w-sm">Save your favorite dishes or food reels here to easily find them later.</p>
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Delivery Address
-                  </label>
-                  <p className="text-gray-900 dark:text-white">{user.address}</p>
-                </div>
-              </div>
-            </div>
+             )}
+             
+             {activeTab === 'addresses' && (
+                <div className="p-10">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white border-b border-emerald-100 dark:border-slate-700 pb-4 mb-6">Manage Addresses</h2>
+                    
+                    <div className="border-2 border-dashed border-emerald-200 dark:border-slate-700 rounded-xl p-8 text-center hover:border-emerald-500 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/10 transition-colors cursor-pointer group">
+                      <div className="w-12 h-12 bg-emerald-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-white dark:group-hover:bg-slate-700 shadow-sm">
+                        <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Add a new address</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-300">Add home, office, or other addresses for quick checkout</p>
+                    </div>
 
-            {/* Action Buttons */}
-            <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex flex-wrap gap-4">
-                <button className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
-                  Edit Profile
-                </button>
-                <button className="px-6 py-2 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg border-2 border-gray-300 dark:border-gray-600 transition-colors">
-                  Change Password
-                </button>
-                <button className="px-6 py-2 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg border-2 border-gray-300 dark:border-gray-600 transition-colors">
-                  Order History
-                </button>
-              </div>
-            </div>
+                    {user?.address && (
+                      <div className="mt-6 border border-emerald-100 dark:border-slate-700 rounded-xl p-6 relative bg-white/70 dark:bg-slate-900/60">
+                        <div className="absolute top-6 right-6 flex gap-3">
+                          <button className="text-slate-400 hover:text-emerald-500 transition-colors">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                          </button>
+                        </div>
+                        <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 mb-3">
+                          Home
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-semibold text-slate-900 dark:text-white">{user.name}</span>
+                          <span className="text-slate-500 dark:text-slate-300">{user.phone}</span>
+                        </div>
+                        <p className="text-slate-600 dark:text-slate-300 max-w-md">{user.address}</p>
+                      </div>
+                    )}
+                </div>
+             )}
+             
+             {activeTab === 'payments' && (
+                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
+                  <svg className="w-20 h-20 text-emerald-300 dark:text-emerald-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Payment Methods</h2>
+                  <p className="text-slate-500 dark:text-slate-300 max-w-sm">Manage your saved cards, UPI, and other payment options for a faster checkout experience.</p>
+                </div>
+             )}
           </div>
         </div>
       </div>
@@ -112,3 +134,4 @@ function UserProfile() {
 }
 
 export default UserProfile;
+
