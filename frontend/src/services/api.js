@@ -71,7 +71,12 @@ apiClient.interceptors.response.use(
         if (typeof window !== 'undefined') {
           // Redirect to appropriate login page based on user type
           const isPartner = window.location.pathname.includes('partner');
-          window.location.href = isPartner ? '/partner/login' : '/user/login';
+          const currentPath = window.location.pathname;
+          const loginPath = isPartner ? '/partner/login' : '/user/login';
+          
+          if (currentPath !== loginPath && currentPath !== '/') {
+            window.location.href = loginPath;
+          }
         }
         
         return Promise.reject(refreshError);
