@@ -60,7 +60,7 @@ function UserRegister() {
                 type="text"
                 autoComplete="name"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="John Doe"
               />
             </div>
@@ -74,7 +74,7 @@ function UserRegister() {
                 type="email"
                 autoComplete="email"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="you@example.com"
               />
             </div>
@@ -88,10 +88,10 @@ function UserRegister() {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="••••••••"
               />
-              {error && <p className="text-sm absolute text-red-500 dark:text-red-400">{error}</p>}
+              {error && <p className="text-sm absolute text-indigo-500 dark:text-indigo-400">{error}</p>}
             </div>
           </div>
 
@@ -101,11 +101,11 @@ function UserRegister() {
               name="terms"
               type="checkbox"
               required
-              className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 rounded"
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded"
             />
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
               I agree to the{' '}
-              <a href="#" className="text-red-600 hover:text-red-500 dark:text-red-400">
+              <a href="#" className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                 Terms and Conditions
               </a>
             </label>
@@ -114,7 +114,7 @@ function UserRegister() {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
             >
               Create account
             </button>
@@ -123,13 +123,13 @@ function UserRegister() {
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
-              <Link to="/user/login" className="font-medium text-red-600 hover:text-red-500 dark:text-red-400">
+              <Link to="/user/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                 Sign in
               </Link>
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Want to register your restaurant?{' '}
-              <Link to="/partner/register" className="font-medium text-red-600 hover:text-red-500 dark:text-red-400">
+              <Link to="/partner/register" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                 Become a Partner
               </Link>
             </p>
@@ -141,3 +141,4 @@ function UserRegister() {
 }
 
 export default UserRegister;
+

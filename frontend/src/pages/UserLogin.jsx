@@ -128,7 +128,7 @@ function UserLogin() {
                 type="email"
                 autoComplete="email"
                 required
-                className="block w-full py-2 pr-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="block w-full py-2 pr-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="you@example.com"
                 />
               <Mail className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' size={18} />
@@ -144,10 +144,10 @@ function UserLogin() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 placeholder="••••••••"
               />
-              {error && <p className="text-sm absolute text-red-500 dark:text-red-400">{error}</p>}
+              {error && <p className="text-sm absolute text-indigo-500 dark:text-indigo-400">{error}</p>}
             </div>
           </div>
 
@@ -157,14 +157,14 @@ function UserLogin() {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 rounded"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                 Remember me
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-blue-600 hover:text-red-500 dark:text-red-400">
+              <a href="#" className="font-medium text-blue-600 hover:text-indigo-500 dark:text-indigo-400">
                 Forgot password?
               </a>
             </div>
@@ -182,7 +182,7 @@ function UserLogin() {
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
-              <Link to="/user/register" className="font-medium text-blue-600 hover:text-red-500 dark:text-red-400">
+              <Link to="/user/register" className="font-medium text-blue-600 hover:text-indigo-500 dark:text-indigo-400">
                 Sign up
               </Link>
             </p>
@@ -201,3 +201,4 @@ function UserLogin() {
 }
 
 export default UserLogin;
+
