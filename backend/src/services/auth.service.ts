@@ -25,6 +25,8 @@ import {
   findUserPublicByEmail,
   revokeAllRefreshTokensForUser as revokeAllRefreshTokensForUserRepo,
   revokeRefreshTokenByHash,
+  userExists,
+  partnerExists,
 } from '../repositories/auth.repository';
 
 const ACCESS_TOKEN_TTL = '15m';
@@ -256,6 +258,25 @@ export const getAuthMeData = async (payload: AuthTokenPayload): Promise<Record<s
     name: user.name,
     email: user.email,
     userType: 'user',
+  };
+};
+
+export const getAuthMeDataLightweight = async (payload: AuthTokenPayload): Promise<Record<string, unknown>> => {
+  // Lightweight existence check instead of full document fetch
+  const exists = payload.type === 'partner' 
+    ? await partnerExists(payload.Id)
+    : await userExists(payload.Id);
+
+  if (!exists) {
+    throw new AuthError('Invalid token - user account no longer exists');
+  }
+
+  // Return JWT data directly (no additional DB fetch needed)
+  return {
+    message: 'User found',
+    id: payload.Id,
+    email: payload.email,
+    userType: payload.type,
   };
 };
 

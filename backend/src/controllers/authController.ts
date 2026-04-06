@@ -13,7 +13,6 @@ import type {
 } from '../types';
 import {
   getAccessCookieOptions,
-  getAuthMeData,
   getRefreshCookieOptions,
   loginPartner,
   loginUser,
@@ -21,6 +20,7 @@ import {
   registerUser,
   revokeAllRefreshTokensForUser,
   rotateRefreshToken,
+  getAuthMeDataLightweight,
 } from '../services/auth.service';
 
 
@@ -173,17 +173,10 @@ export const getMe = asyncHandler(async (req: AuthenticatedRequest, res: Respons
     return;
   }
 
-  
-    const responseData = await getAuthMeData({
-      Id: req.user.id,
-      email: req.user.email,
-      type: req.user.type,
-    });
-    res.status(200).json(responseData);
-  
-  // catch (error) {
-  //   res.status(401).json({
-  //     message: 'Authentication failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
-  //   });
-  // }
+  const responseData = await getAuthMeDataLightweight({
+    Id: req.user.id,
+    email: req.user.email,
+    type: req.user.type,
+  });
+  res.status(200).json(responseData);
 });

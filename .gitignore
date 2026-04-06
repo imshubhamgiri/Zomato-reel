@@ -10,3 +10,6 @@ yarn-error.log*
 .idea/
 *.log
 IMAGEKIT_ERROR_ANALYSIS.md
+MONGODB_REPLICA_SET_SETUP.md
+TRANSACTIONS_IMPLEMENTATION_GUIDE.md
+backend/setup-replica-set.ps1

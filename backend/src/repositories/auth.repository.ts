@@ -76,3 +76,13 @@ export const revokeAllRefreshTokensForUser = async (
     { $set: { revokedAt: new Date() } }
   );
 };
+
+export const userExists = async (id: string): Promise<boolean> => {
+  const result = await User.exists({ _id: id });
+  return result !== null;
+};
+
+export const partnerExists = async (id: string): Promise<boolean> => {
+  const result = await FoodPartner.exists({ _id: id });
+  return result !== null;
+};
