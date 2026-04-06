@@ -32,7 +32,7 @@ const Reel = () => {
                 const newVideos = (res.data || []).filter(v => !existingIds.has(v._id)); // Filter out duplicates
                 return [...prev, ...newVideos];
             });
-            hasMore.current = res.pagination.hasMore; 
+            hasMore.current = res.pagination.hasMore;
             cursor.current = res.pagination.nextCursor;
             const fooditems = res.data || [];
             if(fooditems.length > 0 && !currentVideoId) {
