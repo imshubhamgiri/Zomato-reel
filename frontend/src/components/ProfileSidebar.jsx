@@ -51,9 +51,9 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center gap-4 px-6 py-4 transition-all duration-200 text-left hover:bg-emerald-50 dark:hover:bg-emerald-900/10 group ${
+                    className={`flex items-center gap-4 px-6 py-4 transition-all duration-200 text-left hover:bg-blue-50 dark:hover:bg-emerald-900/10 group ${
                       isActive 
-                        ? 'bg-linear-to-r from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 text-emerald-700 dark:text-emerald-300 border-r-4 border-emerald-500' 
+                        ? 'bg-gray-100 dark:from-emerald-900 dark:to-blue-900 text-emerald-700 dark:text-emerald-300 border-r-4 border-emerald-500' 
                         : 'text-slate-600 dark:text-slate-300'
                     }`}
                   >
