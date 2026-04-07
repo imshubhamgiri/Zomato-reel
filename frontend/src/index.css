@@ -17,7 +17,7 @@
   @apply dark:bg-gray-900/40 backdrop-blur-lg border bg-gray-700
    border-white/20 hover:bg-gray-800/50 text-white flex items-center 
    justify-between outline-0 rounded-lg px-3 h-10 transition-all 
-   duration-200 w-[160px] gap-1;
+   duration-200 w-25 lg:w-40 gap-1;
 }
 
 /* City name text - truncate if too long */
@@ -74,7 +74,7 @@
     bottom: 0.75rem;
     left: 50%;
     width: calc(100% - 1rem);
-    max-width: 48rem;
+    max-width: 41rem;
     border-radius: 1.5rem;
     transform: translateX(-50%);
   }
