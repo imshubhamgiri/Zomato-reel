@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { userAPI } from '../services/api';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 function ProfileDropdown({ user, type  }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { logout } = useAppContext();
+  const navigate = useNavigate();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -18,16 +20,15 @@ function ProfileDropdown({ user, type  }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    userAPI.logout().then((response) => {
-
-    localStorage.clear();
-    window.location.href = '/';
-    window.location.reload()
-    }).catch((error) => {
-      console.error('Logout failed:', error);
-    });
-    setIsOpen(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      localStorage.clear();
+      setIsOpen(false);
+      navigate('/');
+    } catch (error) {
+       console.error('Logout failed:', error);
+    }
   };
 
   const profilePath = type === 'partner' ? '/partner/profile' : '/user/profile';
@@ -40,9 +41,9 @@ function ProfileDropdown({ user, type  }) {
       {/* Profile Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
       >
-        <div className="w-10 h-10 rounded-full bg-red-600 dark:bg-red-500 flex items-center justify-center text-white font-semibold">
+        <div className="w-10 h-10 rounded-full bg-red-600 dark:bg-stone-700 flex items-center justify-center text-white font-semibold">
           {displayName.charAt(0).toUpperCase()}
         </div>
         <div className="hidden md:block text-left">
