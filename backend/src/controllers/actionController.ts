@@ -21,7 +21,7 @@ export const likefood = asyncHandler(
     req: AuthenticatedRequest,
     res: Response<ApiResponse<LikeResponse> | ErrorResponse>
   ): Promise<void> => {
-    const { foodId } = req.body;
+    const { foodId } = req.body  || req.query || req.params;
     const user = req.user;
 
     if (!user) {
@@ -55,7 +55,7 @@ export const saveFood = asyncHandler(
     req: AuthenticatedRequest,
     res: Response<ApiResponse<SaveResponse> | ErrorResponse>
   ): Promise<void> => {
-    const { foodId } = req.body;
+    const { foodId } = req.body || req.query || req.params;
     const user = req.user;
 
     if (!user) {
