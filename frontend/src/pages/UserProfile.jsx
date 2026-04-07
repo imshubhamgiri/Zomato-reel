@@ -32,7 +32,7 @@ function UserProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-emerald-50 via-white to-cyan-50 dark:from-stone-950 dark:via-slate-950 dark:to-black">
+    <div className="min-h-screen bg-white dark:bg-linear-to-b from-stone-950 dark:via-slate-950 dark:to-black">
       {/* Header with Profile Dropdown */}
       <div className="bg-linear-to-r from-white/90 to-emerald-50/80 dark:from-stone-900/90 dark:to-slate-950/90 backdrop-blur-xl shadow-sm border-b border-emerald-100/70 dark:border-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,7 +57,7 @@ function UserProfile() {
           </div>
 
           {/* Right Content Area */}
-          <div className="flex-1 bg-white/85 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-emerald-100/40 dark:shadow-black/30 border border-emerald-100/60 dark:border-slate-800 min-h-[600px] overflow-hidden">
+          <div className="flex-1 bg-white/85 dark:bg-slate-900/80 backdrop-blur-sm mb-20 rounded-2xl shadow-xl shadow-emerald-100/40 dark:shadow-black/30 border border-emerald-100/60 dark:border-slate-800 min-h-[600px] overflow-hidden">
              {activeTab === 'profile' && <ProfileInfo user={user} />}
              
              {activeTab === 'orders' && (
