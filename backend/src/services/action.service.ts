@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import {
   createLike,
   createSave,
@@ -19,47 +20,71 @@ interface ToggleResult {
 }
 
 const toggleLike = async (userId: string, foodId: string): Promise<ToggleResult> => {
-  const existing = await findLike(userId, foodId);
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (existing) {
-    await deleteLike(userId, foodId);
-    await incrementLikeCount(foodId, -1);
-    return { toggled: 'off' };
+  try {
+    const existing = await findLike(userId, foodId, session);
+
+    if (existing) {
+      await deleteLike(userId, foodId, session);
+      await incrementLikeCount(foodId, -1, session);
+      await session.commitTransaction();
+      return { toggled: 'off' };
+    }
+
+    const created = await createLike(userId, foodId, session);
+    await incrementLikeCount(foodId, 1, session);
+
+    await session.commitTransaction();
+    return {
+      toggled: 'on',
+      entity: {
+        id: created._id.toString(),
+        userId: created.userId.toString(),
+        foodId: created.food.toString(),
+      },
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
   }
-
-  const created = await createLike(userId, foodId);
-  await incrementLikeCount(foodId, 1);
-
-  return {
-    toggled: 'on',
-    entity: {
-      id: created._id.toString(),
-      userId: created.userId.toString(),
-      foodId: created.food.toString(),
-    },
-  };
 };
 
 const toggleSave = async (userId: string, foodId: string): Promise<ToggleResult> => {
-  const existing = await findSave(userId, foodId);
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (existing) {
-    await deleteSave(userId, foodId);
-    await incrementSaveCount(foodId, -1);
-    return { toggled: 'off' };
+  try {
+    const existing = await findSave(userId, foodId, session);
+
+    if (existing) {
+      await deleteSave(userId, foodId, session);
+      await incrementSaveCount(foodId, -1, session);
+      await session.commitTransaction();
+      return { toggled: 'off' };
+    }
+
+    const created = await createSave(userId, foodId, session);
+    await incrementSaveCount(foodId, 1, session);
+
+    await session.commitTransaction();
+    return {
+      toggled: 'on',
+      entity: {
+        id: created._id.toString(),
+        userId: created.userId.toString(),
+        foodId: created.food.toString(),
+      },
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
   }
-
-  const created = await createSave(userId, foodId);
-  await incrementSaveCount(foodId, 1);
-
-  return {
-    toggled: 'on',
-    entity: {
-      id: created._id.toString(),
-      userId: created.userId.toString(),
-      foodId: created.food.toString(),
-    },
-  };
 };
 
 export default {
