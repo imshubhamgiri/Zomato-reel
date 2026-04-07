@@ -66,14 +66,14 @@ const LandingPage = () => {
             </div>
            </div>
             
-            <nav className="flex flex-col h-fit items-center dark:text-white ">
+            <nav className="flex  h-fit items-center  rounded-2xl p-3 font-light text-2xl dark:text-white ">
               {/* <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Home</Link>
               <Link to="/blog" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">Blog</Link>
               <Link to="/" className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">About us</Link>
               <button className="text-gray-700 dark:text-white hover:text-gray-900 font-medium">EN</button> */}
-              <div className=' text-shadow-blue-400'>Food</div>
+              <div className=' text-shadow-blue-400 font-serif'>Food</div>
               <div className=' text-shadow-blue-400'>In</div>
-              <div className=' text-shadow-blue-400'>Reels</div>
+              <div className=' text-shadow-blue-400 font-sans'>Reels</div>
             </nav>
             
             <div className="flex items-center gap-4">
@@ -203,7 +203,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer CTA */}
-      <section className=" dark:bg-black  py-16 text-center">
+      <section className=" dark:bg-black min-h-[40vh]  py-16 text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to order your favorite food?
