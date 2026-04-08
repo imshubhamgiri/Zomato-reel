@@ -11,6 +11,7 @@ import { attachAuthContext } from './middleware/auth';
 import { globalApiLimiter } from './middleware/rateLimiter';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { helmetMiddleware } from './middleware/helmet';
+import userprofileRoutes from './routes/userProfiles.routes';
 
 
 dotenv.config();
@@ -32,7 +33,8 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/foods', foodRoutes);
 
-app.use('/api/profiles', profileRoutes);
+app.use('/api/users', userprofileRoutes);
+app.use('/api/partners', profileRoutes);
 app.use('/api/actions',actionRoutes)
 
 app.get('/', (_req, res) => {
