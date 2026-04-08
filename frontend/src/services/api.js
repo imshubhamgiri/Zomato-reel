@@ -149,6 +149,19 @@ export const foodAPI = {
     return response.data;
   }
 }
+
+export const profileAPI = {
+  getMe: async () => {
+    const response = await apiClient.get('/api/users/me');
+    return response.data;
+  },
+
+  updateMe: async (payload) => {
+    const response = await apiClient.patch('/api/users/me', payload);
+    return response.data;
+  },
+};
+
 export default apiClient;
 
 export const useractions = {
