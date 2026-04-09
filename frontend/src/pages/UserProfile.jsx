@@ -4,6 +4,7 @@ import ProfileDropdown from '../components/ProfileDropdown';
 import ProfileSidebar from '../components/ProfileSidebar';
 import ProfileInfo from '../components/ProfileInfo';
 import { useAppContext } from '../context/AppContext';
+import AddressInfo from '../components/AddressInfo';
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -84,37 +85,7 @@ function UserProfile() {
              )}
              
              {activeTab === 'addresses' && (
-                <div className="p-10">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white border-b border-emerald-100 dark:border-slate-700 pb-4 mb-6">Manage Addresses</h2>
-                    
-                    <div className="border-2 border-dashed border-emerald-200 dark:border-slate-700 rounded-xl p-8 text-center hover:border-emerald-500 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/10 transition-colors cursor-pointer group">
-                      <div className="w-12 h-12 bg-emerald-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-white dark:group-hover:bg-slate-700 shadow-sm">
-                        <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Add a new address</h3>
-                      <p className="text-sm text-slate-500 dark:text-slate-300">Add home, office, or other addresses for quick checkout</p>
-                    </div>
-
-                    {user?.address && (
-                      <div className="mt-6 border border-emerald-100 dark:border-slate-700 rounded-xl p-6 relative bg-white/70 dark:bg-slate-900/60">
-                        <div className="absolute top-6 right-6 flex gap-3">
-                          <button className="text-slate-400 hover:text-emerald-500 transition-colors">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                          </button>
-                        </div>
-                        <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 mb-3">
-                          Home
-                        </div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-semibold text-slate-900 dark:text-white">{user.name}</span>
-                          <span className="text-slate-500 dark:text-slate-300">{user.phone}</span>
-                        </div>
-                        <p className="text-slate-600 dark:text-slate-300 max-w-md">{user.address}</p>
-                      </div>
-                    )}
-                </div>
+                <AddressInfo user={user} />
              )}
              
              {activeTab === 'payments' && (
