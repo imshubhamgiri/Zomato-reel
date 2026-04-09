@@ -18,7 +18,7 @@ export default function FormInput({
       <input
         type={type}
         value={value}
-        onChange={onChange}
+        onChange={onChange}  //{(e) => onChangeField('name', e.target.value)} - this is how it will be used in the parent component and onChange is actually setField from the useUserProfileForm hook
         placeholder={placeholder}
         className={`w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all ${className}`}
       />
