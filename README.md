@@ -7,68 +7,114 @@ A modern food ordering platform featuring Instagram/TikTok-style video reels whe
 ### 🎥 Video Reel Experience
 - **Vertical scroll reels** - Instagram/TikTok-style video feed with scroll-snap
 - **Auto-play videos** - Smooth playback as users scroll
-- **Interactive actions** - Like, save, and share food videos
+- **Interactive actions** - Like, save, and share food videos (with atomic transactions)
 - **Optimistic UI updates** - Instant feedback on user interactions
 - **Mute/Unmute controls** - Toggle audio on videos
+- **Responsive design** - Works seamlessly on mobile, tablet, and desktop
 
 ### 👤 Dual User System
 
 #### For Users:
 - Browse food videos in an engaging reel format
-- Like and save favorite food items
-- View partner profiles and their menu
+- Like and save favorite food items with real-time counters
+- View partner profiles and their complete menu
+- Manage multiple delivery addresses (Home, Work, Other)
+- Update personal profile information (name, email, phone, gender)
+- View saved items and order history
 - Real-time interaction counters (likes/saves)
 
 #### For Food Partners:
 - Upload food videos with descriptions and pricing
-- Manage restaurant profile
-- Track video engagement (likes, saves)
+- Manage restaurant profile with details and contact info
+- Track video engagement (likes, saves) in real-time
+- Edit or delete food items
 - Showcase culinary creations to potential customers
+- Monitor viewer activity and interactions
 
 ### 🔐 Authentication & Security
+- **Dual-token system** - Access token (15m) + Refresh token (7d) with rotation
 - **Cookie-based authentication** - Secure, httpOnly cookies instead of localStorage
-- **JWT tokens** - Server-side token verification
+- **Refresh token revocation** - Logout invalidates all existing tokens
+- **JWT tokens** - Server-side token verification with type discrimination
 - **Role-based access control** - Separate routes for users and partners
-- **Protected routes** - Middleware-based authorization
+- **Protected routes** - Middleware-based authorization with role checking
 - **Separate login/register flows** for users and partners
+- **Token hash storage** - Tokens are hashed in database for enhanced security
 
 ### 📤 Video Management
-- **Video upload** - Multer with memory storage
-- **CDN integration** - ImageKit for video hosting
+- **Video upload** - Multer with memory storage for optimized performance
+- **CDN integration** - ImageKit for reliable video hosting
+- **Video deletion** - Remove videos with proper cleanup
 - **Video preview** - Real-time preview before upload
 - **Metadata management** - Name, description, price per dish
+- **Public ID tracking** - ImageKit public IDs for reliable deletion
+
+### 👥 User Profile Management
+- **Profile updates** - User can update name, email, phone, gender
+- **Multiple addresses** - Add multiple delivery addresses with labels (Home, Work, Other)
+- **Address defaults** - Mark preferred delivery address
+- **Complete address info** - Street, city, state, postal code, country, landmark
+- **Profile endpoints** - `/api/users/me` for GET and PATCH operations
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React** (v18) - UI library
-- **Vite** - Build tool & dev server
-- **React Router DOM** - Client-side routing
-- **Axios** - HTTP client with credentials support
-- **Tailwind CSS** - Utility-first styling
-- **React Toastify** - Toast notifications
+- **React** (v19) - Modern UI library with hooks
+- **Vite** (v7) - Lightning-fast build tool & dev server
+- **React Router DOM** (v7) - Client-side routing with latest features
+- **Axios** (v1.13) - HTTP client with credentials support
+- **Tailwind CSS** (v4) - Utility-first styling with Vite plugin
+- **React Toastify** (v11) - Toast notifications with React 19 support
+- **Lucide React** - Modern icon library
 
 ### Backend
-- **Node.js** + **TypeScript** - Typed runtime environment
-- **Express.js** - Lightweight web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - ODM for MongoDB
-- **JWT** - Token-based authentication
-- **Bcrypt** - Password hashing (10 rounds)
-- **Multer** - File upload handling
-- **ImageKit** - Video CDN service
-- **Helmet** - HTTP security headers middleware
-- **Zod** - Runtime type validation
+- **Node.js** + **TypeScript** (v5.9) - Typed runtime environment
+- **Express.js** (v5) - Modern web framework with better error handling
+- **MongoDB** (v9 Mongoose) - NoSQL database with improved types
+- **JWT** - Token-based authentication with rotation support
+- **Bcrypt** - Password hashing (10 rounds) for security
+- **Multer** (v2) - File upload handling with memory storage
+- **ImageKit** - Professional video CDN service
+- **Helmet** (v8) - HTTP security headers middleware
+- **Zod** (v4) - Runtime type validation and schema parsing
 - **Cookie-parser** - Secure httpOnly cookie handling
+- **Express Rate Limit** (v8) - Multiple rate limiting strategies
+- **Jest** & **Supertest** - Testing framework and HTTP assertions
 
 ### Architecture & Patterns (Backend)
-- **TypeScript** - Full type safety across codebase
-- **Custom Error Classes** - Type-safe error handling with operational vs programming error discrimination
-- **Async Error Handler** - Centralized error catching utility eliminating boilerplate try-catch blocks
-- **Repository Pattern** - Abstracted data access layer for clean data access
-- **Middleware Pipeline** - Helmet, rate-limiting, CORS, auth, validation, logging, error handling
-- **Service Layer** - Business logic encapsulation separate from controllers
-- **Structured Logging** - Request/response logging with context and error tracking
+- **TypeScript** - Full type safety across codebase with strict mode
+- **Custom Error Classes** - Type-safe error hierarchy (`AppError`, `AuthError`, `ConflictError`, `NotFoundError`, `ValidationError`, `ForbiddenError`)
+  - Type-safe error throwing with automatic status code mapping
+  - `isOperational` flag to distinguish expected errors from programming bugs
+  
+- **Async Error Handler Utility** - Eliminates repetitive try-catch blocks
+  - Centralized error catching: `asyncHandler(async (req, res) => { ... })`
+  - All promise rejections automatically routed to error middleware
+  
+- **Repository Pattern** - Abstracted data access layer
+  - Separation of concerns between business logic and data access
+  - Session support for transactional operations
+  
+- **Service Layer** - Business logic encapsulation
+  - Typed error throwing with custom error classes
+  - Complex operations like transaction management
+  
+- **MongoDB Transactions** - ACID-compliant operations
+  - Atomic like/save operations with session support
+  - Automatic rollback on errors
+  - Maintains data consistency across related collections
+  
+- **Middleware Pipeline** - Ordered execution of cross-cutting concerns
+  - Helmet → Rate-limiting → Cookie Parser → JSON Parser → CORS → Auth Context → Logger → Routes → Error Handler
+  
+- **Role-Based Access Control (RBAC)** - Granular permission management
+  - User vs Partner role differentiation
+  - Route-level and operation-level access control
+  
+- **Structured Logging** - Request/response logging with context
+  - Error tracking with stack traces
+  - Request timing and method logging
+  
 - **RESTful Endpoints** - Plural resource names and standard HTTP methods (GET, POST, PATCH, DELETE)
 
 ## 📁 Project Structure
@@ -193,47 +239,152 @@ npm run dev
 ```
 Frontend runs on `http://localhost:5173`
 
-## 🏗️ Backend Architecture (Recent Refactor)
+## 🐳 Docker & Containerization
 
-The backend underwent a significant refactor to implement production-grade error handling and architecture patterns:
+The project includes Docker Compose configuration for complete containerization:
+
+### Services
+- **Backend Service** - Express server running on port 3000
+- **Frontend Service** - React/Vite app running on port 8080
+
+
+### Running with Docker Compose
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+### Docker Files
+- **backend/Dockerfile** - TypeScript compilation and Node.js runtime
+- **frontend/Dockerfile** - Vite build and static server
+- **docker-compose.yml** - Service orchestration with networking
+
+
+
+## 🏗️ Backend Architecture (Production-Grade)
+
+The backend implements enterprise-grade architecture patterns with complete type safety and error handling:
 
 ### Error Handling System
-- **Custom Error Classes** (`AppError`, `AuthError`, `ConflictError`, `NotFoundError`, `ValidationError`, etc.)
-  - Type-safe error throwing: `throw new ConflictError('Email already exists')`
-  - Automatic status code assignment per error type
-  - `isOperational` flag to distinguish expected errors from programming bugs
-  
-- **Async Error Handler Utility**
-  - Eliminates repetitive try-catch blocks in controllers
-  - Centralized error catching: `export const register = asyncHandler(async (req, res) => { ... })`
-  - All promise rejections automatically routed to error middleware
-  
-- **Centralized Error Middleware**
-  - Type discrimination: checks `instanceof AppError` vs unknown errors
-  - Stack trace sanitization: hidden in production, visible in development
-  - Consistent error response format
-  - Logging with error context
 
-### Code Organization
-- **Service Layer**: Business logic with typed error throwing
-- **Repository Pattern**: Abstracted database queries
-- **Middleware Pipeline**: Auth → Validation → Logging → Rate-limiting → Routes → Error Handler
-- **Type Safety**: Full TypeScript codebase with interfaces for API contracts
-
-### Example: Error Flow
+#### Custom Error Classes Hierarchy
 ```typescript
-// Service throws typed error
+AppError (abstract base)
+├── AuthError (401 Unauthorized)
+├── ConflictError (409 Conflict)
+├── NotFoundError (404 Not Found)
+├── ValidationError (400 Bad Request)
+└── ForbiddenError (403 Forbidden)
+```
+
+Each error includes:
+- Automatic status code assignment per error type
+- `isOperational` flag for error classification
+- Message context and optional details
+- Stack trace sanitization in production
+
+#### Async Error Handler Utility
+Eliminates repetitive try-catch blocks:
+```typescript
+export const register = asyncHandler(async (req, res) => {
+  const user = await authService.registerUser(req.body);
+  res.status(201).json({ success: true, user });
+  // Errors automatically caught and passed to error middleware
+});
+```
+
+#### Centralized Error Middleware
+```typescript
+// Analyzes error type
+if (error instanceof AppError) {
+  // Operational error - safe to expose
+  res.status(error.statusCode).json({ success: false, message: error.message });
+} else {
+  // Programming error - log and return generic message
+  logger.error('Unexpected error:', error);
+  res.status(500).json({ success: false, message: 'Internal server error' });
+}
+```
+
+### Request Processing Pipeline
+
+Requests pass through middleware in this order:
+1. **Helmet** - Security headers
+2. **Rate Limiter** - Global throttling (300 req/15min)
+3. **Cookie Parser** - Parse httpOnly cookies
+4. **JSON Parser** - Parse request bodies
+5. **CORS** - Cross-origin validation
+6. **Auth Context** - Attach user to request if authenticated
+7. **Logger** - Log request method/path/duration
+8. **Route Handlers** - Business logic
+9. **Error Handler** - Centralized error response
+
+### Rate Limiting Strategy
+
+```typescript
+// Global limiter: 300 requests per 15 minutes
+globalApiLimiter: { windowMs: 900000, max: 300 }
+
+// Auth-specific: 20 requests per 15 minutes  
+authLimiter: { windowMs: 900000, max: 20 }
+
+// Action-specific: 60 requests per 5 minutes
+actionLimiter: { windowMs: 300000, max: 60 }
+```
+
+### Authentication Context Attachment
+
+```typescript
+// User/Partner object automatically attached to req
+req.user = {
+  id: decoded.Id,
+  email: decoded.email,
+  type: 'user' | 'partner'
+}
+```
+
+### Service Layer Architecture
+
+```typescript
+Controller → Service → Repository
+   ↓           ↓            ↓
+Handler    Business Logic   Database
+ (HTTP)     (Validation)    (Queries)
+           + Error Throwing
+```
+
+- **Controllers** -HTTP handlers, validate input format
+- **Services** - Business logic, type-safe error throwing
+- **Repositories** - Database operations, session support
+
+### Example: Error Flow in Action
+
+### Example: Error Flow in Action
+
+```typescript
+// 1. Service throws typed error
 if (existingUser) {
-  throw new ConflictError('Email already registered');  // statusCode: 409, isOperational: true
+  throw new ConflictError('Email already registered');  
+  // statusCode: 409, isOperational: true
 }
 
-// Controller wrapped with asyncHandler (no try-catch needed!)
+// 2. Controller wrapped with asyncHandler (no try-catch needed!)
 export const register = asyncHandler(async (req, res) => {
-  const user = await registerUser(req.body);
+  const user = await authService.registerUser(req.body);
   res.status(201).json({ success: true, user });
 });
 
-// Error automatically caught → middleware → responds with 409 JSON
+// 3. Error automatically caught → middleware → responds with 409 JSON
+// Response: { success: false, message: 'Email already registered' }
 ```
 
 ## 📡 API Documentation
@@ -343,13 +494,39 @@ POST /api/actions/save
 # Response: { isSaved: boolean, saveCount: number }
 ```
 
-### Profile Endpoints (Plural)
+### Profile Endpoints (Plural) 
 
+#### Get & Update User Profile
 ```http
-GET /api/profiles/foodpartner/:id
+GET /api/users/me
+# Protected: User authentication required
+# Returns: { _id, name, email, phone, gender, address[] }
+
+PATCH /api/users/me
+# Protected: User authentication required
+# Body: { name?, email?, phone?, gender? }
+# Returns: Updated user profile
+```
+
+#### Manage User Addresses
+```http
+# Addresses are stored in the user's address array
+# Each address can have labels: 'Home', 'Work', 'Other'
+# Addressfields: label, fullName, phone, line1, city, state, postalCode, country, landmark, isDefault
+```
+
+#### Get Food Partner Profile
+```http
+GET /api/partners/:id
 # Get food partner profile and all their dishes
 # Returns: { partner: {...}, foods: [...], totalLikes: number }
 
+GET /api/profiles/foodpartner/:id
+# Alternative endpoint for partner profile
+```
+
+#### Get User Profile from Partner View
+```http
 GET /api/profiles/user/:id
 # Get user profile information
 ```
@@ -410,6 +587,37 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 };
 ```
 
+## 💡 Code Architecture & Best Practices
+
+### TypeScript Patterns
+- **Strict null checking** - Prevents null/undefined errors
+- **Type inference** - Uses interfaces for API contracts
+- **Generic types** - Reusable components and utilities
+- **Enum usage** - Type-safe constants (Gender, AddressLabel values)
+- **Union types** - For discriminated user types (user | partner)
+
+### Backend Patterns
+- **Service-Repository separation** - Business logic decoupled from data access
+- **Middleware composition** - Ordered execution of cross-cutting concerns
+- **Transaction boundaries** - Sessions passed through repository methods
+- **Async/await** - Consistent async error handling
+- **Type discrimination** - `instanceof` checks for error handling
+
+### Frontend Patterns
+- **React Hooks** - useState, useEffect for state management
+- **Context API** - Theme and authentication context
+- **Composition** - Reusable UI components
+- **Axios interceptors** - Request/response configuration
+- **Optimistic updates** - Instant UI feedback before server confirmation
+- **Error boundaries** - Graceful error handling in components
+
+### Database Patterns
+- **Unique constraints** - Email, phone fields have indexes
+- **Foreign keys** - Mongoose refs for relationships
+- **Timestamps** - Auto-tracking of creation/update times
+- **Lean queries** - Performance optimization for read-only operations
+- **Transactions** - ACID guarantees for critical operations
+
 ## 🎨 UI/UX Highlights
 
 - **Dark theme** - Modern, eye-friendly design
@@ -424,26 +632,78 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 ## 🔒 Security Features
 
 ✅ **Helmet middleware** - HTTP security headers (CSP, X-Frame-Options, X-Content-Type-Options, etc.)  
-✅ **Password hashing** with bcrypt (10 rounds)  
-✅ **JWT expiration** (15m access, 7d refresh)  
-✅ **HttpOnly cookies** - Prevents XSS attacks  
+✅ **Password hashing** with bcrypt (10 rounds, salted)  
+✅ **Dual-token system** - Access token (15m) + Refresh token (7d)  
+✅ **Token rotation** - Refresh tokens are rotated on every use  
+✅ **Token revocation** - Logout invalidates all user tokens immediately  
+✅ **Token hash storage** - Refresh tokens are hashed before storage  
+✅ **HttpOnly cookies** - Prevents XSS attacks by restricting JavaScript access  
+✅ **SameSite cookies** - CSRF protection with strict SameSite policy  
 ✅ **CORS configuration** - Restricted origins, with credentials support  
-✅ **Protected routes** - Middleware-based role verification  
+✅ **Protected routes** - Middleware-based role verification on sensitive endpoints  
 ✅ **Input validation** - Zod schema validation before business logic  
-✅ **File type validation** - Video uploads only  
+✅ **File type validation** - Video uploads with proper MIME type checking  
 ✅ **CSP Policy** - Content Security Policy for media (ImageKit CDN whitelisted)  
 ✅ **Stack trace sanitization** - Never exposed to clients in production  
 ✅ **Error type discrimination** - Programming errors handled separately from operational errors  
-✅ **Rate limiting** - Global API throttling to prevent abuse  
+✅ **Rate limiting** - Global API throttling + auth-specific + action-specific limiters  
+✅ **Session-based access control** - User context attached to all requests  
+
+## 💾 Database Transactions
+
+The application implements **ACID-compliant MongoDB transactions** for critical operations:
+
+### Like/Save Operations (Atomic)
+```typescript
+// Transaction ensures consistency across Like/Save and Food documents
+const session = await mongoose.startSession();
+session.startTransaction();
+
+try {
+  // 1. Create/delete like record
+  // 2. Increment/decrement food.likeCount
+  // Both operations succeed or both fail
+  await session.commitTransaction();
+} catch (error) {
+  await session.abortTransaction();
+  throw error;
+} finally {
+  await session.endSession();
+}
+```
+
+**Benefits:**
+- Counter accuracy: Like/Save count always matches actual records
+- Data consistency: No orphaned or missing records
+- Automatic rollback on failure: Device disconnect or server error triggers full rollback
+- No race conditions: Database-level atomicity prevents concurrent conflicts
 
 ## 📊 Database Schema
 
 ### User Model
 ```javascript
 {
-    name: String,
-    email: String (unique),
-    password: String (hashed),
+    _id: ObjectId (unique),
+    name: String (required),
+    email: String (unique, required),
+    password: String (hashed, required),
+    phone: String (optional),
+    gender: String (enum: 'Male', 'Female', 'Other'),
+    address: [
+        {
+            _id: ObjectId,
+            label: String (enum: 'Home', 'Work', 'Other'),
+            fullName: String,
+            phone: String,
+            line1: String (street address),
+            city: String,
+            state: String,
+            postalCode: String,
+            country: String,
+            landmark: String,
+            isDefault: Boolean
+        }
+    ],
     timestamps: true
 }
 ```
@@ -451,12 +711,13 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 ### FoodPartner Model
 ```javascript
 {
-    name: String,
-    restaurantName: String,
-    email: String (unique),
-    phone: String (unique),
-    address: String,
-    password: String (hashed),
+    _id: ObjectId (unique),
+    name: String (required),
+    restaurantName: String (required),
+    email: String (unique, required),
+    phone: String (unique, required),
+    address: String (required),
+    password: String (hashed, required),
     timestamps: true
 }
 ```
@@ -464,40 +725,89 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 ### Food Model
 ```javascript
 {
-    name: String,
-    video: String (CDN URL),
-    description: String,
-    price: Number,
-    likeCount: Number,
-    saveCount: Number,
-    foodPartner: ObjectId (ref: FoodPartner),
+    _id: ObjectId (unique),
+    name: String (required),
+    video: String (CDN URL, required),
+    videoPublicId: String (ImageKit public ID, required),
+    description: String (required),
+    price: Number (required),
+    likeCount: Number (default: 0),
+    saveCount: Number (default: 0),
+    foodPartner: ObjectId (ref: FoodPartner, required),
     timestamps: true
 }
 ```
 
-### Like/Save Models
+### Like Model
 ```javascript
 {
-    userId: ObjectId (ref: User),
-    food: ObjectId (ref: Food),
+    _id: ObjectId (unique),
+    userId: ObjectId (ref: User, required),
+    food: ObjectId (ref: Food, required),
+    timestamps: true,
+    // Unique constraint: one like per user per food item
+    uniqueIndex: [userId, food]
+}
+```
+
+### Save Model
+```javascript
+{
+    _id: ObjectId (unique),
+    userId: ObjectId (ref: User, required),
+    food: ObjectId (ref: Food, required),
+    timestamps: true,
+    // Unique constraint: one save per user per food item
+    uniqueIndex: [userId, food]
+}
+```
+
+### RefreshToken Model
+```javascript
+{
+    _id: ObjectId (unique),
+    userId: String (required),
+    userType: String (enum: 'user', 'partner', required),
+    tokenHash: String (SHA256 hash, required),
+    expiresAt: Date (required),
+    revokedAt: Date (null if active, set to Date if revoked),
     timestamps: true
 }
 ```
 
 ## 🎯 Future Enhancements
 
+### Immediate Priorities  
+- [ ] **MongoDB Replica Set Setup** - For production transactions (documented in MONGODB_REPLICA_SET_SETUP.md)
+- [ ] **Order Management System** - Complete checkout and order flow
+- [ ] **Payment Gateway Integration** - Stripe or Razorpay for secure payments
+- [ ] **Email Notifications** - Order confirmations, promotional emails
+- [ ] **Search & Filters** - Advanced filtering by cuisine, price range, ratings
+
 ### Planned Features
-- [ ] Structured logging upgrade (Winston/Pino)
-- [ ] Error tracking service (Sentry integration)
-- [ ] Real-time chat system (WebSocket)
-- [ ] Advanced search and filters (cuisine, price, ratings)
-- [ ] User reviews and ratings system
-- [ ] Partner analytics dashboard
-- [ ] Payment gateway integration (Stripe/Razorpay)
-- [ ] Geolocation-based discovery
-- [ ] Video compression pipeline
-- [ ] Admin moderation dashboard
-- [ ] Push notifications
+- [ ] **User Reviews & Ratings** - Rate food items and partners
+- [ ] **Partner Analytics Dashboard** - Real-time engagement metrics and sales data
+- [ ] **Advanced Search** - Full-text search with faceted filtering
+- [ ] **Geolocation-based Discovery** - Show restaurants near user location
+- [ ] **Video Compression Pipeline** - Optimize video sizes before upload
+- [ ] **Admin Moderation Dashboard** - Content approval and dispute resolution
+- [ ] **Push Notifications** - Real-time updates on order status
+- [ ] **Real-time Chat System** - WebSocket-based customer-partner communication
+- [ ] **Wishlist/Favorites** - Enhanced saved items with collections
+- [ ] **Social Features** - Follow partners, share videos, comments
+- [ ] **Structured Logging Upgrade** - Winston/Pino for production logging
+- [ ] **Error Tracking Service** - Sentry integration for error monitoring
+- [ ] **GraphQL API** - Alternative to REST for flexible data queries
+- [ ] **Mobile App** - React Native version for iOS/Android
+
+### DevOps & Infrastructure
+- [ ] **Production MongoDB Cluster** - Atlas or self-hosted with backup
+- [ ] **CDN Configuration** - Global content delivery for videos
+- [ ] **CI/CD Pipeline** - GitHub Actions for automated testing/deployment
+- [ ] **Load Balancing** - Handle high traffic scenarios
+- [ ] **Caching Strategy** - Redis for session and frequently accessed data
+- [ ] **Database Indexing** - Performance optimization for queries
+- [ ] **Monitoring & Alerts** - Health checks and performance tracking
 - [ ] Order placement & tracking
 
 ### Refactoring Complete ✅
@@ -506,12 +816,56 @@ const FoodPartnerAuthMiddleware = async (req, res, next) => {
 - Removed repetitive try-catch boilerplate
 - Established repository pattern for data access
 - Standardized middleware pipeline
+## 📚 Learning Resources & Documentation
 
-## � Project Status
+The repository includes comprehensive learning guides for understanding key concepts:
 
-**Backend**: Production-ready with enterprise-grade error handling and TypeScript support  
-**Frontend**: Feature-complete and stable  
-**Database**: Fully structured with proper relationships  
+### Core Concepts
+- **[TRANSACTIONS_LEARNING_GUIDE.md](TRANSACTIONS_LEARNING_GUIDE.md)** - Understanding MongoDB transactions and ACID guarantees
+- **[TRANSACTIONS_IMPLEMENTATION_GUIDE.md](TRANSACTIONS_IMPLEMENTATION_GUIDE.md)** - How transactions are implemented in the codebase
+- **[MONGODB_REPLICA_SET_SETUP.md](MONGODB_REPLICA_SET_SETUP.md)** - Setting up MongoDB replica set for transactions
+- **[THE_CRITICAL_RETURN_STATEMENT.md](THE_CRITICAL_RETURN_STATEMENT.md)** - Important patterns in database operations
+
+### React Patterns
+- **[USECALLBACK_SIMPLE.md](USECALLBACK_SIMPLE.md)** - Understanding useCallback hook basics
+- **[USECALLBACK_AND_USEMEMO_EXPLAINED.md](USECALLBACK_AND_USEMEMO_EXPLAINED.md)** - Performance optimization with React hooks
+- **[USECALLBACK_REAL_FLOW.md](USECALLBACK_REAL_FLOW.md)** - Real-world implementation examples
+
+### Advanced Topics
+- **[REDUCE_COMPLETE_GUIDE.md](REDUCE_COMPLETE_GUIDE.md)** - Comprehensive useReducer documentation
+- **[REDUCE_FLOW_EXPLAINED.md](REDUCE_FLOW_EXPLAINED.md)** - State management flow diagrams
+- **[REDUCE_DETAILED_TABLE.md](REDUCE_DETAILED_TABLE.md)** - Detailed action handlers reference
+
+### Troubleshooting
+- **[IMAGEKIT_ERROR_ANALYSIS.md](IMAGEKIT_ERROR_ANALYSIS.md)** - Common ImageKit errors and solutions
+
+These guides are living documentation - refer to them while understanding the codebase and implementing new features.
+
+## 🏁 Project Status
+
+### Backend ✅ Production-Ready
+- Full TypeScript with strict type checking
+- Enterprise-grade error handling system
+- Complete API with 20+ endpoints
+- MongoDB transactions for data consistency
+- Rate limiting at multiple levels
+- Comprehensive middleware pipeline
+- Docker containerization
+
+### Frontend ✅ Feature-Complete
+- React 19 with modern hooks
+- Vite 7 build optimization
+- Tailwind CSS v4 styling
+- Real-time UI updates with optimistic rendering
+- Responsive design for all devices
+- Dark theme support
+
+### Database ✅ Well-Structured
+- Proper relationships with foreign keys
+- Indexed fields for performance
+- Transaction support with replica set
+- Timestamp tracking on all models
+- Unique constraints for data integrity
 
 ## 🐛 Known Limitations
 
