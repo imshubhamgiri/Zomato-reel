@@ -160,6 +160,26 @@ export const profileAPI = {
     const response = await apiClient.patch('/api/users/me', payload);
     return response.data;
   },
+
+  getAddress: async ()=>{
+    const response = await apiClient.get('/api/users/me/addresses');
+    return response.data;
+  },
+
+  addAddress: async(payload) =>{
+    const response = await apiClient.post('/api/users/me/addresses',payload);
+    return response.data;
+  },
+
+  updateAddress: async(addressId, payload) =>{
+    const response = await apiClient.patch(`/api/users/me/addresses/${addressId}`, payload);
+    return response.data;
+  }
+  ,
+  deleteAddress: async(addressId) =>{
+    const response = await apiClient.delete(`/api/users/me/addresses/${addressId}`);
+    return response.data;
+  }
 };
 
 export default apiClient;
