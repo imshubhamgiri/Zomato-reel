@@ -7,12 +7,14 @@ interface UserAddress {
     label?: AddressLabel;
     fullName?: string;
     phone?: string;
-    line1?: string;
+    locality?: string;
+    address?: string;
     city?: string;
     state?: string;
     postalCode?: string;
     country?: string;
     landmark?: string;
+    alternatePhone?: string;
     isDefault?: boolean;
 }
 
@@ -35,12 +37,14 @@ const UserSchema = new Schema<User>({
             label: { type: String, enum: ['Home', 'Work', 'Other'] },
             fullName: { type: String, trim: true },
             phone: { type: String, trim: true },
-            line1: { type: String, trim: true },
+            locality: { type: String, trim: true },
+            address: { type: String, trim: true },
             city: { type: String },
             state: { type: String },
             postalCode: { type: String, trim: true },
             country: { type: String, trim: true },
             landmark: { type: String, trim: true },
+            alternatePhone: { type: String, trim: true },
             isDefault: { type: Boolean, default: false }
         }
     ],
