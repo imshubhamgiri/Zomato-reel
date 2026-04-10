@@ -1,8 +1,8 @@
 import { Eye } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FormInput from './FormInput';
 
-const AddressInput = ({ onSave, onCancel }) => {
+const AddressInput = ({ initialData, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -15,6 +15,23 @@ const AddressInput = ({ onSave, onCancel }) => {
     alternatePhone: '',
     label: 'HOME', // Home or Work
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        fullName: initialData.fullName || '',
+        phone: initialData.phone || '',
+        pincode: initialData.postalCode || '',
+        locality: initialData.locality || '',
+        line1: initialData.address || '',
+        city: initialData.city || '',
+        state: initialData.state || '',
+        landmark: initialData.landmark || '',
+        alternatePhone: initialData.alternatePhone || '',
+        label: initialData.label || 'HOME',
+      });
+    }
+  }, [initialData]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -59,7 +76,7 @@ const AddressInput = ({ onSave, onCancel }) => {
   return (
     <div className='bg-white dark:bg-gray-950 rounded-lg p-8 shadow-lg max-w-2xl mx-auto'>
       {/* Header */}
-      <h2 className='text-lg font-bold text-blue-600 mb-6'>ADD A NEW ADDRESS</h2>
+      <h2 className='text-lg font-bold text-blue-600 mb-6'>{initialData ? 'EDIT ADDRESS' : 'ADD A NEW ADDRESS'}</h2>
 
       {/* Use Current Location Button */}
       <button
