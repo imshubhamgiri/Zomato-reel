@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { profileAPI } from '../services/api';
+import { useAppContext } from '../context/AppContext';
 
 const mapProfile = (profile = {}) => ({
   name: profile?.name || '',
@@ -9,6 +10,7 @@ const mapProfile = (profile = {}) => ({
 });
 
 export default function useUserProfileForm(seedUser) {
+  const { user, setUser } = useAppContext();
   const [formData, setFormData] = useState(mapProfile(seedUser));
   const [initialData, setInitialData] = useState(mapProfile(seedUser));
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
@@ -60,12 +62,14 @@ export default function useUserProfileForm(seedUser) {
       }
 
       const mapped = mapProfile(profile);
+      setUser({...user, ...mapped});
       setFormData(mapped);
       setInitialData(mapped);
       return mapped;
     } catch (error) {
       const message = error?.response?.data?.message || error?.message || 'Failed to fetch profile';
       setErrorMessage(message);
+      console.log('Error fetching profile:', error);
       return null;
     } finally {
       setIsLoadingProfile(false);
