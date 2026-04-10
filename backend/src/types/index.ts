@@ -182,3 +182,27 @@ export interface ProfileResponse {
     name: string;
     email: string;
 }
+
+export interface UserAddress {
+    _id?: Types.ObjectId;
+    label?: 'Home' | 'Work' | 'Other';
+    fullName?: string;
+    phone?: string;
+    locality?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    landmark?: string;
+    alternatePhone?: string;
+    isDefault?: boolean;
+}
+
+export interface UserProfile {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    gender?: 'Male' | 'Female' | 'Other';
+}
