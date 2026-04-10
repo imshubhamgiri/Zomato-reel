@@ -65,7 +65,7 @@ export default function ProfileInfo({ user }) {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
           Profile Information
-          <span className="bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white text-xs px-2.5 py-1 rounded-full font-semibold shadow-sm">
+          <span className="bg-linear-to-r from-blue-300 to bg-pink-100 dark:from-slate-600 dark:via-gray-500 dark:to-black/65 text-black dark:text-white text-xs px-2.5 py-1 rounded-full font-semibold shadow-sm">
             Premium
           </span>
         </h1>
