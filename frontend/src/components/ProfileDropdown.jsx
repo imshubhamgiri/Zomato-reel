@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
+import { MoonIcon, Sun } from 'lucide-react';
 
 function ProfileDropdown({ user, type  }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { logout } = useAppContext();
   const navigate = useNavigate();
-
+ const{theme , toggleTheme} = useTheme();
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -221,6 +223,15 @@ function ProfileDropdown({ user, type  }) {
               </svg>
               Settings
             </Link>
+            <div>
+             <button
+                 onClick={() => {toggleTheme() , console.log(theme)}}
+                   className=" w-full flex items-center px-5 gap-2 rounded-lg p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-200"
+                 >
+                   {theme === "light" ? <MoonIcon size={20} />: <Sun size={20} />}
+                    {theme === "light" ? 'Dark Mode' : 'Light Mode'}                   
+                 </button>
+            </div>
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 py-1">
