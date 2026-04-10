@@ -75,6 +75,7 @@ export const AppProvider = ({ children }) => {
 
     const value = {
             user,
+            setUser,
             isAuthenticated,
             setIsAuthenticated,
             Food,
