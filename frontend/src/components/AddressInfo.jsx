@@ -2,40 +2,68 @@ import { Plus } from "lucide-react";
 import Addressbar from "./ui/Addressbar";
 import AddressInput from "./ui/AddressInput";
 import { useState , useEffect } from "react";
+import {profileAPI} from "../services/api"
+import {toast} from "react-toastify"
 
 const AddressInfo = ({ user }) => {
-const [addresses, setAddresses] = useState([
-    {
-        label: 'HOME',
-        fullName: 'John Doe',
-        phone: '+1 (555) 123-4567',
-        line1: '123 Main St',
-        city: 'New York',
-        state: 'NY',
-        postalCode: '10001',
-        country: 'United States',
-        landmark: 'Central Park',
-        isDefault: true,
-    },
-]);
-
+const [addresses, setAddresses] = useState([]);
 const [showAddForm, setShowAddForm] = useState(false);
+const [editingAddress, setEditingAddress] = useState(null);
+
+const getaddress = async() =>{
+     const response = await profileAPI.getAddress();
+    setAddresses(response.data)
+}
 
 useEffect(() => {
-    // In a real app, you'd fetch this from the server
+  getaddress();
 }, []);
 
-const handleAddAddress = (newAddress) => {
-    setAddresses((prev) => [...prev, newAddress]);
-    setShowAddForm(false);
+const handleAddAddress = async(newAddress) => {
+    try {
+        const response = await profileAPI.addAddress(newAddress);
+        setAddresses((prev) => [...prev, response.data]);
+        toast.success('Address added successfully');  
+        setShowAddForm(false);
+    } catch (error) {
+        console.log('error adding address', error)
+        toast.error('Failed to add address');
+    }
+};
+
+const handleUpdateAddress = async(updatedData) => {
+    try {
+        const response = await profileAPI.updateAddress(editingAddress.id, updatedData);
+        setAddresses((prev) => prev.map(addr => addr._id === editingAddress.id ? response.data : addr));
+        toast.success('Address updated successfully');
+        setEditingAddress(null);
+        setShowAddForm(false);
+    } catch (error) {
+        console.log('error updating address', error);
+        toast.error('Failed to update address');
+    }
 };
 
 const handleCancelForm = () => {
     setShowAddForm(false);
+    setEditingAddress(null);
 };
-const handleDelete  =(e) =>{
-    console.log('Delete address', e);
-}
+
+const handleDelete = async(addressId) =>{
+    try {
+        await profileAPI.deleteAddress(addressId);
+        setAddresses((prev) => prev.filter(addr => addr._id !== addressId));
+        toast.success('Address deleted successfully');
+    } catch (error) {
+        console.log('error deleting address', error);
+        toast.error('Failed to delete address');
+    }
+};
+
+const handleEditAddress = (addressData) => {
+    setEditingAddress(addressData);
+    setShowAddForm(true);
+};
     return (
         <div className="p-10">
             <div>
@@ -45,8 +73,12 @@ const handleDelete  =(e) =>{
             {/* Show Form if showAddForm is true */}
             {showAddForm ? (
                 <div className="mb-8">
+                    <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">
+                        {editingAddress ? 'Edit Address' : 'Add New Address'}
+                    </h3>
                     <AddressInput 
-                        onSave={handleAddAddress}
+                        initialData={editingAddress}
+                        onSave={editingAddress ? handleUpdateAddress : handleAddAddress}
                         onCancel={handleCancelForm}
                     />
                 </div>
@@ -73,10 +105,12 @@ const handleDelete  =(e) =>{
                     addresses.map((address, index) => (
                         <Addressbar
                             key={index}
+                            id = {address._id}
                             label={address.label}
                             fullName={address.fullName}
+                            address={address.address}
                             phone={address.phone}
-                            line1={address.line1}
+                            locality={address.locality}
                             city={address.city}
                             state={address.state}
                             postalCode={address.postalCode}
@@ -84,7 +118,8 @@ const handleDelete  =(e) =>{
                             landmark={address.landmark}
                             isDefault={address.isDefault}
                             className={'hover:-translate-y-1 transform duration-150'}
-                            onDelete = {handleDelete}
+                            onDelete={handleDelete}
+                            onEdit={handleEditAddress}
                         />
                     ))
                 ):(
