@@ -27,8 +27,8 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
   return (
     <div className="flex flex-col gap-6">
       {/* User Info Card */}
-      <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl p-6 shadow-lg shadow-emerald-100/50 dark:shadow-black/30 border border-emerald-100/70 dark:border-slate-700 backdrop-blur-sm flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center text-white text-2xl font-bold uppercase shadow-lg shadow-emerald-500/30">
+      <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl p-6 shadow-lg shadow-blue-100 dark:shadow-black/30 border border-blue-100/70 dark:border-slate-700 backdrop-blur-sm flex items-center gap-4">
+        <div className="w-16 h-16 rounded-full bg-gray-300 dark:bg-slate-600 flex items-center justify-center text-white text-2xl font-bold uppercase ">
           {user?.name?.charAt(0) || 'U'}
         </div>
         <div>
@@ -38,10 +38,10 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
       </div>
 
       {/* Navigation Menu */}
-      <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl shadow-lg shadow-emerald-100/50 dark:shadow-black/30 border border-emerald-100/70 dark:border-slate-700 overflow-hidden backdrop-blur-sm">
+      <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl shadow-lg shadow-sky-200 dark:shadow-black/30 border border-blue-100/70 dark:border-slate-700 overflow-hidden backdrop-blur-sm">
         {menuGroups.map((group, groupIdx) => (
-          <div key={groupIdx} className={`${groupIdx !== 0 ? 'border-t border-emerald-100 dark:border-slate-700' : ''}`}>
-            <h3 className="px-6 py-4 text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest bg-emerald-50/50 dark:bg-slate-800/60">
+          <div key={groupIdx} className={`${groupIdx !== 0 ? 'border-t border-blue-100 dark:border-slate-700' : ''}`}>
+            <h3 className="px-6 py-4 text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest bg-blue-50/50 dark:bg-slate-800/60">
               {group.title}
             </h3>
             <div className="flex flex-col">
@@ -51,9 +51,9 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center gap-4 px-6 py-4 transition-all duration-200 text-left hover:bg-blue-50 dark:hover:bg-emerald-900/10 group ${
+                    className={`flex items-center gap-4 px-6 py-4 transition-all duration-200 text-left hover:text-white hover:bg-blue-600 dark:hover:bg-sky-800 group ${
                       isActive 
-                        ? 'bg-gray-100 dark:from-emerald-900 dark:to-blue-900 text-emerald-700 dark:text-emerald-300 border-r-4 border-emerald-500' 
+                        ? 'dark:bg-gray-800 bg-blue-500 text-white border-r-4 border-blue-500' 
                         : 'text-slate-600 dark:text-slate-300'
                     }`}
                   >
@@ -70,6 +70,7 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
                 );
               })}
             </div>
+
           </div>
         ))}
         
