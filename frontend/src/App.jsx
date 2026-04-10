@@ -1,5 +1,7 @@
 import React from 'react';
 import { Route ,Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Reel from './pages/Reel';
 import UserLogin from './pages/UserLogin';
 import UserRegister from './pages/UserRegister';
@@ -16,6 +18,18 @@ import BottomNav from './components/BottomNav';
 function App() {
   return (
     <>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
         <Route path="/reel" element={<Reel />} />
         <Route path="/user/login" element={<UserLogin />} />
@@ -30,7 +44,6 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <BottomNav />
-      
     </>
   )
 }
