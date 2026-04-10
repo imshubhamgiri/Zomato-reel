@@ -1,34 +1,79 @@
 import { EllipsisVertical } from 'lucide-react'
-import React from 'react'
-//  label?: AddressLabel;
-//     fullName?: string;
-//     phone?: string;
-//     line1?: string;
-//     city?: string;
-//     state?: string;
-//     postalCode?: string;
-//     country?: string;
-//     landmark?: string;
-//     isDefault?: boolean;
+import React, { useState } from 'react'
+
 const Addressbar = ({
+    id,
     label,
     fullName,
     phone,
     country,
+    address,
     landmark,
     isDefault,
     state,
     city,
-    line1,
+    locality,
     postalCode,
     className,
-    onDelete
+    onDelete,
+    onEdit
 }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const handleMenuClick = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleEditClick = () => {
+        onEdit({
+            id,
+            label,
+            fullName,
+            phone,
+            locality,
+            address,
+            city,
+            state,
+            postalCode,
+            country,
+            landmark,
+            isDefault
+        });
+        setIsMenuOpen(false);
+    };
+
+    const handleDeleteClick = () => {
+        onDelete(id);
+        setIsMenuOpen(false);
+    };
+
     return (
-        <div className={`bg-white/70 dark:bg-gray-900/70 border border-gray-300  dark:border-gray-700 rounded-xl p-6 ${className}`}>
+        <div className={`bg-white/70 dark:bg-gray-900/70 border border-gray-300 hover:border-blue-400  dark:border-gray-700 rounded-xl p-6 ${className}`}>
             <div className='flex justify-between items-center '>
-                <div className='font-bold text-[12px] p-[2px] bg-gray-200 text-stone-500'>{label || 'HOME'}</div>
-                <div><EllipsisVertical size={23} className='text-gray-400 ' onClick={onDelete}  /> </div>
+                <div className='font-bold text-0.5 p-0.5 bg-gray-200 text-stone-500'>{label || 'HOME'}</div>
+                <div className='relative'>
+                    <EllipsisVertical 
+                        size={23} 
+                        className='text-gray-400 cursor-pointer hover:text-gray-600' 
+                        onClick={handleMenuClick}
+                    />
+                    {isMenuOpen && (
+                        <div className='absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10'>
+                            <button
+                                onClick={handleEditClick}
+                                className='w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors'
+                            >
+                                Edit
+                            </button>
+                            <button
+                                onClick={handleDeleteClick}
+                                className='w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700 transition-colors border-t border-gray-200 dark:border-gray-600'
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
             {/* name and phone */}
             <div className='flex items-center gap-4 py-3'>
@@ -38,7 +83,8 @@ const Addressbar = ({
 
             {/* address details  should be written like this - PD House, Mouna banganj , daldali bazar, Chapra, Bihar - 841301*/}
             <div className='text-sm flex gap-2'>
-                <p className='text-gray-600 dark:text-gray-400'>{line1 || '123 Main St'}</p>
+                <p className='text-gray-600 dark:text-gray-400'>{address || '123 Main St'}</p>
+                <p className='text-gray-600 dark:text-gray-400'>{locality || '123 Main St'}</p>
                 <p className='text-gray-600 dark:text-gray-400'>{city || 'New York'}, {state || 'NY'} - {postalCode || '10001'}</p>
                 <p className='text-gray-600 dark:text-gray-400'>{country || 'United States'}</p>
                 {landmark && (
