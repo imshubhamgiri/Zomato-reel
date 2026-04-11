@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import type { ApiResponse, ErrorResponse, AuthenticatedRequest, FoodItemWithStatus, AddFoodRequest, UploadResponse, File, FoodItemResponse, UpdateFoodRequest, PaginationResponse } from '../types';
-import food from '../models/food.model';
-import storageService from '../service/storage.service';
 import { v4 as uuid } from 'uuid';
-import foodService from '../services/food.service';
+import * as foodService from '../services/food.service';
 import { asyncHandler } from '../utils/asyncHandler';
-import { ForbiddenError, AuthError } from '../utils/error';
+import { ForbiddenError, AuthError, ValidationError } from '../utils/error';
 
 export const addFoodItem = asyncHandler(
   async (
@@ -22,7 +20,19 @@ export const addFoodItem = asyncHandler(
       throw new AuthError('No food partner info or file provided');
     }
 
-    const { name, description, price } = req.body;
+    const { name, description, price, type } = req.body;
+
+    if (!type || (type !== 'standard' && type !== 'reel')) {
+      throw new ValidationError('Type must be either standard or reel');
+    }
+
+    if (type === 'standard' && !req.file.mimetype.startsWith('image/')) {
+      throw new ValidationError('Standard type requires an image file. You uploaded a non-image file.');
+    }
+
+    if (type === 'reel' && !req.file.mimetype.startsWith('video/')) {
+      throw new ValidationError('Reel type requires a video file. You uploaded a non-video file.');
+    }
 
     const file: File = {
       fileBuffer: req.file.buffer,
@@ -30,25 +40,19 @@ export const addFoodItem = asyncHandler(
       mimeType: req.file.mimetype
     };
 
-    const imageUploadResponse = await storageService.uploadVideo(file);
-
-    const foodPartnerId = req.user.id;
-    const newFoodItem = new food({
-      name,
-      video: imageUploadResponse.url,
-      videoPublicId: imageUploadResponse.fileId,
-      description,
-      price,
-      foodPartner: foodPartnerId,
-    });
-
-    await newFoodItem.save();
+    const newFoodItem = await foodService.addFoodItem(
+      { name, description, price, type },
+      file,
+      req.user.id
+    );
 
     res.status(201).json({
       success: true,
       message: 'Food item added successfully',
       data: {
         name: newFoodItem.name,
+        type: newFoodItem.type,
+        image: newFoodItem.image,
         video: newFoodItem.video,
         videoPublicId: newFoodItem.videoPublicId,
         description: newFoodItem.description,
@@ -117,10 +121,6 @@ export const deleteFoodItem = asyncHandler(
 
     // Service handles validation and throws errors if invalid
     await foodService.deleteFoodItem(foodId, req.user.id);
-    
-    const fooditem = await food.findById(foodId);
-    await storageService.deleteVideo(fooditem!.videoPublicId);
-    await food.findByIdAndDelete(foodId);
 
     res.status(200).json({
       success: true,
@@ -134,19 +134,17 @@ export const updateFoodItem = asyncHandler(
     req: Request<{}, {}, UpdateFoodRequest> & { user?: any },
     res: Response<ApiResponse<UploadResponse> | ErrorResponse>
   ): Promise<void> => {
-    const { foodId, name, description, price } = req.body;
+    const { foodId, name, description, price, type } = req.body;
 
     if (!req.user?.id) {
       throw new AuthError('User information is missing');
     }
 
     // Service handles validation and throws errors if invalid
-    await foodService.checkFoodOwnership(foodId, req.user.id);
-
-    const updatedFood = await food.findByIdAndUpdate(
+    const updatedFood = await foodService.updateFoodItem(
       foodId,
-      { name, description, price },
-      { new: true }
+      req.user.id,
+      { name, description, price, type }
     );
 
     res.status(200).json({
@@ -156,7 +154,9 @@ export const updateFoodItem = asyncHandler(
         name: updatedFood!.name,
         video: updatedFood!.video,
         videoPublicId: updatedFood!.videoPublicId,
+        image: updatedFood!.image,
         description: updatedFood!.description,
+        type: updatedFood!.type,
         price: updatedFood!.price,
         foodPartnerId: updatedFood!.foodPartner.toString(),
       },

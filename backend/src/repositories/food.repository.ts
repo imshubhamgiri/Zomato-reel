@@ -3,7 +3,7 @@ import Food from '../models/food.model';
 import type { FoodItemWithStatus } from '../types';
 import { Types } from 'mongoose';
 
-const getFoodItemsWithUserState = async (
+export const getFoodItemsWithUserState = async (
   userId?: string,
   limit: number = 2,
   id?: string,
@@ -185,6 +185,19 @@ const getFoodItemsWithUserState = async (
   };
 };
 
-export default {
-  getFoodItemsWithUserState,
+export const addFoodItem = async (foodData: any) => {
+  const newFood = new Food(foodData);
+  return await newFood.save();
+};
+
+export const findById = async (foodId: string) => {
+  return await Food.findById(foodId);
+};
+
+export const deleteFoodItem = async (foodId: string) => {
+  return await Food.findByIdAndDelete(foodId);
+};
+
+export const updateFoodItem = async (foodId: string, updateData: any) => {
+  return await Food.findByIdAndUpdate(foodId, updateData, { new: true });
 };

@@ -1,9 +1,11 @@
 // import type { FoodItemWithStatus } from '../types';
-import foodRepository from '../repositories/food.repository';
+import * as foodRepository from '../repositories/food.repository';
 import { ValidationError, NotFoundError, ForbiddenError } from '../utils/error';
 import food from '../models/food.model';
+import storageService from '../service/storage.service';
+import type { File } from '../types';
 
-const getFoodItems = async (
+export const getFoodItems = async (
   userId?: string,
   limit?: number,
   lastPartner?: string,
@@ -24,7 +26,7 @@ const getFoodItems = async (
 //   return foodRepository.addFoodItem(foodData, userId);
 // };
 
-const getFoodByPartnerId = async (partnerId: string): Promise<any[]> => {
+export const getFoodByPartnerId = async (partnerId: string): Promise<any[]> => {
   if (!partnerId.match(/^[0-9a-fA-F]{24}$/)) {
     throw new ValidationError('Invalid partner ID format');
   }
@@ -33,12 +35,12 @@ const getFoodByPartnerId = async (partnerId: string): Promise<any[]> => {
   return foodItems;
 };
 
-const deleteFoodItem = async (foodId: string, userId: string): Promise<void> => {
+export const deleteFoodItem = async (foodId: string, userId: string): Promise<void> => {
   if (!foodId.match(/^[0-9a-fA-F]{24}$/)) {
     throw new ValidationError('Invalid food ID format');
   }
 
-  const fooditem = await food.findById(foodId);
+  const fooditem = await foodRepository.findById(foodId);
 
   if (!fooditem) {
     throw new NotFoundError('Food item not found');
@@ -47,9 +49,41 @@ const deleteFoodItem = async (foodId: string, userId: string): Promise<void> => 
   if (fooditem.foodPartner.toString() !== userId) {
     throw new ForbiddenError('You can only delete your own food items');
   }
+
+  if (fooditem.videoPublicId) {
+    await storageService.deleteVideo(fooditem.videoPublicId);
+  }
+
+  await foodRepository.deleteFoodItem(foodId);
 };
 
-const checkFoodOwnership = async (foodId: string, userId: string): Promise<any> => {
+export const updateFoodItem = async (foodId: string, userId: string, updateData: any) => {
+  await checkFoodOwnership(foodId, userId);
+  return await foodRepository.updateFoodItem(foodId, updateData);
+};
+
+export const addFoodItem = async (data: { name: string, description: string, price: number, type: string }, file: File, foodPartnerId: string) => {
+  const imageUploadResponse = await storageService.uploadVideo(file);
+
+  const foodData: any = {
+    name: data.name,
+    description: data.description,
+    price: data.price,
+    type: data.type,
+    foodPartner: foodPartnerId,
+  };
+
+  if (data.type === 'standard') {
+    foodData.image = imageUploadResponse.url;
+  } else {
+    foodData.video = imageUploadResponse.url;
+    foodData.videoPublicId = imageUploadResponse.fileId;
+  }
+
+  return await foodRepository.addFoodItem(foodData);
+};
+
+export const checkFoodOwnership = async (foodId: string, userId: string): Promise<any> => {
   if (!foodId.match(/^[0-9a-fA-F]{24}$/)) {
     throw new ValidationError('Invalid food ID format');
   }
@@ -65,12 +99,4 @@ const checkFoodOwnership = async (foodId: string, userId: string): Promise<any> 
   }
 
   return fooditem;
-};
-
-export default {
-  getFoodItems,
-  getFoodByPartnerId,
-  deleteFoodItem,
-  checkFoodOwnership,
-  // addFoodItem,
 };
