@@ -155,3 +155,25 @@ export const updateUserAddress = asyncHandler(async(req: AuthenticatedRequest & 
     data: updatedAddress
   });
 });
+
+export const setDefaultAddress = asyncHandler(async(req: AuthenticatedRequest, res: Response<ApiResponse<UserAddress> | ErrorResponse>): Promise<void> => {
+  const user = req.user;
+  if (!user) {
+    throw new AuthError('User not authenticated');
+  }
+  const { addressId } = req.params;
+  
+  const updatedAddress = await userProfileService.setDefaultAddress(user.id, addressId);
+  if (!updatedAddress) {
+    res.status(404).json({
+      success: false,
+      message: 'Address not found',
+    });
+    return;
+  }
+  res.status(200).json({
+    success: true,
+    message: 'Address set as default successfully',
+    data: updatedAddress
+  });
+});
