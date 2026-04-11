@@ -2,6 +2,7 @@ import { ValidationError } from "../utils/error";
 import { getUserProfile as getUserProfileFromRepo } from "../repositories/userProfile.repository";
 import { updateUserProfile as updateProfile } from "../repositories/userProfile.repository";
 import { addUserAddress, getUserAddresses as getAddressesFromRepo , deleteUserAddress as Deleteaddress, updateUserAddress as updateAddressInRepo } from "../repositories/userProfile.repository";
+import User from "../models/userModel";
 import type { UserProfile, UserAddress } from "../types";
 
 export const getUserProfile = async (userId: string): Promise<UserProfile> => {
@@ -95,6 +96,34 @@ export const updateAddress = async(userId: string, addressId: string, updateData
   }
 
   // Find the updated address in the profile
+  const updatedAddress = updatedProfile.address?.find(addr => addr._id?.toString() === addressId);
+  if (!updatedAddress) {
+    throw new ValidationError('Address not found in profile');
+  }
+
+  return updatedAddress;
+};
+
+export const setDefaultAddress = async(userId: string, addressId: string): Promise<UserAddress> => {
+  if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ValidationError('Invalid user ID format');
+  }
+  if (!addressId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ValidationError('Invalid address ID format');
+  }
+  
+  // First, set all addresses to isDefault: false
+  await User.updateOne(
+    { _id: userId },
+    { $set: { 'address.$[].isDefault': false } }
+  );
+  
+  // Then set the selected address to isDefault: true
+  const updatedProfile = await updateAddressInRepo(userId, addressId, { isDefault: true });
+  if (!updatedProfile) {
+    throw new ValidationError('Failed to set default address');
+  }
+
   const updatedAddress = updatedProfile.address?.find(addr => addr._id?.toString() === addressId);
   if (!updatedAddress) {
     throw new ValidationError('Address not found in profile');
