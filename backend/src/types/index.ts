@@ -49,7 +49,9 @@ export interface UploadResponse {
     videoPublicId: string;
     description: string;
     price: number;
+    type: 'standard' | 'reel';
     foodPartnerId: string;
+    image: string;
 }
 
 export interface File{
@@ -88,6 +90,8 @@ export interface IFood  {
   name: string;
   video: string;
   videoPublicId: string;
+  image: string;
+  type: 'standard' | 'reel';
   description: string;
   price: number;
   likeCount: number;
