@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route ,Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Reel from './pages/Reel';
@@ -16,6 +16,10 @@ import NotFound from './pages/NotFound';
 import BottomNav from './components/BottomNav';
 
 function App() {
+  const location = useLocation();
+  const hideBottomNavPaths = ['/user/login', '/user/register', '/partner/login', '/partner/register'];
+  const showNav = !hideBottomNavPaths.includes(location.pathname);
+
   return (
     <>
       <ToastContainer 
@@ -43,9 +47,9 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <BottomNav />
+      {showNav && <BottomNav />}
     </>
   )
 }
 
-export default App
+export default App;
