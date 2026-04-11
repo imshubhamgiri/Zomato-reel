@@ -14,6 +14,7 @@ function PartnerProfile() {
   const [activeTab, setActiveTab] = useState('profile');
 
   // Use our new hook for food operations
+  console.log("User in PartnerProfile:", user);
   const { 
     foodItems, 
     deleteFoodItem, 
