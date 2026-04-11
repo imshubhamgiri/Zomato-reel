@@ -10,6 +10,7 @@ const Addfood = () => {
     name: '',
     description: '',
     price: '',
+    type: 'standard',
     video: null
   })
 
@@ -35,8 +36,9 @@ const Addfood = () => {
     submitData.append('name', formData.name)
     submitData.append('description', formData.description)
     submitData.append('price', formData.price)
+    submitData.append('type', formData.type)
     if (formData.video) {
-      submitData.append('video', formData.video)
+      submitData.append('media', formData.video)
     }
 
     axios.post(`${API_URL}/api/food/add`, submitData, {
@@ -47,6 +49,7 @@ const Addfood = () => {
           name: '',
           description: '',
           price: '',
+          type: 'standard',
           video: null
         })
         toast.success('Dish added successfully!');
@@ -97,12 +100,12 @@ const Addfood = () => {
                     <svg className="w-5 h-5 text-black dark:text-red-500" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
                     </svg>
-                    Upload Video *
+                    Upload {formData.type === 'standard' ? 'Image' : 'Video'} *
                   </label>
                   <div className='relative'>
                     <input
                       type="file"
-                      accept="video/*"
+                      accept={formData.type === 'standard' ? 'image/*' : 'video/*'}
                       onChange={handleVideoChange}
                       className='hidden'
                       id='video-upload'
@@ -114,13 +117,20 @@ const Addfood = () => {
                     >
                       {videoPreview ? (
                         <div className='relative w-full h-full'>
-                          <video
-                            src={videoPreview}
-                            className='w-full h-full object-cover rounded-2xl'
-                            controls
-                          />
+                          {formData.type === 'standard' ? (
+                            <img
+                              src={videoPreview}
+                              className='w-full h-full object-cover rounded-2xl'
+                            />
+                          ) : (
+                            <video
+                              src={videoPreview}
+                              className='w-full h-full object-cover rounded-2xl'
+                              controls
+                            />
+                          )}
                           <div className='absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold'>
-                            Change Video
+                            Change {formData.type === 'standard' ? 'Image' : 'Video'}
                           </div>
                         </div>
                       ) : (
@@ -128,18 +138,39 @@ const Addfood = () => {
                           <svg className="w-16 h-16 text-blue-300 dark:text-red-500 mx-auto mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                           </svg>
-                          <p className='text-lg font-bold dark:text-red-500 mb-2'>Click to upload video</p>
-                          <p className='text-sm text-black/55 dark:text-gray-400'>MP4, MOV, AVI (MAX. 100MB)</p>
+                          <p className='text-lg font-bold dark:text-red-500 mb-2'>Click to upload {formData.type === 'standard' ? 'image' : 'video'}</p>
+                          <p className='text-sm text-black/55 dark:text-gray-400'>
+                            {formData.type === 'standard' ? 'JPG, PNG, GIF (MAX. 5MB)' : 'MP4, MOV, AVI (MAX. 100MB)'}
+                          </p>
                         </div>
                       )}
                     </label>
                   </div>
-                  <p className='text-xs text-gray-400 mt-2'>Upload a short video showcasing your dish</p>
+                  <p className='text-xs text-gray-400 mt-2'>
+                    {formData.type === 'standard' ? 'Upload an appetizing picture' : 'Upload a short video showcasing your dish'}
+                  </p>
                 </div>
               </div>
 
             
               <div className='space-y-6'>
+                <div>
+                  <label htmlFor="type" className='flex items-center gap-2 text-sm font-bold text-black dark:text-gray-500 mb-3'>
+                    Item Type *
+                  </label>
+                  <select
+                    id="type"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 text-black dark:text-white text-sm rounded-xl focus:ring-4 focus:ring-red-500/20 focus:border-red-500 block p-4 transition-all"
+                    required
+                  >
+                    <option value="standard">Standard (Image)</option>
+                    <option value="reel">Reel (Video)</option>
+                  </select>
+                </div>
+
                 {/* Food Name */}
                 <div>
                   <label htmlFor="name" className='flex items-center gap-2 text-sm font-bold text-black dark:text-gray-500 mb-3'>

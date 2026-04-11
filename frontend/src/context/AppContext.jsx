@@ -37,15 +37,23 @@ export const AppProvider = ({ children }) => {
 
     const partnerRegister = async (partnerData) => {
         const response = await partnerAPI.register(partnerData);
-        setUser(response.partner);
+        setUser(response.user);
         setIsAuthenticated(true);
     }
 
     const partnerLogin = async (partnerData) => {
         const response = await partnerAPI.login(partnerData);
-        setUser(response.partner);
+        setUser(response.user);
         setIsAuthenticated(true);
     }
+
+    const partnerLogout = async () => {
+        await partnerAPI.logout();
+        setUser(null);
+        setIsAuthenticated(false);
+
+    }
+
     const fetchUserData = async () => {
         try {
           const response = await authAPI.checkAuth();
@@ -87,6 +95,7 @@ export const AppProvider = ({ children }) => {
             logout,
             partnerRegister,
             partnerLogin,
+            partnerLogout,
             fetchUserData,
             isUserfetched,
             isAuthLoading, // Exported for protected routes

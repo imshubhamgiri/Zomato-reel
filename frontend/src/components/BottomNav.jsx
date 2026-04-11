@@ -1,13 +1,15 @@
 import { Home, MenuIcon, User, Utensils, Video } from "lucide-react"
 import { NavLink } from "react-router-dom"
+import { useAppContext } from "../context/AppContext"
 
 const BottomNav = () => {
+  const { user } = useAppContext();
      const navitems =[
         {path:'/' ,label:'Home', icon:Home},
         {path:'/menu' ,label:'Menu', icon:MenuIcon},
         {path:'/reel' ,label:'Reel', icon:Video},
         {path:'/food' ,label:'Food', icon:Utensils},
-        {path:'/user/profile' ,label:'Profile', icon:User},
+        {path:user?.userType === 'partner' ? '/partner/profile' : '/user/profile' ,label:'Profile', icon:User},
     ]
   return (
     <nav className="bottom-nav-responsive  z-50 border border-white/45

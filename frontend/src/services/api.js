@@ -129,8 +129,8 @@ export const partnerAPI = {
     return response.data;
   },
 
-  getProfile: async () => {
-    const response = await apiClient.get('/api/auth/partners/profile');
+  getProfile: async (id) => {
+    const response = await apiClient.get(`/api/partners/foodPartners/${id}`);
     return response.data;
   },
 };
