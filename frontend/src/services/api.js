@@ -174,6 +174,11 @@ export const profileAPI = {
   updateAddress: async(addressId, payload) =>{
     const response = await apiClient.patch(`/api/users/me/addresses/${addressId}`, payload);
     return response.data;
+  },
+
+  setDefaultAddress: async(addressId) =>{
+    const response = await apiClient.patch(`/api/users/me/addresses/${addressId}/default`);
+    return response.data;
   }
   ,
   deleteAddress: async(addressId) =>{
