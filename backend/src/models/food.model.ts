@@ -3,8 +3,14 @@ import { IFood } from '../types';
 
  const foodSchema = new Schema<IFood>({
     name: { type: String, required: true, trim: true },
-    video: { type: String, required: true, trim: true },
-    videoPublicId: { type: String, required: true, trim: true },
+    video: { type: String, trim: true },
+    videoPublicId: { type: String, trim: true },
+    image: { type: String, trim: true },
+    type: { type: String,
+         enum: ['standard', 'reel'], 
+         required: true,
+          index: true 
+        },
     description: { type: String, required: true, trim: true },
     price: { type: Number, required: true },
     likeCount: { type: Number, default: 0 },

@@ -10,14 +10,14 @@ const upload = multer({ storage: storage });
 const requirePartner = [requireAuth, requireRole(['partner'])];
 
 // Backward-compatible aliases (specific routes FIRST to avoid conflicts)
-foodroutes.post('/add', requirePartner, upload.single('video'), validateAddFoodRequest, foodController.addFoodItem);
+foodroutes.post('/add', requirePartner, upload.single('media'), validateAddFoodRequest, foodController.addFoodItem);
 foodroutes.get('/listfood', requireAuth, foodController.getFoodItems);
 foodroutes.get('/getfood/:id', foodController.GetfoodById);
 foodroutes.put('/update', requirePartner, validateUpdateFoodRequest, foodController.updateFoodItem);
 foodroutes.delete('/delete', requirePartner, foodController.deleteFoodItem);
 
 // Refined routes (generic routes LAST)
-foodroutes.post('/', requirePartner, upload.single('video'), validateAddFoodRequest, foodController.addFoodItem);
+foodroutes.post('/', requirePartner, upload.single('media'), validateAddFoodRequest, foodController.addFoodItem);
 foodroutes.get('/', requireAuth, foodController.getFoodItems);
 foodroutes.get('/partners/:id', foodController.GetfoodById);
 foodroutes.patch('/:foodId', requirePartner, (req, _res, next) => {

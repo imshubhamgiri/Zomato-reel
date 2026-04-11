@@ -75,6 +75,7 @@ export interface FoodItemResponse {
 export interface AddFoodRequest {
   name: string;
   description: string;
+  type: 'standard' | 'reel';
   price: number;
 }
 
@@ -83,6 +84,7 @@ export interface UpdateFoodRequest {
   name: string;
   description: string;
   price: number;
+  type: 'standard' | 'reel';
 }
 
 export interface IFood  {

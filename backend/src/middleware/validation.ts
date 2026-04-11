@@ -48,6 +48,7 @@ const addFoodSchema = z.object({
   name: z.string().min(2, 'Food name is required').max(120, 'Food name is too long').trim(),
   description: z.string().min(3, 'Description is required').max(500, 'Description is too long').trim(),
   price: z.coerce.number().positive('Price must be greater than 0'),
+  type: z.enum(['standard', 'reel'], { message: 'Type must be either standard or reel' }),
 });
 
 const updateFoodSchema = z.object({
@@ -55,6 +56,7 @@ const updateFoodSchema = z.object({
   name: z.string().min(2, 'Food name is required').max(120, 'Food name is too long').trim(),
   description: z.string().min(3, 'Description is required').max(500, 'Description is too long').trim(),
   price: z.coerce.number().positive('Price must be greater than 0'),
+  type: z.enum(['standard', 'reel'], { message: 'Type must be either standard or reel' }),
 });
 
 const foodActionSchema = z.object({
