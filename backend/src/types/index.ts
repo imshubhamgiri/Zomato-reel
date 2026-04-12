@@ -177,6 +177,7 @@ export interface PartnerResponse{
     restaurantName:string;
     phone:string;
     address:string;
+    userType?: 'partner';
 }
 export interface FoodPartnerLogin{
     email:string;
@@ -187,6 +188,7 @@ export interface ProfileResponse {
     id: string;
     name: string;
     email: string;
+    userType?: 'user';
 }
 
 export interface UserAddress {

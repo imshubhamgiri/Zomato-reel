@@ -94,6 +94,7 @@ export const registerUser = async (
       id: createdUser._id.toString(),
       name: createdUser.name,
       email: createdUser.email,
+      userType: 'user',
     },
     tokens,
   };
@@ -126,6 +127,7 @@ export const loginUser = async (
       id: user._id.toString(),
       name: user.name,
       email: user.email,
+      userType: 'user',
     },
     tokens,
   };
@@ -160,6 +162,7 @@ export const registerPartner = async (
       restaurantName: createdPartner.restaurantName,
       phone: createdPartner.phone,
       address: createdPartner.address,
+      userType: 'partner',
     },
     tokens,
   };
@@ -195,6 +198,7 @@ export const loginPartner = async (
       restaurantName: partner.restaurantName,
       phone: partner.phone,
       address: partner.address,
+      userType: 'partner',
     },
     tokens,
   };
