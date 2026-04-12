@@ -62,7 +62,7 @@ function PartnerProfile() {
   return (
     <div className="min-h-screen bg-white dark:bg-linear-to-b from-stone-950 dark:via-slate-950 dark:to-black">
       {/* Header with Profile Dropdown */}
-      <div className="bg-linear-to-r from-red-600 to-orange-600 shadow-sm border-b border-red-700 sticky top-0 z-40">
+      <div className="bg-linear-to-r from-slate-600 to-slate-600 shadow-sm border-b border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to="/" className="inline-flex items-center text-sm font-medium text-white hover:text-red-100 transition-colors">
@@ -100,6 +100,16 @@ function PartnerProfile() {
                   updateFoodItem={updateFoodItem}
                   editLoading={editLoading}
                 />
+             )}
+
+             {activeTab === 'overview' && (
+                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
+                  <svg className="w-20 h-20 text-red-300 dark:text-red-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Dashboard Overview</h2>
+                  <p className="text-slate-500 dark:text-slate-300 max-w-sm mb-6">Get insights into your restaurant's performance, recent activity, and key metrics here.</p>
+                </div>
              )}
 
              {activeTab === 'orders' && (

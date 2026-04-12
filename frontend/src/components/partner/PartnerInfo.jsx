@@ -31,7 +31,7 @@ export default function PartnerInfo({ partner }) {
   return (
     <div className='p-6 max-w-4xl mx-auto'>
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden mb-8">
-        <div className="bg-linear-to-r from-red-600 to-orange-600 px-8 py-10">
+        <div className="bg-linear-to-r from-sky-900 to-sky-700 px-8 py-10">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center text-4xl font-bold text-red-600 shadow-xl uppercase">
               {displayData?.restaurantName?.charAt(0) || displayData?.name?.charAt(0) || 'R'}
