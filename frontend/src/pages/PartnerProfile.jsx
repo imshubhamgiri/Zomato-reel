@@ -12,15 +12,14 @@ function PartnerProfile() {
   const navigate = useNavigate();
   const { user, isAuthLoading, partnerLogout } = useAppContext();
   const [activeTab, setActiveTab] = useState('profile');
-
   // Use our new hook for food operations
-  console.log("User in PartnerProfile:", user);
   const { 
     foodItems, 
     deleteFoodItem, 
     updateFoodItem, 
-    editLoading 
-  } = usePartnerFoodItems(user?.id);
+    editLoading,
+    refreshFoodItems
+  } = usePartnerFoodItems(user?.id, activeTab === 'menu');
 
   useEffect(() => {
     // Only redirect if auth loading is complete and no user was found, 
@@ -95,6 +94,7 @@ function PartnerProfile() {
              
              {activeTab === 'menu' && (
                 <PartnerMenu 
+                  fetchFoodItems={refreshFoodItems}
                   foodItems={foodItems} 
                   deleteFoodItem={deleteFoodItem}
                   updateFoodItem={updateFoodItem}

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import { useAppContext } from '../../context/AppContext';
 export default function PartnerMenu({ 
+  fetchFoodItems,
   foodItems, 
   deleteFoodItem, 
   updateFoodItem,
@@ -11,7 +12,7 @@ export default function PartnerMenu({
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [edit, setEdit] = useState(null);
   const [formdata, setFormdata] = useState({});
-
+ const{user} = useAppContext();
   const handleEdit = (foodId) => {
     setEdit(foodId);
     const food = foodItems.find(item => item._id === foodId);
@@ -30,7 +31,11 @@ export default function PartnerMenu({
       }, 100);
     }
   };
-
+  useEffect(() => {
+    if (fetchFoodItems && user?.id) {
+       fetchFoodItems();
+    }
+  }, [fetchFoodItems, user?.id]);
   const handleCancelEdit = () => {
     setEdit(null);
   };
