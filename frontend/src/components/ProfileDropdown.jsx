@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { MoonIcon, Sun } from 'lucide-react';
+import usePartnerFoodItems from '../hooks/usePartnerFoodItems';
 
 function ProfileDropdown({ user, type  }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +11,7 @@ function ProfileDropdown({ user, type  }) {
   const { logout } = useAppContext();
   const navigate = useNavigate();
  const{theme , toggleTheme} = useTheme();
+ const {fetchProfile} = usePartnerFoodItems(user?.id, false);
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -22,10 +24,16 @@ function ProfileDropdown({ user, type  }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    // Only fetch if partner profile details seem missing
+    if (type === 'partner' && !user?.restaurantName && !user?.name) {
+      fetchProfile();
+    }
+  }, [fetchProfile, type, user]);
+
   const handleLogout = async () => {
     try {
       await logout();
-      localStorage.clear();
       setIsOpen(false);
       navigate('/');
     } catch (error) {
