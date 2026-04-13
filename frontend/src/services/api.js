@@ -34,7 +34,12 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
 
     // Check if error is 401 (Unauthorized) and not already a retry
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Do not retry for login, register, or explicit auth routes
+    const isAuthRoute = originalRequest.url?.includes('/login') || 
+                        originalRequest.url?.includes('/register') || 
+                        originalRequest.url?.includes('/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
       if (isRefreshing) {
         // If already refreshing, queue the request
         return new Promise((resolve, reject) => {
@@ -130,7 +135,7 @@ export const partnerAPI = {
   },
 
   getProfile: async (id) => {
-    const response = await apiClient.get(`/api/partners/foodPartners/${id}`);
+    const response = await apiClient.get(`/api/partners/foodPartners`);
     return response.data;
   },
 };
@@ -147,9 +152,20 @@ export const foodAPI = {
   getAllFoods:async(param)=>{
     const response = await apiClient.get('/api/foods?'+param.toString());
     return response.data;
-  }
-}
+  },
 
+  addFood: async (payload) => {
+    // We MUST use apiClient so that our 401 token refresh interceptor fires!
+    // In Axios 1.x, manually setting 'multipart/form-data' correctly overrides 
+    // the global JSON header and natively appends the random boundary string itself.
+    const response = await apiClient.post('/api/foods', payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  }
+};
 export const profileAPI = {
   getMe: async () => {
     const response = await apiClient.get('/api/users/me');
