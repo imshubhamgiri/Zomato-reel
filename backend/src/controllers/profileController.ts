@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
-import type { ApiResponse, ErrorResponse } from '../types';
+import { Response } from 'express';
+import type { ApiResponse, AuthenticatedRequest, ErrorResponse } from '../types';
 import profileService from '../services/profile.service';
 import { asyncHandler } from '../utils/asyncHandler';
+import { AuthError } from '../utils/error';
 
 interface ProfileResponse {
   name: string;
@@ -13,13 +14,16 @@ interface ProfileResponse {
 
 export const getFoodPartnerProfile = asyncHandler(
   async (
-    req: Request,
+    req:AuthenticatedRequest,
     res: Response<ApiResponse<ProfileResponse> | ErrorResponse>
   ): Promise<void> => {
-    const { id } = req.params;
+    const user = req.user;
+     if (!user) {
+          throw new AuthError('User not authenticated');
+        }
     
     // Service handles validation and throws errors if invalid
-    const profile = await profileService.getFoodPartnerProfile(id);
+    const profile = await profileService.getFoodPartnerProfile(user.id);
     
     res.status(200).json({
       success: true,

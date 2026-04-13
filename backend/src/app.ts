@@ -3,7 +3,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import foodRoutes from './routes/food.routes';
-import profileRoutes from './routes/profile.routes';
+import profileRoutes from './routes/partnerProfile.routes';
 import actionRoutes from './routes/useraction.routes';
 import corsMiddleware from './middleware/cors';
 import logger from './middleware/logging';
