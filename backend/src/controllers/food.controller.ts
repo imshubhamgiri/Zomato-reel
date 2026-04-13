@@ -3,11 +3,12 @@ import type { ApiResponse, ErrorResponse, AuthenticatedRequest, FoodItemWithStat
 import { v4 as uuid } from 'uuid';
 import * as foodService from '../services/food.service';
 import { asyncHandler } from '../utils/asyncHandler';
+import { AuthUser } from '../types';
 import { ForbiddenError, AuthError, ValidationError } from '../utils/error';
 
 export const addFoodItem = asyncHandler(
   async (
-    req: Request<{}, {}, AddFoodRequest> & { user?: any; file?: Express.Multer.File },
+    req: Request<{}, {}, AddFoodRequest> & { user?: AuthUser; file?: Express.Multer.File },
     res: Response<ApiResponse<UploadResponse> | ErrorResponse>
   ): Promise<void> => {
     const foodpartner = req.user;
@@ -43,7 +44,7 @@ export const addFoodItem = asyncHandler(
     const newFoodItem = await foodService.addFoodItem(
       { name, description, price, type },
       file,
-      req.user.id
+      foodpartner.id
     );
 
     res.status(201).json({
@@ -110,7 +111,7 @@ export const GetfoodById = asyncHandler(
 
 export const deleteFoodItem = asyncHandler(
   async (
-    req: Request<{}, {}, { foodId: string }> & { user?: any },
+    req: Request<{}, {}, { foodId: string }> & { user?: AuthUser },
     res: Response<ApiResponse | ErrorResponse>
   ): Promise<void> => {
     const { foodId } = req.body;
@@ -131,7 +132,7 @@ export const deleteFoodItem = asyncHandler(
 
 export const updateFoodItem = asyncHandler(
   async (
-    req: Request<{}, {}, UpdateFoodRequest> & { user?: any },
+    req: Request<{}, {}, UpdateFoodRequest> & { user?: AuthUser },
     res: Response<ApiResponse<UploadResponse> | ErrorResponse>
   ): Promise<void> => {
     const { foodId, name, description, price, type } = req.body;
