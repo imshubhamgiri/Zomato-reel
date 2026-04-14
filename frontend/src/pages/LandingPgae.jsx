@@ -95,7 +95,7 @@ const LandingPage = () => {
       <section className="bg-linear-to-r from-green-50 px-5 to-orange-50 dark:from-stone-800 dark:to-black transition-colors duration-300 py-12 md:py-20">
         <div className='w-full z-50 max-w-2xl mb-5 mx-auto'>
           <div className='flex relative items-center gap-2 text-sm w-full  text-black dark:text-gray-50 mb-3'>
-            <input type="text" className=' bg-gray-400 dark:supports-backdrop-filter:bg-white/10 p-4 opacity-95 backdrop-blur-xl pl-10 rounded-3xl w-full 
+            <input type="text" className='bg-white border border-sky-200  dark:bg-gray-400 dark:supports-backdrop-filter:bg-white/10 p-4 opacity-95 backdrop-blur-xl pl-10 rounded-3xl w-full 
             max-w-2xl outline-0 focus:ring-2 focus:ring-blue-500' placeholder='Search for restaurants or dishes...' />
             <Search className='size-5 text-gray-500 absolute left-3 dark:text-gray-400' />
           </div>

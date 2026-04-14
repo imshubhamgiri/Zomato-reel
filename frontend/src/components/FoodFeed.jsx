@@ -26,9 +26,11 @@ const FoodFeed = () => {
         </div>
 
         {/* Grid Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+         <div className="grid grid-rows-2 grid-flow-col gap-4 overflow-x-auto pb-6 snap-x snap-mandatory md:grid-rows-none md:grid-flow-row md:grid-cols-3 lg:grid-cols-4 md:gap-8 auto-cols-[calc(50%-8px)] sm:auto-cols-[calc(33.333%-16px)] md:auto-cols-auto" style={{ scrollbarWidth: 'none' }}>
           {products.map((product) => (
-            <FoodCard key={product.id} product={product} />
+            <div key={product.id} className="snap-start h-full">
+              <FoodCard product={product} />
+            </div>
           ))}
         </div>
 

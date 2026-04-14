@@ -7,8 +7,9 @@ const ThemeContext = createContext({
 });
 
 export function ThemeProvider({ children }: {children: React.ReactNode}) {
-    const [theme, settheme] = useState(()=> localStorage.getItem('theme')|| 
-    window.matchMedia("(prefers-color-scheme:dark)").matches?"dark" : "light")
+    const [theme, settheme] = useState(() => 
+      localStorage.getItem('theme') || (window.matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light")
+    );
 
     useEffect(() => {
      const root = window.document.documentElement;

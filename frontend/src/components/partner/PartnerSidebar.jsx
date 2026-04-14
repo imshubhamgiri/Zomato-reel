@@ -27,21 +27,21 @@ export default function PartnerSidebar({ partner, activeTab, setActiveTab, logou
   return (
     <div className="flex flex-col gap-6">
       {/* Restaurant Info Card */}
-      <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl p-6 shadow-lg shadow-blue-100 dark:shadow-black/30 border border-blue-100/70 dark:border-slate-700 backdrop-blur-sm flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-red-600 dark:bg-red-800 flex items-center justify-center text-white text-2xl font-bold uppercase ">
+      <div className="bg-white/90 dark:bg-slate-900/60 rounded-3xl p-6 shadow-xl shadow-blue-900/10 dark:shadow-[#030637]/60 border border-blue-100/50 dark:border-[#430A5D]/30 backdrop-blur-xl flex items-center gap-4 transition-all duration-300">
+        <div className="w-16 h-16 rounded-full bg-blue-700 dark:bg-[#430A5D] flex items-center justify-center text-white text-2xl font-black uppercase shadow-inner">
           {partner?.restaurantName?.charAt(0) || 'R'}
         </div>
         <div>
-          <p className="text-xs text-slate-500 dark:text-slate-300 font-medium uppercase tracking-wider mb-1">Partner,</p>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{partner?.restaurantName || partner?.name}</h2>
+          <p className="text-xs text-blue-500 dark:text-indigo-300 font-bold uppercase tracking-widest mb-1">Partner</p>
+          <h2 className="text-xl font-extrabold text-slate-800 dark:text-white truncate max-w-[150px] tracking-tight">{partner?.restaurantName || partner?.name}</h2>
         </div>
       </div>
 
       {/* Navigation Menu */}
-      <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl shadow-lg shadow-red-100 dark:shadow-black/30 border border-red-100/70 dark:border-slate-700 overflow-hidden backdrop-blur-sm">
+      <div className="bg-white/90 dark:bg-slate-900/60 rounded-3xl shadow-xl shadow-blue-900/10 dark:shadow-[#030637]/60 border border-blue-100/50 dark:border-[#430A5D]/30 overflow-hidden backdrop-blur-xl transition-all duration-300">
         {menuGroups.map((group, groupIdx) => (
-          <div key={groupIdx} className={`${groupIdx !== 0 ? 'border-t border-red-100 dark:border-slate-700' : ''}`}>
-            <h3 className="px-6 py-4 text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest bg-red-50/50 dark:bg-slate-800/60">
+          <div key={groupIdx} className={`${groupIdx !== 0 ? 'border-t border-blue-100/50 dark:border-[#430A5D]/30' : ''}`}>
+            <h3 className="px-6 py-4 text-[11px] font-extrabold text-slate-400 dark:text-indigo-300/80 uppercase tracking-[0.2em] bg-blue-50/50 dark:bg-slate-800/40">
               {group.title}
             </h3>
             <div className="flex flex-col">
@@ -51,21 +51,21 @@ export default function PartnerSidebar({ partner, activeTab, setActiveTab, logou
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center gap-4 px-6 py-4 transition-all duration-200 text-left hover:text-white hover:bg-red-600 dark:hover:bg-red-800 group ${
+                    className={`flex items-center gap-4 px-6 py-4 transition-all duration-300 text-left hover:bg-blue-50 dark:hover:bg-[#430A5D]/20 group ${
                       isActive 
-                        ? 'dark:bg-gray-800 bg-red-500 text-white border-r-4 border-red-500' 
-                        : 'text-slate-600 dark:text-slate-300'
+                        ? 'bg-blue-50 dark:bg-[#430A5D] dark:text-white border-r-4 border-[#030637] dark:border-blue-400 shadow-md' 
+                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-200'
                     }`}
                   >
                     <svg 
-                      className={`w-5 h-5 transition-colors ${isActive ? 'text-red-200' : 'text-slate-400 group-hover:text-red-200'}`} 
+                      className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110 text-blue-200 dark:text-white' : 'text-slate-400 group-hover:text-blue-500 dark:group-hover:text-indigo-300 group-hover:scale-110'}`} 
                       fill="none" 
                       viewBox="0 0 24 24" 
                       stroke="currentColor"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2.5 : 2} d={item.icon} />
                     </svg>
-                    <span className={`font-medium ${isActive ? 'font-semibold' : ''}`}>{item.label}</span>
+                    <span className={`text-sm ${isActive ? 'font-bold tracking-wide' : 'font-semibold tracking-wide'}`}>{item.label}</span>
                   </button>
                 );
               })}
@@ -74,14 +74,14 @@ export default function PartnerSidebar({ partner, activeTab, setActiveTab, logou
         ))}
         
         {/* Logout */}
-        <div className="border-t border-red-100 dark:border-slate-700">
+        <div className="border-t border-blue-100/50 dark:border-[#430A5D]/30">
           <button 
             onClick={logout}
-            className="flex items-center gap-4 px-6 py-4 w-full text-left text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 dark:hover:text-red-400 transition-colors group">
-            <svg className="w-5 h-5 text-slate-400 group-hover:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            className="flex items-center gap-4 px-6 py-4 w-full text-left text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-[#430A5D]/10 hover:text-red-500 dark:hover:text-red-400 transition-all duration-300 group">
+            <svg className="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-transform duration-300 group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span className="font-medium">Logout</span>
+            <span className="text-sm font-semibold tracking-wide group-hover:font-bold">Logout</span>
           </button>
         </div>
       </div>
