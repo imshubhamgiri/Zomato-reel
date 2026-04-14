@@ -13,13 +13,6 @@ function PartnerProfile() {
   const { user, isAuthLoading, partnerLogout } = useAppContext();
   const [activeTab, setActiveTab] = useState('profile');
   // Use our new hook for food operations
-  const { 
-    foodItems, 
-    deleteFoodItem, 
-    updateFoodItem, 
-    editLoading,
-    refreshFoodItems
-  } = usePartnerFoodItems(user?.id, activeTab === 'menu');
 
   useEffect(() => {
     // Only redirect if auth loading is complete and no user was found, 
@@ -59,17 +52,17 @@ function PartnerProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-linear-to-b from-stone-950 dark:via-slate-950 dark:to-black">
+    <div className="min-h-screen font-sans tracking-wide bg-blue-50 dark:bg-[#222831] font-medium text-slate-800 dark:text-slate-100 transition-colors duration-300">
       {/* Header with Profile Dropdown */}
-      <div className="bg-linear-to-r from-slate-600 to-slate-600 shadow-sm border-b border-gray-700 sticky top-0 z-40">
+      <div className="bg-white dark:bg-[#000000] shadow-sm border-b border-blue-100 dark:border-[#430A5D]/50 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="inline-flex items-center text-sm font-medium text-white hover:text-red-100 transition-colors">
+            <button onClick={() => navigate(-1)} className="inline-flex items-center text-sm font-semibold text-slate-600 dark:text-blue-100 hover:text-blue-600 dark:hover:text-[#430A5D] transition-colors">
               <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back to Home
-            </Link>
+              Back 
+            </button>
             <ProfileDropdown user={user} type="partner" />
           </div>
         </div>
@@ -89,46 +82,42 @@ function PartnerProfile() {
           </div>
 
           {/* Right Content Area */}
-          <div className="flex-1 bg-white/85 dark:bg-slate-900/80 backdrop-blur-sm mb-20 rounded-2xl shadow-xl shadow-red-100/40 dark:shadow-black/30 border border-red-100/60 dark:border-slate-800 min-h-[600px] overflow-hidden">
+          <div className="flex-1 bg-white/90 dark:bg-[#223563] backdrop-blur-xl mb-20 rounded-3xl shadow-2xl shadow-blue-900/10 dark: border border-blue-100/50 dark:border-[#430A5D]/30 min-h-[600px] overflow-hidden transition-all duration-300">
              {activeTab === 'profile' && <PartnerInfo partner={user} />}
              
              {activeTab === 'menu' && (
                 <PartnerMenu 
-                  fetchFoodItems={refreshFoodItems}
-                  foodItems={foodItems} 
-                  deleteFoodItem={deleteFoodItem}
-                  updateFoodItem={updateFoodItem}
-                  editLoading={editLoading}
+                 partner={user}
                 />
              )}
 
              {activeTab === 'overview' && (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
-                  <svg className="w-20 h-20 text-red-300 dark:text-red-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400 py-20 flex flex-col items-center justify-center h-full">
+                  <svg className="w-20 h-20 text-blue-500 dark:text-[#430A5D] mb-6 opacity-80 mix-blend-multiply dark:mix-blend-screen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Dashboard Overview</h2>
-                  <p className="text-slate-500 dark:text-slate-300 max-w-sm mb-6">Get insights into your restaurant's performance, recent activity, and key metrics here.</p>
+                  <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">Dashboard Overview</h2>
+                  <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6 text-sm leading-relaxed">Get insights into your restaurant's performance, recent activity, and key metrics here.</p>
                 </div>
              )}
 
              {activeTab === 'orders' && (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
-                  <svg className="w-20 h-20 text-red-300 dark:text-red-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400 py-20 flex flex-col items-center justify-center h-full">
+                  <svg className="w-20 h-20 text-blue-500 dark:text-[#430A5D] mb-6 opacity-80 mix-blend-multiply dark:mix-blend-screen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Recent Orders</h2>
-                  <p className="text-slate-500 dark:text-slate-300 max-w-sm mb-6">You don't have any recent orders. Make sure your menu is up to date!</p>
+                  <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">Recent Orders</h2>
+                  <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6 text-sm leading-relaxed">You don't have any recent orders. Make sure your menu is up to date!</p>
                 </div>
              )}
 
              {activeTab === 'settings' && (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
-                  <svg className="w-20 h-20 text-red-300 dark:text-red-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400 py-20 flex flex-col items-center justify-center h-full">
+                  <svg className="w-20 h-20 text-blue-500 dark:text-[#430A5D] mb-6 opacity-80 mix-blend-multiply dark:mix-blend-screen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     </svg>
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Account Settings</h2>
-                  <p className="text-slate-500 dark:text-slate-300 max-w-sm mb-6">Manage your restaurant configuration, hours, and delivery zones here.</p>
+                  <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">Account Settings</h2>
+                  <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6 text-sm leading-relaxed">Manage your restaurant configuration, hours, and delivery zones here.</p>
                 </div>
              )}
           </div>
