@@ -3,34 +3,40 @@ import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config/Api.js'
 
+const API_BASE = API_URL.endsWith('/api') ? API_URL : `${API_URL}/api`;
+
 const PartnerProfileUser = () => {
   const { id } = useParams();
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [foodItems, setFoodItems] = useState([]);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const[profileLoading, setProfileLoading] = useState(true);
   const [playingVideoId, setPlayingVideoId] = useState(null);
   const videoRefs = useRef({});
 
   useEffect(() => {
-    const fetchPartnerProfile = async () => {
+    const fetchPartnerProfile = async() => {
       try {
-        const response = await axios.get(`${API_URL}/api/profiles/foodPartners/${id}`);
+        const response = await axios.get(`${API_BASE}/partners/foodPartners/${id}`);
         setPartnerProfile(response.data.data);
-        
+        console.log('Fetched partner profile:', response.data.data);
+        setProfileLoading(false);
       } catch (error) {
         console.error('Error fetching partner profile:', error);
+        setError('Failed to load partner profile. Please try again later.');
+        setProfileLoading(false);
       }
     };
 
     const fetchFoodItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/foods/getfood/${id}`,{
-          withCredentials: true
-        });
+        const response = await axios.get(`${API_BASE}/foods/getfood/${id}`);
         // const partnerFoods = response.data.fooditems?.filter(item => item.foodPartner._id === id) || [];
         setFoodItems(response.data.foodItems || []);
       } catch (error) {
         console.error('Error fetching food items:', error);
+        setError('Failed to load food items. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -56,6 +62,22 @@ const PartnerProfileUser = () => {
       setPlayingVideoId(itemId);
     }
   };
+
+ if(profileLoading){
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
+      <div className="text-gray-600 dark:text-gray-400">Loading partner profile...</div>
+    </div>
+  );
+  }
+
+  if(error){
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
+        <div className="text-gray-600 dark:text-gray-400">Error: {error}</div>
+      </div>
+    );
+  }
 
   const VideoSkeleton = () => (
     <div className="relative aspect-9/16 bg-linear-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-2xl overflow-hidden shadow-lg">

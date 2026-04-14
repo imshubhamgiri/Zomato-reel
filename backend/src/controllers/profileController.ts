@@ -12,6 +12,12 @@ interface ProfileResponse {
   address: string;
 }
 
+interface PublicProfileResponse {
+  name: string;
+  restaurantName: string;
+  address: string;
+}
+
 export const getFoodPartnerProfile = asyncHandler(
   async (
     req:AuthenticatedRequest,
@@ -29,6 +35,23 @@ export const getFoodPartnerProfile = asyncHandler(
       success: true,
       message: 'Profile retrieved successfully',
       data: profile as ProfileResponse
+    });
+  }
+);
+
+export const getPublicFoodPartnerProfile = asyncHandler(
+  async (
+    req: AuthenticatedRequest,
+    res: Response<ApiResponse<PublicProfileResponse> | ErrorResponse>
+  ): Promise<void> => {
+    const { id } = req.params as { id: string };
+
+    const profile = await profileService.getPublicFoodPartnerProfile(id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Public partner profile retrieved successfully',
+      data: profile as PublicProfileResponse,
     });
   }
 );

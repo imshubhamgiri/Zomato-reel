@@ -135,7 +135,8 @@ export const partnerAPI = {
   },
 
   getProfile: async (id) => {
-    const response = await apiClient.get(`/api/partners/foodPartners`);
+    const path = id ? `/api/partners/foodPartners/${id}` : '/api/partners/foodPartners';
+    const response = await apiClient.get(path);
     return response.data;
   },
 };

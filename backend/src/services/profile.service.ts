@@ -9,6 +9,12 @@ interface PartnerProfile {
   address: string;
 }
 
+interface PublicPartnerProfile {
+  name: string;
+  restaurantName: string;
+  address: string;
+}
+
 const getFoodPartnerProfile = async (id: string): Promise<PartnerProfile> => {
   // Validate ID format before querying database
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -31,6 +37,25 @@ const getFoodPartnerProfile = async (id: string): Promise<PartnerProfile> => {
   };
 };
 
+const getPublicFoodPartnerProfile = async (id: string): Promise<PublicPartnerProfile> => {
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ValidationError('Invalid partner ID format');
+  }
+
+  const foodPartner = await profileRepository.getFoodPartnerById(id);
+
+  if (!foodPartner) {
+    throw new NotFoundError('Food Partner not found');
+  }
+
+  return {
+    name: foodPartner.name,
+    restaurantName: foodPartner.restaurantName,
+    address: foodPartner.address,
+  };
+};
+
 export default {
   getFoodPartnerProfile,
+  getPublicFoodPartnerProfile,
 };
