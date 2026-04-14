@@ -13,11 +13,12 @@ import PartnerProfileUser from './pages/PartnerProfileUser';
 import Addfood from './pages/Addfood';
 import LandingPage from './pages/LandingPgae';
 import NotFound from './pages/NotFound';
+import CheckoutPage from './pages/CheckoutPage';
 import BottomNav from './components/BottomNav';
 
 function App() {
   const location = useLocation();
-  const hideBottomNavPaths = ['/user/login', '/user/register', '/partner/login', '/partner/register'];
+  const hideBottomNavPaths = ['/user/login', '/user/register', '/partner/login', '/partner/register', '/checkout'];
   const showNav = !hideBottomNavPaths.includes(location.pathname);
 
   return (
@@ -44,6 +45,7 @@ function App() {
         <Route path="/partner/profile" element={<PartnerProfile />} />
         <Route path="/profile/foodpartner/:id" element={<PartnerProfileUser />} />
         <Route path='/partner/addfood' element={<Addfood/>}/>
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/" element={<LandingPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

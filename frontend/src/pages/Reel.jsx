@@ -1,10 +1,12 @@
 import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import VideoCard from '../components/ui/VideoCard';
 import { foodAPI, useractions } from '../services/api'
 
 const Reel = () => {
+  const navigate = useNavigate();
      const [videos, setVideos] = useState([]);
      const videoFeedRef = useRef(null);
      const videoRefs = useRef([]);
@@ -179,6 +181,23 @@ const Reel = () => {
     };
   }, [videos]);
 
+  const handleOrderNow = (video) => {
+    navigate('/checkout', {
+      state: {
+        food: {
+          _id: video._id,
+          name: video.name,
+          description: video.description,
+          price: video.price,
+          image: video.image,
+          video: video.video,
+          partnerName: video.foodPartner?.name,
+          partnerId: video.foodPartner?._id,
+        },
+      },
+    });
+  };
+
   return (
     <div className='min-h-screen bg-linear-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 '>
     <div className='relative h-screen w-full bg-black overflow-hidden'>
@@ -263,7 +282,9 @@ const Reel = () => {
                       <span className="text-green-400 text-lg font-bold">
                         ₹{video.price}
                       </span>
-                      <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-semibold transition-colors cursor-pointer">
+                      <button 
+                       onClick={() => handleOrderNow(video)}
+                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-semibold transition-colors cursor-pointer">
                         Order Now
                       </button>
                     </div>
