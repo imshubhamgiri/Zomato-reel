@@ -198,6 +198,10 @@ export const profileAPI = {
     return response.data;
   }
   ,
+  getSavedFoods: async () => {
+    const response = await apiClient.get('/api/users/me/saved-foods');
+    return response.data;
+  },
   deleteAddress: async(addressId) =>{
     const response = await apiClient.delete(`/api/users/me/addresses/${addressId}`);
     return response.data;
@@ -208,12 +212,12 @@ export default apiClient;
 
 export const useractions = {
   likeFood: async (foodId) => {
-    const response = await apiClient.post(`/api/foods/like`, { foodId });
+    const response = await apiClient.post(`/api/actions/like`, { foodId });
     return response.data;
   },
 
   saveFood: async (foodId) => {
-    const response = await apiClient.post(`/api/foods/save`, { foodId });
+    const response = await apiClient.post(`/api/actions/save`, { foodId });
     return response.data;
   }
 }
