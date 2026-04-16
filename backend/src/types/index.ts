@@ -214,3 +214,20 @@ export interface UserProfile {
     phone?: string;
     gender?: 'Male' | 'Female' | 'Other';
 }
+
+export interface SavedFood {
+  saveId: string;
+  savedAt: Date;
+  food: {
+    id: string;
+    name: string;
+    image?: string;
+    video?: string;
+    type: 'standard' | 'reel';
+    description: string;
+    price: number;
+    likeCount: number;
+    saveCount: number;
+    foodPartner: string;
+  };
+}

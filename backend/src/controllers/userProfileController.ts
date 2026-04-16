@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import type { ApiResponse, ErrorResponse, AuthenticatedRequest, UserAddress, UserProfile } from '../types';
+import type { ApiResponse, ErrorResponse, AuthenticatedRequest, UserAddress, UserProfile, SavedFood } from '../types';
 import * as userProfileService from '../services/userProfile.service'
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthError } from '../utils/error'; 
@@ -175,5 +175,19 @@ export const setDefaultAddress = asyncHandler(async(req: AuthenticatedRequest, r
     success: true,
     message: 'Address set as default successfully',
     data: updatedAddress
+  });
+});
+
+export const getUserSavedFoods = asyncHandler(async(req: AuthenticatedRequest, res: Response<ApiResponse<SavedFood[]> | ErrorResponse>): Promise<void> => {
+  const user = req.user;
+  if (!user) {
+    throw new AuthError('User not authenticated');
+  }
+
+  const savedFoods = await userProfileService.getSavedFoods(user.id);
+  res.status(200).json({
+    success: true,
+    message: 'Saved foods fetched successfully',
+    data: savedFoods
   });
 });
