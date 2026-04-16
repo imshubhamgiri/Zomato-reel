@@ -6,14 +6,14 @@ const AddressInput = ({ initialData, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
-    pincode: '',
+    postalCode: '',
+    address: '',
     locality: '',
-    line1: '',
     city: '',
     state: '',
     landmark: '',
     alternatePhone: '',
-    label: 'HOME', // Home or Work
+    label: 'Home',
   });
 
   useEffect(() => {
@@ -21,14 +21,14 @@ const AddressInput = ({ initialData, onSave, onCancel }) => {
       setFormData({
         fullName: initialData.fullName || '',
         phone: initialData.phone || '',
-        pincode: initialData.postalCode || '',
+        postalCode: initialData.postalCode || '',
         locality: initialData.locality || '',
-        line1: initialData.address || '',
+        address: initialData.address || '',
         city: initialData.city || '',
         state: initialData.state || '',
         landmark: initialData.landmark || '',
         alternatePhone: initialData.alternatePhone || '',
-        label: initialData.label || 'HOME',
+        label: initialData.label || 'Home',
       });
     }
   }, [initialData]);
@@ -57,12 +57,27 @@ const AddressInput = ({ initialData, onSave, onCancel }) => {
   };
 
   const handleSave = () => {
+    const payload = {
+      ...formData,
+      fullName: formData.fullName.trim(),
+      phone: formData.phone.trim(),
+      postalCode: formData.postalCode.trim(),
+      address: formData.address.trim().toLowerCase(),
+      locality: formData.locality.trim().toLowerCase(),
+      city: formData.city.trim().toLowerCase(),
+      state: formData.state.trim().toLowerCase(),
+      landmark: formData.landmark.trim().toLowerCase(),
+      alternatePhone: formData.alternatePhone.trim(),
+      label: formData.label.trim(),
+    };
+
     // Validate required fields
-    if (!formData.fullName || !formData.phone || !formData.line1 || !formData.city || !formData.state || !formData.pincode) {
+    if (!payload.fullName || !payload.phone || !payload.address || !payload.city || !payload.state || !payload.postalCode) {
       alert('Please fill all required fields');
       return;
     }
-    onSave(formData);
+
+    onSave(payload);
   };
 
   const states = [
@@ -110,8 +125,8 @@ const AddressInput = ({ initialData, onSave, onCancel }) => {
         <FormInput
           label='Pincode'
           placeholder='Pincode'
-          value={formData.pincode}
-          onChange={(e) => handleInputChange('pincode', e.target.value)}
+          value={formData.postalCode}
+          onChange={(e) => handleInputChange('postalCode', e.target.value)}
         />
 
         {/* Locality */}
@@ -130,8 +145,8 @@ const AddressInput = ({ initialData, onSave, onCancel }) => {
         </label>
         <textarea
           placeholder='Address (Area and Street)'
-          value={formData.line1}
-          onChange={(e) => handleInputChange('line1', e.target.value)}
+          value={formData.address}
+          onChange={(e) => handleInputChange('address', e.target.value)}
           rows='3'
           className='w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none'
         />
@@ -197,8 +212,8 @@ const AddressInput = ({ initialData, onSave, onCancel }) => {
             <input
               type='radio'
               name='addressType'
-              value='HOME'
-              checked={formData.label === 'HOME'}
+              value='Home'
+              checked={formData.label === 'Home'}
               onChange={(e) => handleInputChange('label', e.target.value)}
               className='w-5 h-5 text-blue-600 cursor-pointer'
             />
@@ -208,8 +223,8 @@ const AddressInput = ({ initialData, onSave, onCancel }) => {
             <input
               type='radio'
               name='addressType'
-              value='WORK'
-              checked={formData.label === 'WORK'}
+              value='Work'
+              checked={formData.label === 'Work'}
               onChange={(e) => handleInputChange('label', e.target.value)}
               className='w-5 h-5 text-blue-600 cursor-pointer'
             />
