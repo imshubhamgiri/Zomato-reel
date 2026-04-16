@@ -2,8 +2,32 @@ import { ValidationError } from "../utils/error";
 import { getUserProfile as getUserProfileFromRepo } from "../repositories/userProfile.repository";
 import { updateUserProfile as updateProfile } from "../repositories/userProfile.repository";
 import { addUserAddress, getUserAddresses as getAddressesFromRepo , deleteUserAddress as Deleteaddress, updateUserAddress as updateAddressInRepo } from "../repositories/userProfile.repository";
+import { getSavedFoodsByUser } from "../repositories/userProfile.repository";
 import User from "../models/userModel";
-import type { UserProfile, UserAddress } from "../types";
+import type { UserProfile, UserAddress, SavedFood } from "../types";
+
+type RawAddressUpdate = Partial<UserAddress> & {
+  postalcode?: string;
+  label?: string;
+};
+
+const normalizeAddressUpdate = (updateData: Partial<UserAddress>): Partial<UserAddress> => {
+  const raw = { ...(updateData as RawAddressUpdate) };
+
+  if (raw.postalcode && !raw.postalCode) {
+    raw.postalCode = raw.postalcode;
+  }
+  delete raw.postalcode;
+
+  if (typeof raw.label === 'string') {
+    const normalized = raw.label.trim().toLowerCase();
+    if (normalized === 'home') raw.label = 'Home';
+    if (normalized === 'work') raw.label = 'Work';
+    if (normalized === 'other') raw.label = 'Other';
+  }
+
+  return raw;
+};
 
 export const getUserProfile = async (userId: string): Promise<UserProfile> => {
   if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
@@ -89,9 +113,20 @@ export const updateAddress = async(userId: string, addressId: string, updateData
   if (!addressId.match(/^[0-9a-fA-F]{24}$/)) {
     throw new ValidationError('Invalid address ID format');
   }
-  
-  const updatedProfile = await updateAddressInRepo(userId, addressId, updateData);
+
+  const normalizedUpdateData = normalizeAddressUpdate(updateData);
+  const updatedProfile = await updateAddressInRepo(userId, addressId, normalizedUpdateData);
   if (!updatedProfile) {
+    const existingProfile = await getAddressesFromRepo(userId);
+    if (!existingProfile) {
+      throw new ValidationError('User profile not found');
+    }
+
+    const hasAddress = (existingProfile.address || []).some((addr) => addr._id?.toString() === addressId);
+    if (!hasAddress) {
+      throw new ValidationError('Address not found for this user');
+    }
+
     throw new ValidationError('Failed to update address');
   }
 
@@ -130,4 +165,31 @@ export const setDefaultAddress = async(userId: string, addressId: string): Promi
   }
 
   return updatedAddress;
+};
+
+export const getSavedFoods = async (userId: string): Promise<SavedFood[]> => {
+  if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ValidationError('Invalid user ID format');
+  }
+
+  const savedItems = await getSavedFoodsByUser(userId);
+
+  return savedItems
+    .filter((savedItem) => savedItem.food !== null)
+    .map((savedItem) => ({
+      saveId: savedItem._id.toString(),
+      savedAt: savedItem.createdAt,
+      food: {
+        id: savedItem.food!._id.toString(),
+        name: savedItem.food!.name,
+        image: savedItem.food!.image,
+        video: savedItem.food!.video,
+        type: savedItem.food!.type,
+        description: savedItem.food!.description,
+        price: savedItem.food!.price,
+        likeCount: savedItem.food!.likeCount,
+        saveCount: savedItem.food!.saveCount,
+        foodPartner: savedItem.food!.foodPartner.toString(),
+      },
+    }));
 };
