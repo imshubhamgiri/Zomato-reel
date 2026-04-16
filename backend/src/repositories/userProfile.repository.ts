@@ -3,6 +3,34 @@ import { Types } from 'mongoose';
 import type { UserAddress } from '../types';
 import Save from '../models/save.model';
 
+const ADDRESS_UPDATABLE_FIELDS: Array<keyof UserAddress> = [
+  'label',
+  'fullName',
+  'phone',
+  'locality',
+  'address',
+  'city',
+  'state',
+  'postalCode',
+  'country',
+  'landmark',
+  'alternatePhone',
+  'isDefault',
+];
+
+const buildAddressSetUpdate = (updateData: Partial<UserAddress>): Record<string, unknown> => {
+  const setUpdate: Record<string, unknown> = {};
+
+  for (const field of ADDRESS_UPDATABLE_FIELDS) {
+    const value = updateData[field];
+    if (value !== undefined) {
+      setUpdate[`address.$.${String(field)}`] = value;
+    }
+  }
+
+  return setUpdate;
+};
+
 export interface UserProfileRecord {
   _id: Types.ObjectId;
   name: string;
@@ -63,12 +91,20 @@ export const deleteUserAddress = (userId: string, addressId: string): Promise<Us
 };
 
 export const updateUserAddress = (userId: string, addressId: string, updateData: Partial<UserAddress>): Promise<UserProfileRecord | null> => {
-  return User.findByIdAndUpdate(
-    userId,
-    { $set: { 'address.$[addr]': updateData } },
-    { 
+  const setUpdate = buildAddressSetUpdate(updateData);
+
+  if (Object.keys(setUpdate).length === 0) {
+    return User.findById(userId)
+      .select('_id name email phone gender address')
+      .lean() as Promise<UserProfileRecord | null>;
+  }
+
+  return User.findOneAndUpdate(
+    { _id: userId, 'address._id': new Types.ObjectId(addressId) },
+    { $set: setUpdate },
+    {
       new: true,
-      arrayFilters: [{ 'addr._id': addressId }],
+      runValidators: true,
       select: '_id name email phone gender address'
     }
   ).lean() as Promise<UserProfileRecord | null>;
