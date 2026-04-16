@@ -67,6 +67,146 @@ const refreshTokenSchema = z.object({
   refreshToken: z.string().optional(),
 });
 
+const normalizeAddressPayload = (raw: unknown): unknown => {
+  if (!raw || typeof raw !== 'object') {
+    return raw;
+  }
+
+  const body = { ...(raw as Record<string, unknown>) };
+
+  if (typeof body.postalcode === 'string' && typeof body.postalCode !== 'string') {
+    body.postalCode = body.postalcode;
+  }
+
+  if (typeof body.label === 'string') {
+    body.label = body.label.trim().toLowerCase();
+  }
+
+  return body;
+};
+
+const requiredTrimmedString = (field: string, min = 1, max = 250, lowercase = false) =>
+  z.preprocess(
+    (value) => {
+      if (typeof value !== 'string') return value;
+      const trimmed = value.trim();
+      return lowercase ? trimmed.toLowerCase() : trimmed;
+    },
+    z.string().min(min, `${field} is required`).max(max, `${field} is too long`)
+  );
+
+const optionalTrimmedString = (max = 250, lowercase = false) =>
+  z.preprocess(
+    (value) => {
+      if (value === undefined || value === null) return undefined;
+      if (typeof value !== 'string') return value;
+      const trimmed = value.trim();
+      if (!trimmed) return undefined;
+      return lowercase ? trimmed.toLowerCase() : trimmed;
+    },
+    z.string().max(max, 'Field is too long').optional()
+  );
+
+const normalizedLabelSchema = z
+  .enum(['home', 'work', 'other'], { message: 'Label must be Home, Work, or Other' })
+  .transform((label) => {
+    if (label === 'home') return 'Home' as const;
+    if (label === 'work') return 'Work' as const;
+    return 'Other' as const;
+  });
+
+const addAddressSchema = z.preprocess(
+  normalizeAddressPayload,
+  z.object({
+    fullName: requiredTrimmedString('Full name', 2, 100),
+    phone: z.preprocess(
+      (value) => (typeof value === 'string' ? value.trim() : value),
+      z.string().regex(/^[0-9]{10}$/, 'Phone must be 10 digits')
+    ),
+    postalCode: z.preprocess(
+      (value) => (typeof value === 'string' ? value.trim() : value),
+      z.string().regex(/^[0-9]{6}$/, 'Postal code must be 6 digits')
+    ),
+    locality: requiredTrimmedString('Locality', 2, 120, true),
+    address: requiredTrimmedString('Address', 3, 250, true),
+    city: requiredTrimmedString('City', 2, 80, true),
+    state: requiredTrimmedString('State', 2, 80, true),
+    country: optionalTrimmedString(80, true),
+    landmark: optionalTrimmedString(120, true),
+    alternatePhone: z.preprocess(
+      (value) => {
+        if (value === undefined || value === null) return undefined;
+        if (typeof value !== 'string') return value;
+        const trimmed = value.trim();
+        return trimmed || undefined;
+      },
+      z
+        .string()
+        .regex(/^[0-9]{10}$/, 'Alternate phone must be 10 digits')
+        .optional()
+    ),
+    label: normalizedLabelSchema.default('Home'),
+    isDefault: z.boolean().optional(),
+  })
+);
+
+const updateAddressSchema = z.preprocess(
+  normalizeAddressPayload,
+  z
+    .object({
+      fullName: optionalTrimmedString(100),
+      phone: z.preprocess(
+        (value) => {
+          if (value === undefined || value === null) return undefined;
+          if (typeof value !== 'string') return value;
+          const trimmed = value.trim();
+          return trimmed || undefined;
+        },
+        z.string().regex(/^[0-9]{10}$/, 'Phone must be 10 digits').optional()
+      ),
+      postalCode: z.preprocess(
+        (value) => {
+          if (value === undefined || value === null) return undefined;
+          if (typeof value !== 'string') return value;
+          const trimmed = value.trim();
+          return trimmed || undefined;
+        },
+        z.string().regex(/^[0-9]{6}$/, 'Postal code must be 6 digits').optional()
+      ),
+      locality: optionalTrimmedString(120, true),
+      address: optionalTrimmedString(250, true),
+      city: optionalTrimmedString(80, true),
+      state: optionalTrimmedString(80, true),
+      country: optionalTrimmedString(80, true),
+      landmark: optionalTrimmedString(120, true),
+      alternatePhone: z.preprocess(
+        (value) => {
+          if (value === undefined || value === null) return undefined;
+          if (typeof value !== 'string') return value;
+          const trimmed = value.trim();
+          return trimmed || undefined;
+        },
+        z
+          .string()
+          .regex(/^[0-9]{10}$/, 'Alternate phone must be 10 digits')
+          .optional()
+      ),
+      label: z.preprocess(
+        (value) => {
+          if (value === undefined || value === null) return undefined;
+          if (typeof value !== 'string') return value;
+          const trimmed = value.trim();
+          return trimmed ? trimmed.toLowerCase() : undefined;
+        },
+        normalizedLabelSchema.optional()
+      ),
+      isDefault: z.boolean().optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'At least one address field is required for update',
+    })
+);
+
 
 type RegisterRequest = Request<{}, {}, ProfileRegister>;
 
@@ -158,4 +298,20 @@ export const validateRefreshTokenRequest = (
   next: NextFunction
 ): void => {
   validateSchema<{ refreshToken?: string }>(refreshTokenSchema, req, res, next);
+};
+
+export const validateAddAddressRequest = (
+  req: Request,
+  res: Response<ErrorResponse>,
+  next: NextFunction
+): void => {
+  validateSchema(addAddressSchema, req, res, next);
+};
+
+export const validateUpdateAddressRequest = (
+  req: Request,
+  res: Response<ErrorResponse>,
+  next: NextFunction
+): void => {
+  validateSchema(updateAddressSchema, req, res, next);
 };
