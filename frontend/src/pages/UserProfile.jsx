@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
-import ProfileSidebar from '../components/ProfileSidebar';
-import ProfileInfo from '../components/ProfileInfo';
+import ProfileSidebar from '../components/user-profile/ProfileSidebar';
+import ProfileInfo from '../components/user-profile/ProfileInfo';
 import { useAppContext } from '../context/AppContext';
-import AddressInfo from '../components/AddressInfo';
+import AddressInfo from '../components/user-profile/AddressInfo';
+import SavedFoodsTab from '../components/user-profile/SavedFoodsTab';
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -75,17 +76,11 @@ function UserProfile() {
              )}
              
              {activeTab === 'saved' && (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
-                  <svg className="w-20 h-20 text-blue-300 dark:text-blue-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Saved Reels & Foods</h2>
-                  <p className="text-slate-500 dark:text-slate-300 max-w-sm">Save your favorite dishes or food reels here to easily find them later.</p>
-                </div>
+                <SavedFoodsTab />
              )}
              
              {activeTab === 'addresses' && (
-                <AddressInfo user={user} />
+               <AddressInfo />
              )}
              
              {activeTab === 'payments' && (

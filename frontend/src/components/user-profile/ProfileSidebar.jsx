@@ -26,7 +26,6 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* User Info Card */}
       <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl p-6 shadow-lg shadow-blue-100 dark:shadow-black/30 border border-blue-100/70 dark:border-slate-700 backdrop-blur-sm flex items-center gap-4">
         <div className="w-16 h-16 rounded-full bg-gray-300 dark:bg-slate-600 flex items-center justify-center text-white text-2xl font-bold uppercase ">
           {user?.name?.charAt(0) || 'U'}
@@ -37,7 +36,6 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
         </div>
       </div>
 
-      {/* Navigation Menu */}
       <div className="bg-white/85 dark:bg-slate-900/75 rounded-2xl shadow-lg shadow-sky-200 dark:shadow-black/30 border border-blue-100/70 dark:border-slate-700 overflow-hidden backdrop-blur-sm">
         {menuGroups.map((group, groupIdx) => (
           <div key={groupIdx} className={`${groupIdx !== 0 ? 'border-t border-blue-100 dark:border-slate-700' : ''}`}>
@@ -52,15 +50,15 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
                     className={`flex items-center gap-4 px-6 py-4 transition-all duration-200 text-left hover:text-white hover:bg-blue-600 dark:hover:bg-sky-800 group ${
-                      isActive 
-                        ? 'dark:bg-gray-800 bg-blue-500 text-white border-r-4 border-blue-500' 
+                      isActive
+                        ? 'dark:bg-gray-800 bg-blue-500 text-white border-r-4 border-blue-500'
                         : 'text-slate-600 dark:text-slate-300'
                     }`}
                   >
-                    <svg 
-                      className={`w-5 h-5 transition-colors ${isActive ? 'text-emerald-500' : 'text-slate-400 group-hover:text-emerald-400'}`} 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
+                    <svg
+                      className={`w-5 h-5 transition-colors ${isActive ? 'text-emerald-500' : 'text-slate-400 group-hover:text-emerald-400'}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2.5 : 2} d={item.icon} />
@@ -70,11 +68,9 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
                 );
               })}
             </div>
-
           </div>
         ))}
-        
-        {/* Logout (Non-tab action) */}
+
         <div className="border-t border-emerald-100 dark:border-slate-700">
           <button className="flex items-center gap-4 px-6 py-4 w-full text-left text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group">
             <svg className="w-5 h-5 text-slate-400 group-hover:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,4 +83,3 @@ export default function ProfileSidebar({ user, activeTab, setActiveTab }) {
     </div>
   );
 }
-

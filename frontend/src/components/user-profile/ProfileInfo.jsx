@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import PersonalDetailsSection from './profile/PersonalDetailsSection';
-import ContactInfoSection from './profile/ContactInfoSection';
-import ProfileFaqSection from './profile/ProfileFaqSection';
-import useUserProfileForm from '../hooks/useUserProfileForm';
+import useUserProfileForm from '../../hooks/useUserProfileForm';
+import ContactInfoSection from './sections/ContactInfoSection';
+import PersonalDetailsSection from './sections/PersonalDetailsSection';
+import ProfileFaqSection from './sections/ProfileFaqSection';
 
 export default function ProfileInfo({ user }) {
   const [isEditingData, setIsEditingData] = useState(false);
@@ -111,9 +111,7 @@ export default function ProfileInfo({ user }) {
         <div className="h-px bg-gray-100 dark:bg-gray-700 w-full" />
 
         <ProfileFaqSection />
-
       </div>
     </div>
   );
 }
-

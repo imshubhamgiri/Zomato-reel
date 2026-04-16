@@ -1,5 +1,5 @@
 import React from 'react';
-import FormInput from '../ui/FormInput';
+import FormInput from '../../ui/FormInput';
 
 export default function PersonalDetailsSection({
   isEditing,
