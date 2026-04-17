@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import API_URL from '../config/Api';
+import API_URL from '../config/api';
 import { partnerAPI } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 const mapProfile = (profile = {}) => ({

@@ -83,10 +83,10 @@ const Addressbar = ({
 
             {/* address details  should be written like this - PD House, Mouna banganj , daldali bazar, Chapra, Bihar - 841301*/}
             <div className='text-sm flex gap-2'>
-                <p className='text-gray-600 dark:text-gray-400'>{address || '123 Main St'}</p>
-                <p className='text-gray-600 dark:text-gray-400'>{locality || '123 Main St'}</p>
-                <p className='text-gray-600 dark:text-gray-400'>{city || 'New York'}, {state || 'NY'} - {postalCode || '10001'}</p>
-                <p className='text-gray-600 dark:text-gray-400'>{country || 'United States'}</p>
+                <p className='text-gray-600 dark:text-gray-400'>{address || ''}</p>
+                <p className='text-gray-600 dark:text-gray-400'>{locality || ''}</p>
+                <p className='text-gray-600 dark:text-gray-400'>{city || 'New '}, {state || ''} - {postalCode || ''}</p>
+                <p className='text-gray-600 dark:text-gray-400'>{country || 'India'}</p>
                 {landmark && (
                     <p className='text-gray-600 dark:text-gray-400'>Near {landmark}</p>
                 )}
