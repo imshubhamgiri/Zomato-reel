@@ -1,7 +1,7 @@
 import React, { useState, useEffect , useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
-import API_URL from '../config/Api.js'
+import API_URL from '../config/api.js'
 
 const API_BASE = API_URL.endsWith('/api') ? API_URL : `${API_URL}/api`;
 
