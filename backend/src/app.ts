@@ -12,6 +12,7 @@ import { globalApiLimiter } from './middleware/rateLimiter';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { helmetMiddleware } from './middleware/helmet';
 import userprofileRoutes from './routes/userProfiles.routes';
+import { getDbHealth } from './db/db';
 
 
 dotenv.config();
@@ -43,12 +44,16 @@ app.get('/', (_req, res) => {
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
-  res.json({
-    status: 'healthy',
+  const db = getDbHealth();
+  const status = db.isConnected ? 'healthy' : 'degraded';
+
+  res.status(db.isConnected ? 200 : 503).json({
+    status,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
-    service: 'Zomato-Reel API'
+    service: 'Zomato-Reel API',
+    db,
   });
 });
 
