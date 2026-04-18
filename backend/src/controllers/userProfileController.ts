@@ -27,6 +27,13 @@ interface UserAddressInput {
   isDefault?: boolean;
 }
 
+const getAddressIdParam = (raw: string | string[] | undefined): string => {
+  if (Array.isArray(raw)) {
+    return raw[0] ?? '';
+  }
+  return raw ?? '';
+};
+
 export const getUserProfile = asyncHandler
 ( async (req: AuthenticatedRequest, res: Response<ApiResponse<UserProfile> | ErrorResponse>): Promise<void> => {
     const user = req.user;
@@ -126,7 +133,14 @@ export const deleteUserAddress = asyncHandler(async(req: AuthenticatedRequest, r
   if (!user) {
     throw new AuthError('User not authenticated');
   }
-  const { addressId } = req.params;
+  const addressId = getAddressIdParam((req.params as { addressId?: string | string[] }).addressId);
+  if (!addressId) {
+    res.status(400).json({
+      success: false,
+      message: 'Address ID is required',
+    });
+    return;
+  }
   await userProfileService.deleteUserAddress(user.id, addressId);
   res.status(200).json({
     success: true,
@@ -139,7 +153,14 @@ export const updateUserAddress = asyncHandler(async(req: AuthenticatedRequest & 
   if (!user) {
     throw new AuthError('User not authenticated');
   }
-  const { addressId } = req.params;
+  const addressId = getAddressIdParam((req.params as { addressId?: string | string[] }).addressId);
+  if (!addressId) {
+    res.status(400).json({
+      success: false,
+      message: 'Address ID is required',
+    });
+    return;
+  }
   
   const updatedAddress = await userProfileService.updateAddress(user.id, addressId, req.body);
   if (!updatedAddress) {
@@ -161,7 +182,14 @@ export const setDefaultAddress = asyncHandler(async(req: AuthenticatedRequest, r
   if (!user) {
     throw new AuthError('User not authenticated');
   }
-  const { addressId } = req.params;
+  const addressId = getAddressIdParam((req.params as { addressId?: string | string[] }).addressId);
+  if (!addressId) {
+    res.status(400).json({
+      success: false,
+      message: 'Address ID is required',
+    });
+    return;
+  }
   
   const updatedAddress = await userProfileService.setDefaultAddress(user.id, addressId);
   if (!updatedAddress) {
