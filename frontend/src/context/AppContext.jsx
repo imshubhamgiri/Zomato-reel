@@ -21,12 +21,14 @@ export const AppProvider = ({ children }) => {
         const response = await userAPI.login(userData);
         setUser(response.user);
         setIsAuthenticated(true);
+        return response;
     }
 
     const register = async (userData) => {
         const response = await userAPI.register(userData);
         setUser(response.user);
         setIsAuthenticated(true);
+        return response;
     }
 
     const logout = async () => {
@@ -39,6 +41,7 @@ export const AppProvider = ({ children }) => {
         const response = await partnerAPI.register(partnerData);
         setUser(response.user);
         setIsAuthenticated(true);
+        return response;
     }
 
     const partnerLogin = async (partnerData) => {
@@ -46,6 +49,7 @@ export const AppProvider = ({ children }) => {
         setUser(response.user);
         setIsAuthenticated(true);
         console.log("Partner logged in:", response);
+        return response;
     }
 
     const partnerLogout = async () => {

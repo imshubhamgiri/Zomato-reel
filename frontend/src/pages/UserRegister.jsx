@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { userAPI, authAPI } from '../services/api';
+import { useAppContext } from '../context/AppContext';
 
 function UserRegister() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
+  const { register } = useAppContext();
   const handleSubmit = async (e) => {
     e.preventDefault();
     const name = e.target.fullname.value;
@@ -13,18 +13,17 @@ function UserRegister() {
     const password = e.target.password.value;
 
     try {
-     const {data} =  await userAPI.register(name, email, password); 
-     if(data.status == 201){  // Check user type and navigate accordingly
-       const authCheck = await authAPI.checkAuth();
-       if (authCheck.userType === 'partner') {
-         navigate('/partner/profile');
-       } else {
-         navigate('/user/profile');
-       }
-     }     
+      const response = await register({ name, email, password });
+      if (response?.user?.userType === 'user') {
+        navigate('/user/profile');
+      }
     } catch (error) {
       console.error(error?.message || 'registration failed');
-      setError(error?.response?.data?.error || error?.message || "Registration failed");
+      const serverError = error?.response?.data?.error;
+      const normalizedError = Array.isArray(serverError)
+        ? serverError.map((item) => item.message).join(', ')
+        : serverError;
+      setError(normalizedError || error?.response?.data?.message || error?.message || 'Registration failed');
     }
     console.log(error);
   };

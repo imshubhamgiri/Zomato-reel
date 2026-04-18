@@ -26,6 +26,34 @@ export const errorHandler = (
   _next: NextFunction
 ): void => {
 
+  const maybeParseError = err as {
+    type?: string;
+    status?: number;
+    statusCode?: number;
+    body?: string;
+    message?: string;
+  };
+
+  if (maybeParseError?.type === 'entity.parse.failed') {
+    console.error('[BadRequest] Invalid JSON payload', {
+      body: maybeParseError.body,
+      message: maybeParseError.message,
+    });
+
+    const response: ClientErrorResponse = {
+      success: false,
+      message: 'Invalid JSON payload. Please send a valid JSON object.',
+      timestamp: new Date().toISOString(),
+    };
+
+    if (process.env.NODE_ENV === 'development') {
+      response.error = maybeParseError.message || 'entity.parse.failed';
+    }
+
+    res.status(maybeParseError.statusCode || maybeParseError.status || 400).json(response);
+    return;
+  }
+
   if (err instanceof AppError) {
     console.error(`[${err.name}] ${err.message}`);
 
