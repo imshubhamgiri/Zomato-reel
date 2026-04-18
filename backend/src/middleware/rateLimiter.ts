@@ -22,6 +22,17 @@ export const authLimiter = rateLimit({
   },
 });
 
+export const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many token refresh attempts, please try again later.',
+  },
+});
+
 export const actionLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 60,

@@ -1,7 +1,7 @@
 import express from 'express';
 import * as authController from '../controllers/authController';
 import { requireAuth } from '../middleware/auth';
-import { authLimiter } from '../middleware/rateLimiter';
+import { authLimiter, refreshLimiter } from '../middleware/rateLimiter';
 import {
 	validatePartnerLogin,
 	validatePartnerRegister,
@@ -24,7 +24,7 @@ authRoutes.post('/partners/login', authLimiter, validatePartnerLogin, authContro
 authRoutes.post('/partners/logout', requireAuth, authController.logoutFoodpartner)
 authRoutes.get('/partners/logout', requireAuth, authController.logoutFoodpartner)
 
-authRoutes.post('/refresh', authLimiter, authController.refreshToken)
+authRoutes.post('/refresh', refreshLimiter, authController.refreshToken)
 authRoutes.get('/me', requireAuth, authController.getMe)
 
 export default authRoutes;
