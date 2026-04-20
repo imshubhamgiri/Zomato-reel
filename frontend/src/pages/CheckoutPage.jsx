@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { profileAPI } from '../services/api';
 
 const SAMPLE_ADDRESSES = [
   {
@@ -34,14 +35,29 @@ const formatMoney = (amount) => `Rs ${Number(amount || 0).toFixed(2)}`;
 
 const CheckoutPage = () => {
   const location = useLocation();
+  const [addresses, setAddresses] = useState([]);
   const navigate = useNavigate();
   const food = location.state?.food;
 
-  const [selectedAddressId, setSelectedAddressId] = useState(SAMPLE_ADDRESSES[0].id);
+  const [selectedAddressId, setSelectedAddressId] = useState();
   const [quantity, setQuantity] = useState(1);
 
+  const getAddres = async() =>{
+      await profileAPI.getAddress().then((response)=>{
+      console.log('address response', response);
+      setAddresses(response.data);
+      setSelectedAddressId(response.data[0]?._id);
+    }).catch((error)=>{
+
+    })
+  }
+
+  useEffect(()=>{
+  getAddres();
+  },[])
+
   const selectedAddress = useMemo(
-    () => SAMPLE_ADDRESSES.find((addr) => addr.id === selectedAddressId),
+    () => addresses.find((addr) => addr._id === selectedAddressId),
     [selectedAddressId]
   );
 
@@ -111,12 +127,15 @@ const CheckoutPage = () => {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Delivery Address</h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Choose an available address for this order.</p>
 
-            <div className="mt-4 space-y-3">
-              {SAMPLE_ADDRESSES.map((address) => {
-                const isSelected = selectedAddressId === address.id;
+            <div className="mt-4 space-y-3 overflow-y-auto max-h-56 " style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(100, 100, 100, 0.5) transparent',
+            }} >
+              {addresses.map((address) => {
+                const isSelected = selectedAddressId === address._id;
                 return (
                   <label
-                    key={address.id}
+                    key={address._id}
                     className={`block cursor-pointer rounded-lg border p-4 transition ${
                       isSelected
                         ? 'border-blue-700 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/30'
@@ -128,7 +147,7 @@ const CheckoutPage = () => {
                         type="radio"
                         name="address"
                         checked={isSelected}
-                        onChange={() => setSelectedAddressId(address.id)}
+                        onChange={() => setSelectedAddressId(address._id)}
                         className="mt-1 h-4 w-4 accent-blue-700"
                       />
                       <div>
