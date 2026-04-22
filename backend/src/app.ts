@@ -52,7 +52,7 @@ app.get('/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
-    service: 'Zomato-Reel API',
+    service: 'FoodInReels API',
     db,
   });
 });
