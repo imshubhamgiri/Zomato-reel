@@ -1,4 +1,4 @@
-import { IOrder } from '../models/order.model';
+import type { IOrder } from '../models/order.model';
 import { createOrder as createOrderRepo } from '../repositories/orders.repository';
 
 type CreateOrderItemInput = {

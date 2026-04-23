@@ -40,7 +40,7 @@ interface OrderItem {
   priceSnapshot: number;
 }
 
-interface IOrder {
+ export interface IOrder {
   user: Types.ObjectId;
   foodPartner: Types.ObjectId;
   userAddressId?: Types.ObjectId;

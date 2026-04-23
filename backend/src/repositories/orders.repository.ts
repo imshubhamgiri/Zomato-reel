@@ -1,4 +1,5 @@
-import Order, { IOrder } from '../models/order.model';
+import Order from '../models/order.model';
+import type { IOrder } from '../models/order.model';
 
 type CreateOrderRepositoryInput = Pick<
     IOrder,
