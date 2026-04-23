@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes';
 import foodRoutes from './routes/food.routes';
 import profileRoutes from './routes/partnerProfile.routes';
 import actionRoutes from './routes/useraction.routes';
+import orderRoutes from './routes/order.routes';
 import corsMiddleware from './middleware/cors';
 import logger from './middleware/logging';
 import { attachAuthContext } from './middleware/auth';
@@ -37,6 +38,7 @@ app.use('/api/foods', foodRoutes);
 app.use('/api/users', userprofileRoutes);
 app.use('/api/partners', profileRoutes);
 app.use('/api/actions',actionRoutes)
+app.use('/api/orders', orderRoutes);
 
 app.get('/', (_req, res) => {
   res.send('Hello, World!');
