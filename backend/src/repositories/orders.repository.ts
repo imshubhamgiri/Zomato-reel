@@ -1,8 +1,11 @@
-import Order from "../models/order.model";
-import { IOrder } from "../models/order.model";
+import Order, { IOrder } from '../models/order.model';
 
+type CreateOrderRepositoryInput = Pick<
+    IOrder,
+    'user' | 'foodPartner' | 'userAddressId' | 'deliveryAddressSnapshot' | 'items' | 'price'
+>;
 
-export const createdOrder = async(orderData:IOrder): Promise<IOrder> => {
+export const createOrder = async (orderData: CreateOrderRepositoryInput): Promise<IOrder> => {
     const order = new Order(orderData);
-    return await order.save();
-}
+    return order.save();
+};
