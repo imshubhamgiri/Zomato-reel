@@ -59,7 +59,7 @@ describe('Integration Tests - Health & Status Endpoints', () => {
     expect(response.body).toHaveProperty('timestamp');
     expect(response.body).toHaveProperty('uptime');
     expect(response.body).toHaveProperty('environment');
-    expect(response.body).toHaveProperty('service', 'Zomato-Reel API');
+    expect(response.body).toHaveProperty('service', 'FoodInReels API');
   });
 });
 
@@ -105,7 +105,7 @@ describe('Integration Tests - Authentication & Protected Routes', () => {
 
     expect(response.status).toBeGreaterThanOrEqual(400);
     expect(response.body).toHaveProperty('name');
-  }, 15000);
+  });
 });
 
 describe('Integration Tests - Error Handling & Validation', () => {
@@ -174,3 +174,73 @@ describe('Integration Tests - Multiple Request Scenarios', () => {
     expect(jsonResponse.body).toHaveProperty('status');
   });
 });
+
+
+describe('Integration Tests - Create Order Endpoint', () => {
+  // Test 11: Create order with valid data
+  it('POST /api/orders should create an order with valid data', async () => {
+      // First, we need to register and login a user to get an access token
+      const uniqueEmail = `testuser-${Date.now()}@example.com`;
+      const userCredentials = {
+        name: 'Test User',
+        email: uniqueEmail,
+        password: 'password123'
+      };
+
+      const userResponse = await request(app)
+        .post('/api/auth/users/register')
+        .send(userCredentials)
+        .expect(201);
+
+      expect(userResponse.body).toHaveProperty('user');
+      expect(userResponse.body).toHaveProperty('tokens');
+      const token = userResponse.body.tokens?.accessToken;
+
+      // Now we can create an order using the token
+      const orderData = {
+        foodPartner: '64b8f8d8f6e5c2a1b0d9e123',
+        deliveryAddressSnapshot: {
+          fullName: 'Test User',
+          phone: '9876543210',
+          address: '123 Main St',
+          city: 'Anytown',
+          state: 'California',
+          postalCode: '123456',
+          country: 'India',
+        },
+        items: [
+          {
+            food: '64b8f8d8f6e5c2a1b0d9e124',
+            nameSnapshot: 'Test Food Item',
+            quantity: 2,
+            priceSnapshot: 500
+          }
+        ]
+      };
+
+      const orderResponse = await request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${token}`)
+        .send(orderData)
+        .expect(201);
+
+      expect(orderResponse.body).toHaveProperty('data');
+      expect(orderResponse.body.data).toHaveProperty('price');
+
+
+    });
+
+
+  // Test 12: Create order without authentication
+  // it('POST /api/orders should return 401 when user is not authenticated', async () => {
+
+  // });
+
+  // Test 13: Create order with missing required fields
+  // it('POST /api/orders should return error for missing required fields', async () => {});
+
+  // Test 14: Create order with invalid data types
+  // it('POST /api/orders should return error for invalid data types', async () => {});
+
+
+})
