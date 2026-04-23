@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import type { ProfileRegister, UserLogin, FoodPartnerRegister, FoodPartnerLogin, AddFoodRequest, UpdateFoodRequest } from '../types';
+import type { ProfileRegister, UserLogin, FoodPartnerRegister, FoodPartnerLogin, AddFoodRequest, UpdateFoodRequest, CreateOrder } from '../types';
 import * as z from 'zod';
 
 type ErrorResponse = {
@@ -208,6 +208,41 @@ const updateAddressSchema = z.preprocess(
 );
 
 
+const createOrderSchema = z.object({
+  foodPartner: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Food partner ID must be a valid ObjectId'),
+  userAddressId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, 'User address ID must be a valid ObjectId')
+    .optional(),
+  deliveryAddressSnapshot: z.object({
+    label: z.enum(['Home', 'Work', 'Other']).optional(),
+    fullName: z.string().min(2, 'Full name is required').max(100, 'Full name is too long').trim(),
+    phone: z.string().regex(/^[0-9]{10}$/, 'Phone must be 10 digits'),
+    locality: z.string().max(120, 'Locality is too long').trim().optional(),
+    address: z.string().min(3, 'Address is required').max(250, 'Address is too long').trim(),
+    city: z.string().min(2, 'City is required').max(80, 'City is too long').trim(),
+    state: z.string().min(2, 'State is required').max(80, 'State is too long').trim(),
+    postalCode: z.string().regex(/^[0-9]{6}$/, 'Postal code must be 6 digits'),
+    country: z.string().min(2, 'Country is required').max(80, 'Country is too long').trim(),
+    landmark: z.string().max(120, 'Landmark is too long').trim().optional(),
+    alternatePhone: z.string().regex(/^[0-9]{10}$/, 'Alternate phone must be 10 digits').optional(),
+  }),
+  items: z.array(
+    z.object({
+      food: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Food ID must be a valid ObjectId'),
+      nameSnapshot: z.string().min(1, 'Item nameSnapshot is required').trim(),
+      quantity: z.number().int().positive('Quantity must be at least 1'),
+      priceSnapshot: z.number().nonnegative('Price snapshot must be a non-negative number'),
+    })
+  ).min(1, 'Order must contain at least one item'),
+}).refine(
+  (data) => data.items.reduce((sum, item) => sum + item.quantity * item.priceSnapshot, 0) > 0,
+  {
+    message: 'Order total must be greater than 0',
+    path: ['items'],
+  }
+);
+
 type RegisterRequest = Request<{}, {}, ProfileRegister>;
 
 const validateSchema = <T>(
@@ -314,4 +349,20 @@ export const validateUpdateAddressRequest = (
   next: NextFunction
 ): void => {
   validateSchema(updateAddressSchema, req, res, next);
+};
+
+export const validateObjectIdParam = (paramName: string) => (
+  req: Request,
+  res: Response<ErrorResponse>,
+  next: NextFunction
+): void => {
+  validateSchema(z.object({ [paramName]: z.string().regex(/^[0-9a-fA-F]{24}$/, `${paramName} must be a valid ObjectId`) }), req, res, next);
+}
+
+export const validateOrderSchemaRequest = (
+  req: Request<{}, {}, CreateOrder>,
+  res: Response<ErrorResponse>,
+  next: NextFunction
+): void => {
+  validateSchema(createOrderSchema, req, res, next);
 };
