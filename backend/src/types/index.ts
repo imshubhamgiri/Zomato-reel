@@ -110,6 +110,9 @@ export interface AuthenticatedRequest extends Request {
   user?: AuthUser;
 }
 
+
+
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -129,7 +132,7 @@ export interface AuthTokens {
 
 /**
  * Pagination params
- */
+*/
 export interface PaginationParams {
   page: number;
   limit: number;
@@ -139,7 +142,7 @@ export interface PaginationParams {
 
 /**
  * Standard paginated response
- */
+*/
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   pagination: PaginationParams;
 }
@@ -154,44 +157,44 @@ export interface ErrorResponse extends ApiResponse {
 }
 
 export interface ProfileRegister{
-    name:string;
-    email:string;
-    password:string;
+  name:string;
+  email:string;
+  password:string;
 }
 export interface UserLogin{
-    email:string;
-    password:string;
+  email:string;
+  password:string;
 }
 export interface FoodPartnerRegister{
-    name:string;
-    email:string;
-    password:string;
-    restaurantName:string;
-    phone:string;
-    address:string;
+  name:string;
+  email:string;
+  password:string;
+  restaurantName:string;
+  phone:string;
+  address:string;
 }
 export interface PartnerResponse{
-    id: string;
-    name:string;
-    email:string;
-    restaurantName:string;
-    phone:string;
-    address:string;
-    userType?: 'partner';
+  id: string;
+  name:string;
+  email:string;
+  restaurantName:string;
+  phone:string;
+  address:string;
+  userType?: 'partner';
 }
 export interface FoodPartnerLogin{
-    email:string;
-    password:string;
+  email:string;
+  password:string;
 }
 
 export interface ProfileResponse {
-    id: string;
+  id: string;
     name: string;
     email: string;
     userType?: 'user';
-}
-
-export interface UserAddress {
+  }
+  
+  export interface UserAddress {
     _id?: Types.ObjectId;
     label?: 'Home' | 'Work' | 'Other';
     fullName?: string;
@@ -205,29 +208,56 @@ export interface UserAddress {
     landmark?: string;
     alternatePhone?: string;
     isDefault?: boolean;
-}
-
-export interface UserProfile {
+  }
+  
+  export interface UserProfile {
     id: string;
     name: string;
     email: string;
     phone?: string;
     gender?: 'Male' | 'Female' | 'Other';
+  }
+  
+  export interface SavedFood {
+    saveId: string;
+    savedAt: Date;
+    food: {
+      id: string;
+      name: string;
+      image?: string;
+      video?: string;
+      type: 'standard' | 'reel';
+      description: string;
+      price: number;
+      likeCount: number;
+      saveCount: number;
+      foodPartner: string;
+    };
+  }
+export interface CreateOrderItem {
+  food: string;
+  nameSnapshot: string;
+  quantity: number;
+  priceSnapshot: number;
 }
 
-export interface SavedFood {
-  saveId: string;
-  savedAt: Date;
-  food: {
-    id: string;
-    name: string;
-    image?: string;
-    video?: string;
-    type: 'standard' | 'reel';
-    description: string;
-    price: number;
-    likeCount: number;
-    saveCount: number;
-    foodPartner: string;
-  };
+export interface DeliveryAddressSnapshotPayload {
+  label?: 'Home' | 'Work' | 'Other';
+  fullName: string;
+  phone: string;
+  locality?: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  landmark?: string;
+  alternatePhone?: string;
+}
+
+export interface CreateOrder {
+  foodPartner: string;
+  userAddressId?: string;
+  deliveryAddressSnapshot: DeliveryAddressSnapshotPayload;
+  items: CreateOrderItem[];
 }
