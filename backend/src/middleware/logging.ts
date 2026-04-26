@@ -6,11 +6,11 @@ const logger = (req: AuthenticatedRequest, res: Response, next: NextFunction): v
   const startedAt = Date.now();
   const userTag = req.user ? `${req.user.type}:${req.user.id}` : 'anonymous';
 
-  console.log('🔵 MIDDLEWARE: Request started', req.method, req.originalUrl);
+  // console.log('🔵 MIDDLEWARE: Request started', req.method, req.originalUrl);
 
   res.on('finish', () => {
     const durationMs = Date.now() - startedAt;
-    console.log(`[${new Date().toISOString()}] ${res.statusCode} ${req.method} ${req.originalUrl} user=${userTag} ${durationMs}ms`);
+    // console.log(`[${new Date().toISOString()}] ${res.statusCode} ${req.method} ${req.originalUrl} user=${userTag} ${durationMs}ms`);
     appLogger.info('HTTP request completed', {
       method: req.method,
       path: req.originalUrl,

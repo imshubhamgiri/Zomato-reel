@@ -9,7 +9,6 @@ export const findLike = async (userId: string, foodId: string, session?: ClientS
 
 export const createLike = async (userId: string, foodId: string, session?: ClientSession): Promise<any> => {
   const [created] = await Like.create([{ userId, food: foodId }], { session });
-  console.log('Created Like:', created);
   return created;
 };
 
