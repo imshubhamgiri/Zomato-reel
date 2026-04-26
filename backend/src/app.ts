@@ -1,6 +1,5 @@
 import express  from 'express';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import foodRoutes from './routes/food.routes';
 import profileRoutes from './routes/partnerProfile.routes';
@@ -15,10 +14,9 @@ import { helmetMiddleware } from './middleware/helmet';
 import userprofileRoutes from './routes/userProfiles.routes';
 import { getDbHealth } from './db/db';
 
-
-dotenv.config();
-
 const app = express();
+
+app.use(logger);
 
 app.use(helmetMiddleware);
 app.use(globalApiLimiter);
@@ -29,7 +27,6 @@ app.use(express.json());
 // GLOBAL MIDDLEWARES (run before all routes)
 app.use(corsMiddleware);
 app.use(attachAuthContext);
-app.use(logger);
 
 app.use('/api/auth', authRoutes);
 
