@@ -1,13 +1,28 @@
 import 'dotenv/config';
 import app from './src/app';
 import { connectDB } from './src/db/db';
+import path from 'path';
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = '0.0.0.0';
 
 const startServer = (): void => {
-  app.listen(PORT, HOST, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}`);
+  const entryPoint = process.argv[1] || '';
+  const normalizedEntry = entryPoint.split(path.sep).join('/');
+  const runtime = normalizedEntry.includes('/dist/') ? 'compiled-js' : 'ts-node';
+
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`[BOOT] pid=${process.pid} runtime=${runtime} env=${process.env.NODE_ENV || 'development'} url=http://${HOST}:${PORT}`);
+  });
+
+  server.on('error', (error: NodeJS.ErrnoException) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`[BOOT] Port ${PORT} is already in use. Stop the existing server process before starting another one.`);
+      process.exit(1);
+    }
+
+    console.error('[BOOT] Server listen error:', error);
+    process.exit(1);
   });
 };
 
