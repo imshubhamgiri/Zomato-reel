@@ -74,7 +74,7 @@ export const requireAuth = async (
   const token = extractToken(req);
 
   if (!token) {
-    res.status(401).json({ message: 'Please login first' });
+    res.status(401).json({ success: false, message: 'Please login first' });
     return;
   }
 
@@ -83,7 +83,7 @@ export const requireAuth = async (
     const principal = parsePayload(decoded);
 
     if (!principal) {
-      res.status(401).json({ message: 'Invalid token payload' });
+      res.status(401).json({ success: false, message: 'Invalid token payload' });
       return;
     }
 
@@ -91,6 +91,7 @@ export const requireAuth = async (
     next();
   } catch (error) {
     res.status(401).json({
+      success: false,
       message: 'Authentication failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
     });
   }
@@ -99,12 +100,12 @@ export const requireAuth = async (
 export const requireRole = (allowedRoles: Array<'user' | 'partner'>) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      res.status(401).json({ message: 'Please login first' });
+      res.status(401).json({ success: false, message: 'Please login first' });
       return;
     }
 
     if (!allowedRoles.includes(req.user.type)) {
-      res.status(403).json({ message: 'Forbidden' });
+      res.status(403).json({ success: false, message: 'Forbidden' });
       return;
     }
 

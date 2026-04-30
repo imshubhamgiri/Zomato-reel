@@ -44,8 +44,14 @@ const hashToken = (rawToken: string): string => {
 const getExpiryDate = (ms: number): Date => new Date(Date.now() + ms);
 
 const issueTokens = async (payload: AuthTokenPayload): Promise<AuthTokens> => {
-  const accessToken = jwt.sign(payload, getAccessSecret(), { expiresIn: ACCESS_TOKEN_TTL });
-  const refreshToken = jwt.sign(payload, getRefreshSecret(), { expiresIn: REFRESH_TOKEN_TTL });
+  const accessToken = jwt.sign(payload, getAccessSecret(), { 
+    expiresIn: ACCESS_TOKEN_TTL,
+    jwtid: crypto.randomBytes(16).toString('hex')
+  });
+  const refreshToken = jwt.sign(payload, getRefreshSecret(), { 
+    expiresIn: REFRESH_TOKEN_TTL,
+    jwtid: crypto.randomBytes(16).toString('hex')
+  });
 
   await createRefreshTokenRecord({
     userId: payload.Id,

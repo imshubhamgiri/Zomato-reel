@@ -21,10 +21,12 @@ foodroutes.post('/', requirePartner, upload.single('media'), validateAddFoodRequ
 foodroutes.get('/', requireAuth, foodController.getFoodItems);
 foodroutes.get('/partners/:id', foodController.GetfoodById);
 foodroutes.patch('/:foodId', requirePartner, (req, _res, next) => {
+	req.body = req.body || {};
 	req.body.foodId = req.params.foodId;
 	next();
 }, validateUpdateFoodRequest, foodController.updateFoodItem);
 foodroutes.delete('/:foodId', requirePartner, (req, _res, next) => {
+	req.body = req.body || {};
 	req.body.foodId = req.params.foodId;
 	next();
 }, foodController.deleteFoodItem);
