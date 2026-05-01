@@ -883,43 +883,43 @@ describe('FOOD - Update Food Item Tests', () => {
 // ORDER RETRIEVAL TESTS
 // ============================================================================
 
-// describe('ORDER - Retrieve Orders Tests', () => {   //removed as order retrieval endpoint is not implemented yet
+describe('ORDER - Retrieve Orders Tests', () => {   //removed as order retrieval endpoint is not implemented yet
   
-//   let accessToken: string;
+  let accessToken: string;
 
-//   beforeEach(async () => {
-//     await cleanDatabase();
+  beforeEach(async () => {
+    await cleanDatabase();
 
-//     const response = await request(app)
-//       .post('/api/auth/users/register')
-//       .send({
-//         name: 'John Doe',
-//         email: 'john@example.com',
-//         password: 'Password123!',
-//       });
+    const response = await request(app)
+      .post('/api/auth/users/register')
+      .send({
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'Password123!',
+      });
 
 
-//     accessToken = response.body.tokens.accessToken;
-//   });
+    accessToken = response.body.tokens.accessToken;
+  });
 
-//   it('should get user orders with authentication', async () => {
-//     const response = await request(app)
-//       .get('/api/orders/my-orders')
-//       .set('Authorization', `Bearer ${accessToken}`)
-//       .expect(200);
+  it('should get user orders with authentication', async () => {
+    const response = await request(app)
+      .get('/api/orders/my-orders')
+      .set('Authorization', `Bearer ${accessToken}`)
+      console.log(response.body)
 
-//     expect(response.body.success).toBe(true);
-//     expect(Array.isArray(response.body.data)).toBe(true);
-//   });
+    expect(response.body.success).toBe(true);
+    expect(Array.isArray(response.body.data)).toBe(true);
+  });
 
-//   it('should fail to get orders without authentication', async () => {
-//     const response = await request(app)
-//       .get('/api/orders/my-orders')
-//       .expect(401);
+  it('should fail to get orders without authentication', async () => {
+    const response = await request(app)
+      .get('/api/orders/my-orders')
+      .expect(401);
 
-//     expect(response.body.success).toBe(false);
-//   });
-// });
+    expect(response.body.success).toBe(false);
+  });
+});
 
 // ============================================================================
 // INPUT VALIDATION TESTS
