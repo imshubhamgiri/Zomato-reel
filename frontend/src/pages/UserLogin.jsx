@@ -99,12 +99,15 @@ function UserLogin() {
     <div className="min-h-screen flex items-center col-span-2 md:col-span-1 justify-center bg-linear-to-br from-green-100 to-blue-100 dark:from-gray-800 dark:to-gray-900 px-4">
       <style>{customStyles}</style>
       <div className="max-w-md w-full space-y-8 ">
-        <div className="flex justify-start">
+        <div className="flex justify-between items-center">
           <Link to="/" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to Home
+          </Link>
+          <Link to="/partner/login" className="inline-flex items-center text-sm text-blue-600 dark:text-indigo-400 hover:text-blue-700 dark:hover:text-indigo-300 font-medium transition-colors">
+            Partner Login
           </Link>
         </div>
         <div className='initial-hidden animate-fadeInUp delay-200'>
