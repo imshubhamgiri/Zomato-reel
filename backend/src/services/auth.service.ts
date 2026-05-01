@@ -216,7 +216,13 @@ export const loginPartner = async (
 export const rotateRefreshToken = async (
   refreshToken: string
 ): Promise<{ tokens: AuthTokens; payload: AuthTokenPayload }> => {
-  const decoded = jwt.verify(refreshToken, getRefreshSecret()) as AuthTokenPayload;
+  let decoded: AuthTokenPayload;
+  try {
+    decoded = jwt.verify(refreshToken, getRefreshSecret()) as AuthTokenPayload;
+  } catch (error) {
+    throw new AuthError('Invalid refresh token');
+  }
+
   const tokenHash = hashToken(refreshToken);
 
   const tokenRecord = await findActiveRefreshToken(tokenHash);
