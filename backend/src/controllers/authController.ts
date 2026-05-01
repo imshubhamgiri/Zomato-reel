@@ -74,7 +74,7 @@ export const logoutuser = asyncHandler(
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.clearCookie('token');
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({ success: true, message: 'Logout successful' });
   }
 );
 
