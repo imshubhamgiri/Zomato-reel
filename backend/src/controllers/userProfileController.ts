@@ -100,7 +100,8 @@ export const addUserAddress = asyncHandler(async(req: AuthenticatedRequest & { b
     });
     return;
   }
-    res.status(200).json({
+    res.status(201).location(`/api/users/me/addresses/${address._id}`)
+    .json({
         success: true,
         message: 'Address added successfully',
         data: address
