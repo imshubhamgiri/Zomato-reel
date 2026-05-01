@@ -3,6 +3,7 @@ import type { ApiResponse, AuthenticatedRequest, ErrorResponse } from '../types'
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthError } from '../utils/error';
 import * as orderService from '../services/order.service';
+import type { IOrder } from '../models/order.model';
 
 type CreateOrderResponse = {
 	id: string;
@@ -37,6 +38,24 @@ export const createOrder = asyncHandler(
 				paymentStatus: order.paymentStatus,
 				placedAt: order.placedAt,
 			},
+		});
+	}
+);
+
+export const getAllOrders = asyncHandler(
+	async (
+		req: AuthenticatedRequest,
+		res: Response<ApiResponse<IOrder[]> | ErrorResponse>
+	): Promise<void> => {
+		const user = req.user;
+		if(!user) {
+			throw new AuthError('User not authenticated');
+		}
+		const orders = await orderService.getAllOrders();
+		res.status(200).json({
+			success: true,
+			message: 'Orders fetched successfully',
+			data: orders,
 		});
 	}
 );

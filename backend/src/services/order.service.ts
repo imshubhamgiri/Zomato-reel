@@ -1,5 +1,8 @@
 import type { IOrder } from '../models/order.model';
-import { createOrder as createOrderRepo } from '../repositories/orders.repository';
+import {
+   createOrder as createOrderRepo, 
+    getAllOrders as getAllOrdersRepo
+} from '../repositories/orders.repository';
 
 type CreateOrderItemInput = {
   food: string;
@@ -44,3 +47,7 @@ export const createOrder = async (orderData: CreateOrderInput, userId: string): 
     price: computedTotal,
   });
 };
+
+export const getAllOrders = async (): Promise<IOrder[]> => {
+    return getAllOrdersRepo();
+}

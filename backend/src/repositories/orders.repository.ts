@@ -10,3 +10,7 @@ export const createOrder = async (orderData: CreateOrderRepositoryInput): Promis
     const order = new Order(orderData);
     return order.save();
 };
+
+export const getAllOrders = async (): Promise<IOrder[]> => {
+    return Order.find().populate('user').populate('foodPartner').exec();
+}
