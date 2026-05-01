@@ -1,6 +1,14 @@
 import rateLimit from 'express-rate-limit';
+import { Request, Response, NextFunction } from 'express';
 
-export const globalApiLimiter = rateLimit({
+// Skip rate limiting in test environment
+const isTestEnv = process.env.NODE_ENV === 'test';
+
+const skipRequestHandler = (_req: Request, _res: Response, next: NextFunction) => {
+  next();
+};
+
+export const globalApiLimiter = isTestEnv ? skipRequestHandler : rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
   standardHeaders: true,
@@ -11,7 +19,7 @@ export const globalApiLimiter = rateLimit({
   },
 });
 
-export const authLimiter = rateLimit({
+export const authLimiter = isTestEnv ? skipRequestHandler : rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
   standardHeaders: true,
@@ -22,7 +30,7 @@ export const authLimiter = rateLimit({
   },
 });
 
-export const refreshLimiter = rateLimit({
+export const refreshLimiter = isTestEnv ? skipRequestHandler : rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 120,
   standardHeaders: true,
@@ -33,7 +41,7 @@ export const refreshLimiter = rateLimit({
   },
 });
 
-export const actionLimiter = rateLimit({
+export const actionLimiter = isTestEnv ? skipRequestHandler : rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 60,
   standardHeaders: true,
