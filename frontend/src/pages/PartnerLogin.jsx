@@ -70,12 +70,15 @@ function PartnerLogin() {
         
         {/* Glassmorphism Card */}
         <div className="relative z-10 max-w-md w-full bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/60 dark:border-gray-700/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-3xl p-8 space-y-8">
-          <div className="flex justify-start">
+          <div className="flex justify-between items-center">
             <Link to="/" className="inline-flex items-center text-sm text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors font-medium">
               <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Back to Home
+            </Link>
+            <Link to="/user/login" className="inline-flex items-center text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium transition-colors">
+              User Login
             </Link>
           </div>
           <div className='initial-hidden animate-fadeInUp delay-200'>
