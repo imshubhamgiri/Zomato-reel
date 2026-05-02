@@ -107,7 +107,7 @@ export const userAPI = {
   },
 
   logout: async () => {
-    const response = await apiClient.get('/api/auth/users/logout');
+    const response = await apiClient.post('/api/auth/users/logout');
     return response.data;
   },
 
@@ -130,7 +130,7 @@ export const partnerAPI = {
   },
 
   logout: async () => {
-    const response = await apiClient.get('/api/auth/partners/logout');
+    const response = await apiClient.post('/api/auth/partners/logout');
     return response.data;
   },
 
