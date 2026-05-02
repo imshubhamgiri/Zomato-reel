@@ -25,7 +25,7 @@ const logger = (req: AuthenticatedRequest, res: Response, next: NextFunction): v
     appLogger.error('HTTP response error', {
       method: req.method,
       path: req.originalUrl,
-      user: userTag,
+     userTag,
       error: error.message
     });
   });
