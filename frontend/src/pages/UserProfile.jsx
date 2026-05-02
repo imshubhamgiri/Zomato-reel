@@ -6,6 +6,7 @@ import ProfileInfo from '../components/user-profile/ProfileInfo';
 import { useAppContext } from '../context/AppContext';
 import AddressInfo from '../components/user-profile/AddressInfo';
 import SavedFoodsTab from '../components/user-profile/SavedFoodsTab';
+import OrdersTab from '../components/user-profile/OrdersTab';
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -63,16 +64,7 @@ function UserProfile() {
              {activeTab === 'profile' && <ProfileInfo user={user} />}
              
              {activeTab === 'orders' && (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-300 py-20 flex flex-col items-center justify-center h-full">
-                  <svg className="w-20 h-20 text-blue-300 dark:text-blue-500/50 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">My Orders</h2>
-                  <p className="text-slate-500 dark:text-slate-300 max-w-sm mb-6">You haven't placed any orders yet. Discover some amazing food!</p>
-                  <button onClick={() => navigate('/')} className="px-6 py-2.5 bg-linear-to-r from-blue-500 to-cyan-500 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-white/25 transition-all">
-                      Browse Food
-                    </button>
-                </div>
+                <OrdersTab />
              )}
              
              {activeTab === 'saved' && (
