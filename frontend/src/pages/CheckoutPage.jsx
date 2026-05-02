@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { use, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { profileAPI } from '../services/api';
+import { orderAPI, profileAPI } from '../services/api';
+import { toast } from 'react-toastify';
+import { useAppContext } from '../context/AppContext';
 
 const SAMPLE_ADDRESSES = [
   {
@@ -38,6 +40,8 @@ const CheckoutPage = () => {
   const [addresses, setAddresses] = useState([]);
   const navigate = useNavigate();
   const food = location.state?.food;
+  const {user} = useAppContext();
+  const [placeOrderLoading, setPlaceOrderLoading] = useState(false);
 
   const [selectedAddressId, setSelectedAddressId] = useState();
   const [quantity, setQuantity] = useState(1);
@@ -88,8 +92,48 @@ const CheckoutPage = () => {
   const discount = itemTotal > 499 ? 40 : 0;
   const finalTotal = itemTotal + deliveryFee - discount;
 
+
+  const orderData = {        // This is the data structure that would be sent to the backend when placing the order
+      foodPartner: food.partnerId,
+      userAddressId: selectedAddress?._id,
+      deliveryAddressSnapshot: {
+        fullName: selectedAddress?.fullName,
+        phone: selectedAddress?.phone,
+        locality: selectedAddress?.locality,
+        address: selectedAddress?.address,
+        city: selectedAddress?.city,
+        state: selectedAddress.state,
+        postalCode: selectedAddress.postalCode,
+        country: 'India',
+      },
+      items: [
+        {
+          food:  food._id,
+          nameSnapshot: food.name,
+          quantity,
+          priceSnapshot: unitPrice,
+        },
+      ],
+    };
+    console.log('Order Data to be sent to backend:', orderData);
+
+    const placeOrder = async () => {
+      setPlaceOrderLoading(true);
+      // Here you would typically make an API call to your backend to place the order
+      try {
+        const resonse = await orderAPI.placeOrder(orderData);
+        console.log('Order placed successfully:', resonse);
+        toast.success('Order placed successfully!');
+      } catch (error) {
+        console.error('Error placing order:', error);
+        toast.error('Error placing order. Please try again.');
+      } finally {
+        setPlaceOrderLoading(false);
+      }
+    };
+
   const orderPreview = {
-    user: 'current-user-id',
+    user: user?.id || 'user-id',
     foodPartner: food.partnerId || 'partner-id',
     userAddressId: selectedAddress?.id,
     deliveryAddressSnapshot: selectedAddress,
@@ -188,8 +232,10 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            <button className="mt-5 w-full rounded-md bg-blue-700 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-800">
-              Place Order
+            <button onClick={placeOrder}
+              disabled={placeOrderLoading}
+            className="mt-5 w-full rounded-md bg-blue-700 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-800">
+              {placeOrderLoading ? 'Placing Order...' : 'Place Order'}
             </button>
           </div>
         </section>
