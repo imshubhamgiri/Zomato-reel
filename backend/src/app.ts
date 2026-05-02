@@ -7,6 +7,7 @@ import actionRoutes from './routes/useraction.routes';
 import orderRoutes from './routes/order.routes';
 import corsMiddleware from './middleware/cors';
 import logger from './middleware/logging';
+import appLogger from './logger';
 import { attachAuthContext } from './middleware/auth';
 import { globalApiLimiter } from './middleware/rateLimiter';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -16,7 +17,16 @@ import { getDbHealth } from './db/db';
 
 const app = express();
 
-app.use(logger);
+// Early log (before auth)
+app.use((req, _res, next) => {
+  appLogger.info('HTTP request received', {
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    path: req.originalUrl,
+    ip: req.ip
+  });
+  next();
+});
 
 app.use(helmetMiddleware);
 app.use(globalApiLimiter);
@@ -27,6 +37,7 @@ app.use(express.json());
 // GLOBAL MIDDLEWARES (run before all routes)
 app.use(corsMiddleware);
 app.use(attachAuthContext);
+app.use(logger);
 
 app.use('/api/auth', authRoutes);
 
