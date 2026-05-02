@@ -167,6 +167,7 @@ export const foodAPI = {
     return response.data;
   }
 };
+
 export const profileAPI = {
   getMe: async () => {
     const response = await apiClient.get('/api/users/me');
@@ -208,7 +209,16 @@ export const profileAPI = {
   }
 };
 
-export default apiClient;
+export const orderAPI = {
+  placeOrder: async (payload) => {
+    const response = await apiClient.post('/api/orders/', payload);
+    return response.data;
+  },
+  getMyOrders: async () => {
+    const response = await apiClient.get('/api/orders/my-orders');
+    return response.data;
+  },
+};
 
 export const useractions = {
   likeFood: async (foodId) => {
@@ -220,4 +230,9 @@ export const useractions = {
     const response = await apiClient.post(`/api/actions/save`, { foodId });
     return response.data;
   }
-}
+};
+
+
+
+export default apiClient;
+
