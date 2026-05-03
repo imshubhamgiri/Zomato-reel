@@ -112,6 +112,8 @@ A modern food ordering platform featuring Instagram/TikTok-style video reels whe
   - Route-level and operation-level access control
   
 - **Structured Logging** - Request/response logging with context
+  - Environment-specific loggers (dev, uat, production)
+  - Winston logger integration for production-grade logging
   - Error tracking with stack traces
   - Request timing and method logging
   
@@ -341,6 +343,28 @@ authLimiter: { windowMs: 900000, max: 20 }
 actionLimiter: { windowMs: 300000, max: 60 }
 ```
 
+### Winston Logger Implementation
+
+The application uses **Winston** for production-grade structured logging with environment-specific configurations:
+
+```typescript
+// Environment-specific loggers
+- devLogger: Console output with detailed formatting for development
+- uatLogger: File-based logging for testing environments  
+- productionLogger: Production-optimized with error tracking
+
+// Features:
+- Timestamp tracking on all logs
+- Automatic request/response logging in middleware
+- Error stack traces with context
+- Environment-aware log levels (debug, info, warn, error)
+```
+
+**Logger locations:**
+- Dev logs: Console output
+- UAT logs: File-based (logs/)
+- Production logs: File and error file separation
+
 ### Authentication Context Attachment
 
 ```typescript
@@ -493,6 +517,29 @@ POST /api/actions/save
 # Toggles save on food item
 # Response: { isSaved: boolean, saveCount: number }
 ```
+
+### Order Endpoints (v1 - Initial Version)
+
+```http
+POST /api/v1/orders
+# Protected: User authentication required
+# Body: { foodId, quantity, deliveryAddress, ... }
+# Creates a new order
+# Response: { _id, userId, foods[], status, totalAmount, createdAt }
+
+GET /api/v1/orders/my-orders
+# Protected: User authentication required
+# Returns: Array of all orders belonging to authenticated user
+# Response: [{ _id, status, totalAmount, createdAt, foods[] }, ...]
+```
+
+**Status codes:**
+- 201 - Order created successfully
+- 400 - Validation error (missing/invalid fields)
+- 401 - Unauthorized (not authenticated)
+- 500 - Server error
+
+**Note:** Order route is versioned as v1 to support future API versions (v2, v3, etc.)
 
 ### Profile Endpoints (Plural) 
 
@@ -777,7 +824,8 @@ try {
 
 ## 🎯 Future Enhancements
 
-- Order management system and payment gateway integration
+- Order management system enhancements (order tracking, status updates, order history)
+- Payment gateway integration
 - User reviews, ratings, and partner analytics dashboard
 - Advanced search and geolocation-based discovery
 - Push notifications and real-time chat system
@@ -834,7 +882,7 @@ This project is open source and available under the MIT License.
 
 ---
 
-**Latest Update**: Backend refactor complete. TypeScript migration, custom error handling system, and repository pattern implementation. Ready for scaling and integrating additional services.
+**Latest Update**: Winston logger implementation (dev/uat/production configs) and initial Order routes (v1) added. Production-grade structured logging with environment-specific configurations. Order management system initiated with create order and fetch user orders endpoints.
 
 ## 🙏 Acknowledgments
 

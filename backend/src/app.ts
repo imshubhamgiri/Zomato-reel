@@ -46,7 +46,7 @@ app.use('/api/foods', foodRoutes);
 app.use('/api/users', userprofileRoutes);
 app.use('/api/partners', profileRoutes);
 app.use('/api/actions',actionRoutes)
-app.use('/api/orders', orderRoutes);
+app.use('/api/v1/orders', orderRoutes);
 
 app.get('/', (_req, res) => {
   res.send('Hello, World!');

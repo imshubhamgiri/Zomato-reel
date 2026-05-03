@@ -5,6 +5,7 @@ import { validateOrderSchemaRequest } from '../middleware/validation';
 
 const router = Router();
 
+// v1 routes
 router.post('/', userAuthMiddleware, validateOrderSchemaRequest, createOrder);
 router.get('/my-orders', userAuthMiddleware, getAllOrders);
 export default router;
