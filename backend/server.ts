@@ -15,6 +15,19 @@ const startServer = (): void => {
     console.log(`[BOOT] pid=${process.pid} runtime=${runtime} env=${process.env.NODE_ENV || 'development'} url=http://${HOST}:${PORT}`);
   });
 
+  process.on('SIGTERM', () => {
+    console.log('[SHUTDOWN] Received SIGTERM, shutting down gracefully...');
+    server.close( async() => {
+      try {
+        console.log('[SHUTDOWN] Server closed.');
+        process.exit(0);  
+      } catch (error) {
+        console.error('Error during shutdown:', error);
+        process.exit(1);
+      }
+    });
+  });
+
   server.on('error', (error: NodeJS.ErrnoException) => {
     if (error.code === 'EADDRINUSE') {
       console.error(`[BOOT] Port ${PORT} is already in use. Stop the existing server process before starting another one.`);
