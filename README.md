@@ -1,4 +1,4 @@
-# 🍽️ Zomato Reel - Food Discovery Platform
+# 🍽️ FoodInReels - Food Discovery Platform
 
 A modern food ordering platform featuring Instagram/TikTok-style video reels where food partners showcase their dishes through engaging short videos. Built with MERN + TypeScript, featuring production-ready error handling, structured logging, and enterprise-grade architecture patterns.
 
