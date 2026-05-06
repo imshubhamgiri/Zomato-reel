@@ -1,10 +1,12 @@
 import React from 'react';
 import FormInput from '../../ui/FormInput';
+import Skeleton from '../../ui/Skeleton';
 
 export default function PersonalDetailsSection({
   isEditing,
   formData,
   isSaving,
+  isLoading = false,
   onToggleEdit,
   onChangeField,
   onSave,
@@ -34,7 +36,11 @@ export default function PersonalDetailsSection({
               <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                 Full Name
               </label>
-              <p className="text-gray-900 dark:text-white font-medium text-lg">{formData.name || '-'}</p>
+              {isLoading ? (
+                <Skeleton height="h-7" width="w-48" />
+              ) : (
+                <p className="text-gray-900 dark:text-white font-medium text-lg">{formData.name || '-'}</p>
+              )}
             </>
           )}
         </div>
@@ -59,6 +65,8 @@ export default function PersonalDetailsSection({
                 </label>
               ))}
             </div>
+          ) : isLoading ? (
+            <Skeleton height="h-7" width="w-32" />
           ) : (
             <p className="text-gray-900 dark:text-white font-medium text-lg">{formData.gender || '-'}</p>
           )}

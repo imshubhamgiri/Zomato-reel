@@ -87,6 +87,7 @@ export default function ProfileInfo({ user }) {
           isEditing={isEditingData}
           formData={formData}
           isSaving={isSaving}
+          isLoading={isLoadingProfile}
           onToggleEdit={() => (isEditingData ? handleCancelPersonal() : setIsEditingData(true))}
           onChangeField={setField}
           onSave={handleSavePersonal}
@@ -99,6 +100,7 @@ export default function ProfileInfo({ user }) {
           isEditingPhone={isEditingPhone}
           formData={formData}
           isSaving={isSaving}
+          isLoading={isLoadingProfile}
           onStartEmailEdit={() => setIsEditingEmail(true)}
           onStartPhoneEdit={() => setIsEditingPhone(true)}
           onCancelEmail={handleCancelEmail}

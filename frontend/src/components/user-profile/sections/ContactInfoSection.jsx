@@ -1,11 +1,13 @@
 import React from 'react';
 import FormInput from '../../ui/FormInput';
+import Skeleton from '../../ui/Skeleton';
 
 export default function ContactInfoSection({
   isEditingEmail,
   isEditingPhone,
   formData,
   isSaving,
+  isLoading = false,
   onStartEmailEdit,
   onStartPhoneEdit,
   onCancelEmail,
@@ -44,7 +46,11 @@ export default function ContactInfoSection({
                 <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                   Email Address
                 </label>
-                <p className="text-gray-900 dark:text-white font-medium text-lg">{formData.email || '-'}</p>
+                {isLoading ? (
+                  <Skeleton height="h-7" width="w-64" />
+                ) : (
+                  <p className="text-gray-900 dark:text-white font-medium text-lg">{formData.email || '-'}</p>
+                )}
               </>
             )}
           </div>
@@ -84,7 +90,11 @@ export default function ContactInfoSection({
                 <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                   Mobile Number
                 </label>
-                <p className="text-gray-900 dark:text-white font-medium text-lg">{formData.phone || 'Not added yet'}</p>
+                {isLoading ? (
+                  <Skeleton height="h-7" width="w-40" />
+                ) : (
+                  <p className="text-gray-900 dark:text-white font-medium text-lg">{formData.phone || 'Not added yet'}</p>
+                )}
               </>
             )}
           </div>
