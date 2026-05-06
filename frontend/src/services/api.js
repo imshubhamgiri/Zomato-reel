@@ -215,7 +215,7 @@ export const orderAPI = {
     return response.data;
   },
   getMyOrders: async () => {
-    const response = await apiClient.get('/api/orders/my-orders');
+    const response = await apiClient.get('/api/V1/orders/my-orders');
     return response.data;
   },
 };
