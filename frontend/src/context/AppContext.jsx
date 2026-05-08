@@ -15,6 +15,7 @@ export const AppProvider = ({ children }) => {
     const [Cart , setCart] = useState([]);
     const [Orders , setOrders] = useState([]);
     const [Restaurants , setRestaurants] = useState([]);
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
 
     const login = async (userData) => {
@@ -104,6 +105,8 @@ export const AppProvider = ({ children }) => {
             fetchUserData,
             isUserfetched,
             isAuthLoading, // Exported for protected routes
+            showLoginModal,
+            setShowLoginModal,
     }    
     return (
         <AppContext.Provider value={value}>

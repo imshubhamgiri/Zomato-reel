@@ -23,7 +23,7 @@ const LoginModal = ({ isOpen, onClose, userType = 'user' }) => {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="relative bg-linear-to-r from-emerald-500 to-cyan-500 dark:from-emerald-600 dark:to-cyan-600 p-6 flex items-center justify-between">
+          <div className="relative bg-linear-to-r from-emerald-500 to-cyan-500 dark:from-black dark:to-black/10 p-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <LogIn className="w-6 h-6 text-white" />
               <h2 className="text-xl font-bold text-white">Login Required</h2>
@@ -47,7 +47,7 @@ const LoginModal = ({ isOpen, onClose, userType = 'user' }) => {
               <Link
                 to={loginPath}
                 onClick={onClose}
-                className="w-full block px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors text-center"
+                className="w-full block px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors text-center"
               >
                 Login to your Account
               </Link>

@@ -7,18 +7,19 @@ import { useAppContext } from '../context/AppContext';
 import AddressInfo from '../components/user-profile/AddressInfo';
 import SavedFoodsTab from '../components/user-profile/SavedFoodsTab';
 import OrdersTab from '../components/user-profile/OrdersTab';
+import LoginModal from '../components/LoginModal';
 
 function UserProfile() {
   const navigate = useNavigate();
-  const { user, isAuthLoading } = useAppContext();
+  const { user, isAuthLoading, showLoginModal, setShowLoginModal } = useAppContext();
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
-    // Only redirect if auth loading is complete and no user was found
+    // Show login modal if auth loading is complete and no user was found
     if (!isAuthLoading && !user) {
-      navigate('/user/login');
+      setShowLoginModal(true);
     }
-  }, [user, isAuthLoading, navigate]);
+  }, [user, isAuthLoading, setShowLoginModal]);
 
   // While checking auth state on refresh, show a nice loading screen
   if (isAuthLoading) {
@@ -29,9 +30,15 @@ function UserProfile() {
     );
   }
 
-  // Double check user exists before trying to render properties
+  // Show login modal if user not authenticated
   if (!user) {
-    return null;
+    return (
+      <LoginModal 
+        isOpen={true}
+        onClose={() => navigate('/')}
+        userType="user"
+      />
+    );
   }
 
   return (

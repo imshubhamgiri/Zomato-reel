@@ -6,11 +6,12 @@ import { ToastContainer } from 'react-toastify';
 import PartnerSidebar from '../components/partner/PartnerSidebar';
 import PartnerInfo from '../components/partner/PartnerInfo';
 import PartnerMenu from '../components/partner/PartnerMenu';
+import LoginModal from '../components/LoginModal';
 import usePartnerFoodItems from '../hooks/usePartnerFoodItems';
 
 function PartnerProfile() {
   const navigate = useNavigate();
-  const { user, isAuthLoading, partnerLogout } = useAppContext();
+  const { user, isAuthLoading, partnerLogout, showLoginModal, setShowLoginModal } = useAppContext();
   const [activeTab, setActiveTab] = useState('profile');
   // Use our new hook for food operations
 
@@ -19,12 +20,12 @@ function PartnerProfile() {
     // or if the user is not a partner
     if (!isAuthLoading) {
       if (!user) {
-        navigate('/partner/login');
+        setShowLoginModal(true);
       } else if (user.userType !== 'partner') {
         navigate('/user/profile');
       }
     }
-  }, [user, isAuthLoading, navigate]);
+  }, [user, isAuthLoading, setShowLoginModal, navigate]);
 
   const handleLogout = async () => {
     try {
@@ -46,9 +47,15 @@ function PartnerProfile() {
     );
   }
 
-  // Double check user exists before trying to render properties
+  // Show login modal if user not authenticated or not a partner
   if (!user || user.userType !== 'partner') {
-    return null;
+    return (
+      <LoginModal 
+        isOpen={true}
+        onClose={() => navigate('/')}
+        userType="partner"
+      />
+    );
   }
 
   return (
